@@ -1,6 +1,15 @@
 <?php
 session_start();
-require_once('head.php');
+require_once 'utils.php';
+
+if ( ! isset($_SESSION['quizIsSet']) ) {
+    setQuestions();
+} else {
+    getQuestion();
+    var_dump($_SESSION['nextQuestion']);
+}
+
+require_once 'head.php';
 ?>
 
 <div id="quiz-area"></div>
