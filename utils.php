@@ -1,9 +1,5 @@
 <?php
 
-function clearSession() {
-    session_unset();
-}
-
 // Get the next quiz question and save it to session
 function getQuestion() {
     $quizzes = array();

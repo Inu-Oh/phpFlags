@@ -3,7 +3,7 @@ session_start();
 require_once 'utils.php';
 
 if ( isset($_POST['clear']) ) {
-    clearSession();
+    session_unset();
 }
 
 if ( ! isset($_SESSION['quizIsSet']) ) {
