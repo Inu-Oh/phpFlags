@@ -9,25 +9,25 @@ $question = $countryList[$currentQuestion];
 switch ( $_SESSION['currentQuiz'] ) {
     case 'flagCountry':
         $question['src'] = 'static/images/'.$question['code'].'.png';
-        $question['text'] = 'Name the country of this flag';
+        $question['text'] = 'Name the country';
         $_SESSION['answer'] = $question['country'];
         unset($question['country']);
         unset($question['capital']);
         break;
     case 'flagCapital':
         $question['src'] = 'static/images/'.$question['code'].'.png';
-        $question['text'] = "Name the capital of this flag's country";
+        $question['text'] = "Name the capital";
         $_SESSION['answer'] = $question['capital'];
         unset($question['capital']);
         unset($question['country']);
         break;
     case 'countryCapital':
-        $question['text'] = 'Name the capital of this country';
+        $question['text'] = 'Name the capital';
         $_SESSION['answer'] = $question['capital'];
         unset($question['capital']);
         break;
     case 'capitalCountry':
-        $question['text'] = 'Name the country of this capital';
+        $question['text'] = 'Name the country';
         $_SESSION['answer'] = $question['country'];
         unset($question['country']);
         break;
