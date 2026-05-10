@@ -35,9 +35,11 @@ function getQuestion() {
         getQuestion;
     }
     // TODO - remove vardumps after testing
-    var_dump($_SESSION['nextQuestion']);
-    var_dump(count($_SESSION['flagCountry']), count($_SESSION['flagCapital']),
-        count($_SESSION['countryCapital']), count($_SESSION['capitalCountry']));
+    echo("current Q: ".$_SESSION['nextQuestion']);
+    echo("; FtoCount: ".count($_SESSION['flagCountry']).
+        "; FtoCap: ".count($_SESSION['flagCapital']).
+        "; CountoCap: ".count($_SESSION['countryCapital']). 
+        "; CaptoCount: ".count($_SESSION['capitalCountry']));
 }
 
 // Set up all quiz questions to session at start or restart
@@ -63,7 +65,7 @@ function quizLists() {
     $countryIntList = range(0, count($countries) - 1);
     $capitalIntList = array();
     foreach ( $countries as $country ) {
-        if ( $country['capital'] === 0 ) continue;
+        if ( $country['capital'] == 0 ) continue;
         $capitalIntList[] = $country['pk'];
     }
     $questionLists = array(

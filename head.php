@@ -15,11 +15,11 @@
             crossorigin="anonymous"></script>
         <script type="text/javascript" src="static/js/jquery.min.js"></script>
         <script src="static/js/handlebars.js"></script>
-        
+        <link rel="stylesheet" href="static/css/style.css">
         <style>
             body {
                 font-family: Arial, sans-serif;
             }
         </style>
     </head>
-    <body>
+    <body class="p-5">

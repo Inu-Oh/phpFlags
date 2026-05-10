@@ -1,0 +1,16 @@
+#q-card {
+    width: 33rem;
+    height: 36rem;
+    position: relative;
+}
+
+#q-img {
+    max-width: 100%;
+    max-height: 18rem;
+}
+
+#q-form {
+    position: absolute;
+    bottom: 2rem;
+    width: 94%;
+}
