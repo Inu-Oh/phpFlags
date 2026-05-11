@@ -3,7 +3,7 @@ A flag quiz Web app written in php
 
 This is in early development. The GUI is not worth sharing at this time.
 
-The app chooses randomly chooses between four types of quizzes, then chooses a random question from each.
+The app randomly chooses between four types of quizzes, then chooses a random question from each quiz question list.
 - Guess country from flag
 - Guess capital from flag
 - Guess capital from country
