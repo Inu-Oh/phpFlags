@@ -2,6 +2,7 @@
 session_start();
 header("Content-type: application/json; charset=utf-8");
 
+// Prapare array of question data to be sent via JSON to Handlebars template
 $jsonData = file_get_contents('countries.json');
 $countryList = json_decode($jsonData, true);
 $currentQuestion = $_SESSION['nextQuestion'];
@@ -16,23 +17,19 @@ switch ( $_SESSION['currentQuiz'] ) {
         } else {
             unset($question['hint']);
         }
-        unset($question['country']);
-        unset($question['capital']);
+        unset($question['country'], $question['capital']);
         break;
     case 'flagCapital':
         $question['src'] = 'static/images/'.$question['code'].'.png';
         $question['text'] = "Name the <b>capital</b> of this flag";
         $_SESSION['answer'] = $question['capital'];
-        unset($question['hint']);
-        unset($question['capital']);
-        unset($question['country']);
+        unset($question['hint'], $question['country'], $question['capital']);
         break;
     case 'countryCapital':
         $question['text'] = "What's the capital of 
             <b>".$question['country']."</b>?";
         $_SESSION['answer'] = $question['capital'];
-        unset($question['hint']);
-        unset($question['capital']);
+        unset($question['hint'], $question['capital']);
         break;
     case 'capitalCountry':
         $question['text'] = '<b>'.$question['capital']."</b> is the capital 

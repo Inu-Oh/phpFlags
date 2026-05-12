@@ -18,8 +18,8 @@ if ( ! isset($_SESSION['quizIsSet']) ) {
 
 if ( isset($_POST['check'])) {
     if ( isset($_POST['answer']) && strlen($_POST['answer']) > 0 ) {
-        if ( strtolower(htmlentities($_POST['answer']))
-            == strtolower($_SESSION['answer']) ) {
+        if ( iconv('UTF-8', 'ASCII//TRANSLIT', strtolower(htmlentities($_POST['answer'])))
+            == iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['answer'])) ) {
             $_SESSION['correct'] = TRUE;    
             $_SESSION['score'] += 3;
         } else {
@@ -32,7 +32,7 @@ if ( isset($_POST['check'])) {
     }
 } 
 
-if ( isset($_POST['next'])) {
+if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion'])) {
     getQuestion();
     $_SESSION['loaded'] = TRUE;
     $_SESSION['feedback'] = FALSE;
@@ -100,7 +100,19 @@ echo '<script id="quiz-feedback" type="text/x-handlebars-template">
 <div class="px-3">
 
     <div id="feedback" class="text-center">
-        <h3>{{ feedback.answer }}</h3></span>
+        <h2 class="pb-2">
+            {{#if feedback.correct }}
+                You got it right
+            {{else}}
+                Better luck next time
+            {{/if}}
+        </h2>
+
+        {{#if feedback.src}}
+            <img id="f-img" src="{{ feedback.src }}" alt="" class="rounded-1">
+        {{/if}}
+
+        <h3 class="pt-3">{{{ feedback.text }}}</h3></span>
     </div>
 
     <div id="form-div">
@@ -108,17 +120,13 @@ echo '<script id="quiz-feedback" type="text/x-handlebars-template">
     <form method="post" action="" class="form-group pt-5">
         <div id="q-form" class="row">
             <div class="col-9 text-center">
-                {{#if feedback.correct }}
-                    <span class="text-success fw-bold">
-                {{else}}
-                    <span class="text-danger fw-bold">
-                {{/if}} 
-                <h4>{{ feedback.user_input }}</h4></span>
+                <input id="answer" type="text" name="answer" class="form-control"
+                    placeholder="{{ feedback.user_input }}" disabled>
             </div>
             <div class="col-3">
                 <input id="check-button" type="submit" 
                     class="btn btn-outline-success form-control" 
-                    name="next" value="Next">
+                    name="next" value="Next" autofocus>
             </div>
         </div>
 
@@ -142,7 +150,7 @@ $(document).ready(function() {
         var context = {};
         context.question = question;
         $('#quiz-area').replaceWith(template(context));
-    }).fail( function() { alert('getJSON fail'); } );
+    }).fail( function() { alert('getJSON question fail'); } );
 
     $.getJSON('feedback.php', function(feedback) {
         window.console && console.log(feedback);
@@ -151,7 +159,7 @@ $(document).ready(function() {
         var context = {};
         context.feedback = feedback;
         $('#quiz-area').replaceWith(template(context));
-    }).fail( function() { alert('getJSON fail'); } );
+    }).fail( function() { alert('getJSON feedback fail'); } );
 });
 </script>
 

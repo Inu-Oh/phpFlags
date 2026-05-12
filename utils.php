@@ -16,6 +16,9 @@ function getQuestion() {
         $quizzes[] = 'capitalCountry';
     }
     $randomQuiz = $quizzes[array_rand($quizzes)];
+    if ( isset($_SESSION['nextQuestion']) ) {
+        unset($_SESSION['nextQuestion']);
+    }
     $_SESSION['currentQuiz'] = $randomQuiz;
     switch ($randomQuiz) {
         case 'flagCountry':
@@ -32,10 +35,10 @@ function getQuestion() {
             break;
     }
     if ( ! isset($_SESSION['nextQuestion']) ) {
-        getQuestion;
+        getQuestion();
     }
     // TODO - remove vardumps after testing
-    echo("current Q: ".$_SESSION['nextQuestion']);
+    echo("current Q: ".$_SESSION['nextQuestion'].$randomQuiz);
     echo("; FtoCount: ".count($_SESSION['flagCountry']).
         "; FtoCap: ".count($_SESSION['flagCapital']).
         "; CountoCap: ".count($_SESSION['countryCapital']). 
