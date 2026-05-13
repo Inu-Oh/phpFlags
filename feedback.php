@@ -10,8 +10,11 @@ $feedback = $countryList[$currentQuestion];
 if ( isset($_SESSION['feedback']) ) {
     if ($_SESSION['feedback'] === TRUE ) {
         $feedback['correct'] = $_SESSION['correct'];
-        $feedback['user_input'] = $_SESSION['user_input'];
+        $feedback['user_input'] = $_SESSION['userInput'];
         $feedback['answer'] = $_SESSION['answer'];
+        if ( isset($_SESSION['misspelled']) && $_SESSION['misspelled'] === TRUE ) {
+            $feedback['misspelled'] = TRUE;
+        }
         switch ( $_SESSION['currentQuiz'] ) {
             case 'flagCountry':
                 $feedback['src'] = 'static/images/'.$feedback['code'].'.png';
@@ -33,7 +36,7 @@ if ( isset($_SESSION['feedback']) ) {
                 break;
         }
         unset($feedback['country'],$feedback['capital'], $feedback['code'],
-            $feedback['hint'], $feedback['pk']);
+            $feedback['hint'], $feedback['pk'], $_SESSION['misspelled']);
         echo(json_encode($feedback, JSON_PRETTY_PRINT));
     }
 }

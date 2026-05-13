@@ -19,15 +19,21 @@ if ( ! isset($_SESSION['quizIsSet']) ) {
 
 if ( isset($_POST['check'])) {
     if ( isset($_POST['answer']) && strlen($_POST['answer']) > 0 ) {
-        if ( iconv('UTF-8', 'ASCII//TRANSLIT', strtolower(htmlentities($_POST['answer'])))
-            == iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['answer'])) ) {
+        $matching_chars = similar_text(
+            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower(htmlentities($_POST['answer']))),
+            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['answer'])),
+            $perc_accuracy );
+        if ( $perc_accuracy > 85 ) {
             $_SESSION['correct'] = TRUE;    
             $_SESSION['score']++;
+            if ( $perc_accuracy < 100 ) {
+                $_SESSION['misspelled'] = TRUE;
+            }
         } else {
             $_SESSION['correct'] = FALSE;
         }
         $_SESSION['count']++;
-        $_SESSION['user_input'] = htmlentities($_POST['answer']);
+        $_SESSION['userInput'] = htmlentities($_POST['answer']);
         $_SESSION['feedback'] = TRUE;
         header( 'Location: index.php' );
         return;
@@ -40,13 +46,16 @@ if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion'])) {
     $_SESSION['feedback'] = FALSE;
 }
 
-require_once 'head.php';
-?>
+require_once 'head.php'; ?>
 
 <div id="q-card" class="container pt-3 bg-light rounded-4">
     <div class="text-center p-3">
-        <h1 id="score" class="bg-secondary fw-bold text-light rounded">
-            Score : <?= $_SESSION['score']*7 ?> &nbsp; Grade : <?= grade() ?>% </h1>
+        <h1 id="score" class="bg-secondary text-light rounded py-1">
+            <i class="fa-solid fa-check"></i> <?= $_SESSION['score'] ?> 
+            &nbsp; <i class="fa-solid fa-brain"></i> <?= grade() ?>
+            &nbsp; <i class="fa-solid fa-graduation-cap"></i>
+            <?= $_SESSION['count']."/".$_SESSION['totalQs'] ?>
+        </h1>
     </div>
 
     <div id="quiz-area"></div>
@@ -57,22 +66,24 @@ echo '<script id="quiz-template" type="text/x-handlebars-template">
 <div class="px-3">
 
     <div id="question" class="text-center">
-    {{#if question.country}}
-        <h3 class="pb-2">{{{ question.text }}}</h3>
-    {{/if}}
-    {{#if question.capital}}
-        <h3 class="pb-2">{{{ question.text }}}</h3>
-        {{#if question.hint}}
-            <h5>Hint: {{ question.hint }}</h5>
+        {{#if question.country}}
+            <h3 class="pb-2">{{{ question.text }}}</h3>
         {{/if}}
-    {{/if}}
-    {{#if question.src}}
-        <h3 class="pb-2">{{{ question.text }}}</h3>
-        {{#if question.hint}}
-            <h5>Hint: {{ question.hint }}</h5>
+
+        {{#if question.capital}}
+            <h3 class="pb-2">{{{ question.text }}}</h3>
+            {{#if question.hint}}
+                <h5>Hint: {{ question.hint }}</h5>
+            {{/if}}
         {{/if}}
-        <img id="q-img" src="{{ question.src }}" alt="" class="rounded-1">
-    {{/if}}
+
+        {{#if question.src}}
+            <h3 class="pb-2">{{{ question.text }}}</h3>
+            {{#if question.hint}}
+                <h5>Hint: {{ question.hint }}</h5>
+            {{/if}}
+            <img id="q-img" src="{{ question.src }}" alt="" class="rounded-1">
+        {{/if}}
     </div>
 
     <div id="form-div">
@@ -109,6 +120,10 @@ echo '<script id="quiz-feedback" type="text/x-handlebars-template">
                 Better luck next time
             {{/if}}
         </h2>
+        
+        {{#if feedback.misspelled }}
+            <p class="text-small">...but check your spelling</p>
+        {{/if}}
 
         {{#if feedback.src}}
             <img id="f-img" src="{{ feedback.src }}" alt="" class="rounded-1">
@@ -123,7 +138,7 @@ echo '<script id="quiz-feedback" type="text/x-handlebars-template">
         <div id="q-form" class="row">
             <div class="col-9 text-center">
                 <input id="answer" type="text" name="answer" class="form-control"
-                    placeholder="{{ feedback.user_input }}" disabled>
+                    value="{{ feedback.user_input }}" disabled>
             </div>
             <div class="col-3">
                 <input id="check-button" type="submit" 
@@ -139,9 +154,7 @@ echo '<script id="quiz-feedback" type="text/x-handlebars-template">
     </div>
 </div>
 </script>';
-}
-?>
-
+} ?>
 
 <script>
 $(document).ready(function() {

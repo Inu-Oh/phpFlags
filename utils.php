@@ -37,20 +37,33 @@ function getQuestion() {
     if ( ! isset($_SESSION['nextQuestion']) ) {
         getQuestion();
     }
+    $_SESSION['totalQs'] = count($_SESSION['flagCountry']) + 
+        count($_SESSION['flagCapital']) +
+        count($_SESSION['countryCapital']) +
+        count($_SESSION['flagCountry']);
     // TODO - remove vardumps after testing
-    echo("current Q: ".$_SESSION['nextQuestion'].$randomQuiz);
-    echo("; FtoCount: ".count($_SESSION['flagCountry']).
-        "; FtoCap: ".count($_SESSION['flagCapital']).
-        "; CountoCap: ".count($_SESSION['countryCapital']). 
-        "; CaptoCount: ".count($_SESSION['capitalCountry']));
+    // echo("current Q: ".$_SESSION['nextQuestion'].$randomQuiz);
+    // echo("; FtoCount: ".count($_SESSION['flagCountry']).
+    //     "; FtoCap: ".count($_SESSION['flagCapital']).
+    //     "; CountoCap: ".count($_SESSION['countryCapital']). 
+    //     "; CaptoCount: ".count($_SESSION['capitalCountry']));
 }
 
 // return grade based on percentage score
 function grade() {
     if ($_SESSION['count'] > 0) {
-        return intval(($_SESSION['score'] / $_SESSION['count']) * 100);
+        $perc = intval(($_SESSION['score'] / $_SESSION['count']) * 100);
+        if ( $perc > 80 ) {
+            return "A";
+        } elseif ( $perc > 50 ) {
+            return "B";
+        } elseif ( $perc > 20 ) {
+            return "C";
+        } else {
+            return '<i class="fa-regular fa-face-sad-cry"></i>';
+        }
     } else {
-        return 0;
+        return "?";
     }
 }
 
