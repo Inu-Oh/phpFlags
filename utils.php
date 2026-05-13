@@ -45,6 +45,16 @@ function getQuestion() {
         "; CaptoCount: ".count($_SESSION['capitalCountry']));
 }
 
+// return grade based on percentage score
+function grade() {
+    if ($_SESSION['count'] > 0) {
+        return intval(($_SESSION['score'] / $_SESSION['count']) * 100);
+    } else {
+        return 0;
+    }
+}
+
+
 // Set up all quiz questions to session at start or restart
 function setQuestions() {
     list($countryIntList, $capitalIntList) = quizLists();

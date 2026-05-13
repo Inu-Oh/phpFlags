@@ -12,6 +12,7 @@ if ( ! isset($_SESSION['quizIsSet']) ) {
 
     setQuestions();
     // Start new score session
+    $_SESSION['count'] = 0;
     $_SESSION['score'] = 0;
     $_SESSION['feedback'] = FALSE;
 }
@@ -21,10 +22,11 @@ if ( isset($_POST['check'])) {
         if ( iconv('UTF-8', 'ASCII//TRANSLIT', strtolower(htmlentities($_POST['answer'])))
             == iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['answer'])) ) {
             $_SESSION['correct'] = TRUE;    
-            $_SESSION['score'] += 3;
+            $_SESSION['score']++;
         } else {
             $_SESSION['correct'] = FALSE;
         }
+        $_SESSION['count']++;
         $_SESSION['user_input'] = htmlentities($_POST['answer']);
         $_SESSION['feedback'] = TRUE;
         header( 'Location: index.php' );
@@ -44,7 +46,7 @@ require_once 'head.php';
 <div id="q-card" class="container pt-3 bg-light rounded-4">
     <div class="text-center p-3">
         <h1 id="score" class="bg-secondary fw-bold text-light rounded">
-            Score : <?= $_SESSION['score'] ?></h1>
+            Score : <?= $_SESSION['score']*7 ?> &nbsp; Grade : <?= grade() ?>% </h1>
     </div>
 
     <div id="quiz-area"></div>
