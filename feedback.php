@@ -1,42 +1,88 @@
 <?php
 session_start();
-header("Content-type: application/json; charset=utf-8");
+require_once 'utils.php';
 
-// Prapare array of question data to be sent via JSON to Handlebars template
-$jsonData = file_get_contents('countries.json');
-$countryList = json_decode($jsonData, true);
-$currentQuestion = $_SESSION['nextQuestion'];
-$feedback = $countryList[$currentQuestion];
-if ( isset($_SESSION['feedback']) ) {
-    if ($_SESSION['feedback'] === TRUE ) {
-        $feedback['correct'] = $_SESSION['correct'];
-        $feedback['user_input'] = $_SESSION['userInput'];
-        $feedback['answer'] = $_SESSION['answer'];
-        if ( isset($_SESSION['misspelled']) && $_SESSION['misspelled'] === TRUE ) {
-            $feedback['misspelled'] = TRUE;
-        }
-        switch ( $_SESSION['currentQuiz'] ) {
-            case 'flagCountry':
-                $feedback['src'] = 'static/images/'.$feedback['code'].'.png';
-                $feedback['text'] = "This is the flag of <strong>"
-                    .$feedback['country']."</strong>";
-                break;
-            case 'flagCapital':
-                $feedback['src'] = 'static/images/'.$feedback['code'].'.png';
-                $feedback['text'] = "This flag belongs to ".$feedback['country'].
-                    " whose capital is <strong>".$feedback['capital']."</strong>";
-                break;
-            case 'countryCapital':
-                $feedback['text'] = "The capital of ".$feedback['country'].
-                    " is <strong>".$feedback['capital']."</strong>";
-                break;
-            case 'capitalCountry':
-                $feedback['text'] = $feedback['capital']." is the capital of <strong>"
-                    .$feedback['country']."</strong>";
-                break;
-        }
-        unset($feedback['country'],$feedback['capital'], $feedback['code'],
-            $feedback['hint'], $feedback['pk'], $_SESSION['misspelled']);
-        echo(json_encode($feedback, JSON_PRETTY_PRINT));
-    }
+// For testing TODO remove later along with button in view below
+if ( isset($_POST['clear']) || ! isset($_SESSION['quizIsSet']) ) {
+    session_unset();
+    header( 'Location: index.php' );
+    return;
 }
+
+if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion'])) {
+    getQuestion();
+    $_SESSION['loaded'] = TRUE;
+    $_SESSION['feedback'] = FALSE;
+    header( 'Location: index.php' );
+    return;
+}
+
+require_once 'head.php'; ?>
+
+<div id="q-card" class="container pt-3 bg-light rounded-4">
+    <?= scoreBoard(); ?>
+
+    <div id="quiz-area"></div>
+</div>
+
+<script id="quiz-feedback" type="text/x-handlebars-template">
+<div class="px-3">
+
+    <div id="feedback" class="text-center">
+        <h2 class="pb-2">
+            {{#if feedback.correct }}
+                You got it right
+            {{else}}
+                Better luck next time
+            {{/if}}
+        </h2>
+        
+        {{#if feedback.misspelled }}
+            <p class="text-small">...but check your spelling</p>
+        {{/if}}
+
+        {{#if feedback.src}}
+            <img id="f-img" src="{{ feedback.src }}" alt="" class="rounded-1">
+        {{/if}}
+
+        <h3 class="pt-3">{{{ feedback.text }}}</h3></span>
+    </div>
+
+    <div id="form-div">
+
+    <form method="post" action="" class="form-group pt-5">
+        <div id="q-form" class="row">
+            <div class="col-9 text-center">
+                <input id="answer" type="text" name="answer" class="form-control"
+                    value="{{ feedback.user_input }}" disabled>
+            </div>
+            <div class="col-3">
+                <input id="check-button" type="submit" 
+                    class="btn btn-outline-success form-control" 
+                    name="next" value="Next" autofocus>
+            </div>
+        </div>
+
+        <!-- <input class="btn btn-outline-danger me-3" type="submit"
+            value="Clear session" name="clear"> -->
+    </form>
+
+    </div>
+</div>
+</script>
+
+<script>
+$(document).ready(function() {
+    $.getJSON('answer.php', function(feedback) {
+        window.console && console.log(feedback);
+        var source = $('#quiz-feedback').html();
+        var template = Handlebars.compile(source);
+        var context = {};
+        context.feedback = feedback;
+        $('#quiz-area').replaceWith(template(context));
+    }).fail( function() { alert('getJSON feedback fail'); } );
+});
+</script>
+
+</body>
+</html>

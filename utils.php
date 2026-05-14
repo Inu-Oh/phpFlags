@@ -37,10 +37,7 @@ function getQuestion() {
     if ( ! isset($_SESSION['nextQuestion']) ) {
         getQuestion();
     }
-    $_SESSION['totalQs'] = count($_SESSION['flagCountry']) + 
-        count($_SESSION['flagCapital']) +
-        count($_SESSION['countryCapital']) +
-        count($_SESSION['flagCountry']);
+
     // TODO - remove vardumps after testing
     // echo("current Q: ".$_SESSION['nextQuestion'].$randomQuiz);
     // echo("; FtoCount: ".count($_SESSION['flagCountry']).
@@ -54,11 +51,11 @@ function grade() {
     if ($_SESSION['count'] > 0) {
         $perc = intval(($_SESSION['score'] / $_SESSION['count']) * 100);
         if ( $perc > 80 ) {
-            return "A";
+            return '<i class="fa-regular fa-hand-spock"></i>';
         } elseif ( $perc > 50 ) {
-            return "B";
+            return '<i class="fa-regular fa-face-grin"></i>';
         } elseif ( $perc > 20 ) {
-            return "C";
+            return '<i class="fa-regular fa-thumbs-up"></i>';
         } else {
             return '<i class="fa-regular fa-face-sad-cry"></i>';
         }
@@ -67,6 +64,21 @@ function grade() {
     }
 }
 
+
+function scoreBoard() {
+    // $remaining = count($_SESSION['flagCountry']) + 
+    //     count($_SESSION['flagCapital']) +
+    //     count($_SESSION['countryCapital']) +
+    //     count($_SESSION['flagCountry']);
+
+    return '<div class="text-center p-3">
+        <h1 id="score" class="bg-secondary text-light rounded py-1">'
+            .$_SESSION["score"].' <i class="fa fa-check"></i> '.
+            ' &nbsp;'.grade().' &nbsp;'.$_SESSION['count'].
+            // '&nbsp; '.$remaining.' to go'.
+        '</h1>
+    </div>';
+}
 
 // Set up all quiz questions to session at start or restart
 function setQuestions() {

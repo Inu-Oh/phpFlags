@@ -21,19 +21,18 @@ switch ( $_SESSION['currentQuiz'] ) {
         break;
     case 'flagCapital':
         $question['src'] = 'static/images/'.$question['code'].'.png';
-        $question['text'] = "Name the <b>capital</b> of this flag";
+        $question['text'] = 'Name the <b>capital</b> of this flag';
         $_SESSION['answer'] = $question['capital'];
         unset($question['hint'], $question['country'], $question['capital']);
         break;
     case 'countryCapital':
-        $question['text'] = "What's the capital of 
-            <b>".$question['country']."</b>?";
+        $question['text'] = 'What\'s the capital of <b>'.$question['country'].'</b>?';
         $_SESSION['answer'] = $question['capital'];
         unset($question['hint'], $question['capital']);
         break;
     case 'capitalCountry':
-        $question['text'] = '<b>'.$question['capital']."</b> is the capital 
-            of which country?";
+        $question['text'] = '<b>'.$question['capital'].'</b> is the capital 
+            of which country?';
         $_SESSION['answer'] = $question['country'];
         if ($question['hint'] && $question['hint'][0] === "C") {
             $question['hint'] = substr($question['hint'], 2);
