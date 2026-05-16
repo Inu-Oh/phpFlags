@@ -38,6 +38,9 @@ function getQuestion() {
         getQuestion();
     }
 
+    $_SESSION['loaded'] = TRUE;
+    $_SESSION['feedback'] = FALSE;
+
     // TODO - remove vardumps after testing
     // echo("current Q: ".$_SESSION['nextQuestion'].$randomQuiz);
     // echo("; FtoCount: ".count($_SESSION['flagCountry']).
@@ -48,36 +51,41 @@ function getQuestion() {
 
 // return grade based on percentage score
 function grade() {
-    if ($_SESSION['count'] > 0) {
+    if ($_SESSION['count'] - 1 > 0) {
         $perc = intval(($_SESSION['score'] / $_SESSION['count']) * 100);
-        if ( $perc > 80 ) {
-            return '<i class="fa-regular fa-hand-spock"></i>';
-        } elseif ( $perc > 50 ) {
-            return '<i class="fa-regular fa-face-grin"></i>';
+        if ( $perc > 85 ) {
+            return 'Amazing !';
+        } elseif ( $perc > 70 ) {
+            return 'Great !';
+        } elseif ( $perc > 55 ) {
+            return 'Nice !';
+        } elseif ( $perc > 35 ) {
+            return 'Not bad';
         } elseif ( $perc > 20 ) {
-            return '<i class="fa-regular fa-thumbs-up"></i>';
+            return '<i class="fa-regular fa-face-frown-open"></i>';
         } else {
             return '<i class="fa-regular fa-face-sad-cry"></i>';
         }
     } else {
-        return "?";
+        return "";
     }
 }
 
 
 function scoreBoard() {
-    // $remaining = count($_SESSION['flagCountry']) + 
-    //     count($_SESSION['flagCapital']) +
-    //     count($_SESSION['countryCapital']) +
-    //     count($_SESSION['flagCountry']);
+    $scoreBoard = '<div class="text-center p-3">
+        <h3 id="score" class="bg-secondary text-light rounded py-1">';
+    if ( $_SESSION["score"] > 0 ) {
+        $scoreBoard.='You got '.$_SESSION["score"].' out of '.$_SESSION['count'].' right. ';
+    } else {
+        $scoreBoard.='Question '.$_SESSION['count'];
+    }
+    if ( grade() ) {
+        $scoreBoard.=' &nbsp; '.grade();
+    }
+    $scoreBoard.='</h3></div>';
 
-    return '<div class="text-center p-3">
-        <h1 id="score" class="bg-secondary text-light rounded py-1">'
-            .$_SESSION["score"].' <i class="fa fa-check"></i> '.
-            ' &nbsp;'.grade().' &nbsp;'.$_SESSION['count'].
-            // '&nbsp; '.$remaining.' to go'.
-        '</h1>
-    </div>';
+    return $scoreBoard;
 }
 
 // Set up all quiz questions to session at start or restart

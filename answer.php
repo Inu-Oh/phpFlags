@@ -3,12 +3,13 @@ session_start();
 header("Content-type: application/json; charset=utf-8");
 
 // Prapare array of question data to be sent via JSON to Handlebars template
-$jsonData = file_get_contents('countries.json');
-$countryList = json_decode($jsonData, true);
-$currentQuestion = $_SESSION['nextQuestion'];
-$feedback = $countryList[$currentQuestion];
+// only if user has entered an answer and feedbck has been set to true
 if ( isset($_SESSION['feedback']) ) {
     if ($_SESSION['feedback'] === TRUE ) {
+        $jsonData = file_get_contents('countries.json');
+        $countryList = json_decode($jsonData, true);
+        $currentQuestion = $_SESSION['nextQuestion'];
+        $feedback = $countryList[$currentQuestion];
         $feedback['correct'] = $_SESSION['correct'];
         $feedback['user_input'] = $_SESSION['userInput'];
         $feedback['answer'] = $_SESSION['answer'];

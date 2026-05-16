@@ -16,13 +16,19 @@ if ( ! isset($_SESSION['quizIsSet']) ) {
     $_SESSION['count'] = 0;
     $_SESSION['score'] = 0;
     $_SESSION['feedback'] = FALSE;
+    getQuestion();
+}
+
+if ( ! isset($_SESSION['nextQuestion']) ) {
+    getQuestion();
 }
 
 if ( isset($_POST['check'])) {
     if ( isset($_POST['answer']) && strlen($_POST['answer']) > 0 ) {
+        $_SESSION['userInput'] = htmlentities($_POST['answer']);
         $matching_chars = similar_text(
-            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower(htmlentities($_POST['answer']))),
-            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower(htmlentities($_SESSION['answer']))),
+            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['userInput'])),
+            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['answer'])),
             $perc_accuracy );
         if ( $perc_accuracy > 85 ) {
             $_SESSION['correct'] = TRUE;    
@@ -34,7 +40,6 @@ if ( isset($_POST['check'])) {
             $_SESSION['correct'] = FALSE;
         }
         $_SESSION['count']++;
-        $_SESSION['userInput'] = htmlentities($_POST['answer']);
         $_SESSION['feedback'] = TRUE;
         header( 'Location: feedback.php' );
         return;

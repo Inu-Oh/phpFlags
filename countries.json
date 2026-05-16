@@ -197,7 +197,7 @@
     },
     {
         "country": "Brazil",
-        "capital": "Bras\u00edlia",
+        "capital": "Brasília",
         "code": "br",
         "hint": "",
         "pk": 28
@@ -253,7 +253,7 @@
     },
     {
         "country": "Cameroon",
-        "capital": "Yaound\u00e9",
+        "capital": "Yaoundé",
         "code": "cm",
         "hint": "",
         "pk": 36
@@ -323,7 +323,7 @@
     },
     {
         "country": "Colombia",
-        "capital": "Bogot\u00e1",
+        "capital": "Bogotá",
         "code": "co",
         "hint": "",
         "pk": 46
@@ -344,7 +344,7 @@
     },
     {
         "country": "Costa Rica",
-        "capital": "San Jos\u00e9",
+        "capital": "San José",
         "code": "cr",
         "hint": "",
         "pk": 49
@@ -364,7 +364,7 @@
         "pk": 51
     },
     {
-        "country": "Cura\u00e7ao",
+        "country": "Curaçao",
         "capital": "Willemstad",
         "code": "cw",
         "hint": "",
@@ -385,7 +385,7 @@
         "pk": 54
     },
     {
-        "country": "C\u00f4te d'Ivoire",
+        "country": "Côte d'Ivoire",
         "capital": "Yamoussoukro",
         "code": "ci",
         "hint": "",
@@ -505,7 +505,7 @@
     },
     {
         "country": "Faroe Islands",
-        "capital": "T\u00f3rshavn",
+        "capital": "Tórshavn",
         "code": "fo",
         "hint": "",
         "pk": 72
@@ -617,7 +617,7 @@
     },
     {
         "country": "Guam",
-        "capital": "Hag\u00e5t\u00f1a",
+        "capital": "Hagåtña",
         "code": "gu",
         "hint": "",
         "pk": 88
@@ -687,7 +687,7 @@
     },
     {
         "country": "Iceland",
-        "capital": "Reykjav\u00edk",
+        "capital": "Reykjavík",
         "code": "is",
         "hint": "",
         "pk": 98
@@ -918,7 +918,7 @@
     },
     {
         "country": "Maldives",
-        "capital": "Mal\u00e9",
+        "capital": "Malé",
         "code": "mv",
         "hint": "",
         "pk": 131
@@ -1058,7 +1058,7 @@
     },
     {
         "country": "New Caledonia",
-        "capital": "Noum\u00e9a",
+        "capital": "Nouméa",
         "code": "nc",
         "hint": "",
         "pk": 151
@@ -1184,7 +1184,7 @@
     },
     {
         "country": "Paraguay",
-        "capital": "Asunci\u00f3n",
+        "capital": "Asunción",
         "code": "py",
         "hint": "",
         "pk": 169
@@ -1260,7 +1260,7 @@
         "pk": 179
     },
     {
-        "country": "R\u00e9union",
+        "country": "Réunion",
         "capital": "0",
         "code": "re",
         "hint": "",
@@ -1491,8 +1491,8 @@
         "pk": 212
     },
     {
-        "country": "S\u00e3o Tom\u00e9 and Pr\u00edncipe",
-        "capital": "S\u00e3o Tom\u00e9",
+        "country": "São Tomé and Príncipe",
+        "capital": "São Tomé",
         "code": "st",
         "hint": "",
         "pk": 213
@@ -1555,7 +1555,7 @@
     },
     {
         "country": "Togo",
-        "capital": "Lom\u00e9",
+        "capital": "Lomé",
         "code": "tg",
         "hint": "",
         "pk": 222
@@ -1736,7 +1736,7 @@
         "pk": 247
     },
     {
-        "country": "\u00c5land Islands",
+        "country": "Åland Islands",
         "capital": "Mariehamn",
         "code": "ax",
         "hint": "",

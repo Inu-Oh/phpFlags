@@ -11,8 +11,6 @@ if ( isset($_POST['clear']) || ! isset($_SESSION['quizIsSet']) ) {
 
 if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion'])) {
     getQuestion();
-    $_SESSION['loaded'] = TRUE;
-    $_SESSION['feedback'] = FALSE;
     header( 'Location: index.php' );
     return;
 }
