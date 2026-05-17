@@ -9,7 +9,7 @@ if ( empty($_SESSION['csrf_token']) ) {
 // For testing TODO remove later along with button in view below
 if ( isset($_POST['clear']) ) {
     session_unset();
-    session_regenerate_id();
+    session_regenerate_id(true);
     header( 'Location: index.php' );
     return;
 }
