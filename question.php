@@ -8,9 +8,10 @@ $countryList = json_decode($jsonData, true);
 $currentQuestion = $_SESSION['nextQuestion'];
 $question = $countryList[$currentQuestion];
 // Sanitize data for use in HTML template
-foreach ( $question as $key => $value ) {
+foreach ( $question as $key => &$value ) {
     $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
+unset($value);
 // Conform data depnding on quiz type
 switch ( $_SESSION['currentQuiz'] ) {
     case 'flagCountry':

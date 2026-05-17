@@ -11,9 +11,10 @@ if ( isset($_SESSION['feedback']) ) {
         $currentQuestion = $_SESSION['nextQuestion'];
         $feedback = $countryList[$currentQuestion];
         // Sanitize data for use in HTML template
-        foreach ( $feedback as $key => $value ) {
+        foreach ( $feedback as $key => &$value ) {
             $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
         }
+        unset($value);
         // Add feedback data from session
         $feedback['correct'] = $_SESSION['correct'];
         $feedback['user_input'] = $_SESSION['userInput'];
@@ -25,8 +26,7 @@ if ( isset($_SESSION['feedback']) ) {
         switch ( $_SESSION['currentQuiz'] ) {
             case 'flagCountry':
                 $feedback['src'] = 'static/images/'.$feedback['code'].'.png';
-                $feedback['text'] = 'This is the flag of '
-                    .$feedback['country'];
+                $feedback['text'] = 'This is the flag of '.$feedback['country'];
                 break;
             case 'flagCapital':
                 $feedback['src'] = 'static/images/'.$feedback['code'].'.png';
