@@ -40,45 +40,42 @@ function getQuestion() {
 
     $_SESSION['loaded'] = TRUE;
     $_SESSION['feedback'] = FALSE;
-
-    // TODO - remove vardumps after testing
-    // echo("current Q: ".$_SESSION['nextQuestion'].$randomQuiz);
-    // echo("; FtoCount: ".count($_SESSION['flagCountry']).
-    //     "; FtoCap: ".count($_SESSION['flagCapital']).
-    //     "; CountoCap: ".count($_SESSION['countryCapital']). 
-    //     "; CaptoCount: ".count($_SESSION['capitalCountry']));
 }
 
 // return grade based on percentage score
 function grade() {
-    if ($_SESSION['count'] - 1 > 0) {
+    if ($_SESSION['count'] > 0) {
         $perc = intval(($_SESSION['score'] / $_SESSION['count']) * 100);
         if ( $perc > 85 ) {
-            return 'Amazing !';
+            $grade = '<i class="fa-regular fa-face-grin-stars"></i>';
         } elseif ( $perc > 70 ) {
-            return 'Great !';
+            $grade = '<i class="fa-regular fa-face-grin-squint-tears"></i>';
         } elseif ( $perc > 55 ) {
-            return 'Nice !';
+            $grade = '<i class="fa-regular fa-face-grin-tears"></i>';
         } elseif ( $perc > 35 ) {
-            return 'Not bad';
+            $grade = '<i class="fa-regular fa-face-grin"></i>';
         } elseif ( $perc > 20 ) {
-            return '<i class="fa-regular fa-face-frown-open"></i>';
+            $grade = '<i class="fa-regular fa-face-frown-open"></i>';
         } else {
-            return '<i class="fa-regular fa-face-sad-cry"></i>';
+            $grade = '<i class="fa-regular fa-face-sad-cry"></i>';
         }
     } else {
-        return "";
+        $grade = "";
     }
+    return $grade;
 }
 
 
 function scoreBoard() {
     $scoreBoard = '<div class="text-center p-3">
         <h3 id="score" class="bg-secondary text-light rounded py-1">';
-    if ( $_SESSION["score"] > 0 ) {
-        $scoreBoard.='You got '.$_SESSION["score"].' out of '.$_SESSION['count'].' right. ';
+    if ( $_SESSION['score'] > 0 ) {
+        $scoreBoard.='You got '
+            .htmlspecialchars($_SESSION['score'], ENT_QUOTES, 'UTF-8').' out of '
+            .htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8').' right ';
     } else {
-        $scoreBoard.='Question '.$_SESSION['count'];
+        $scoreBoard.='Question '
+            .htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8');
     }
     if ( grade() ) {
         $scoreBoard.=' &nbsp; '.grade();

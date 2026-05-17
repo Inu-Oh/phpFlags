@@ -2,14 +2,22 @@
 session_start();
 require_once 'utils.php';
 
+if ( empty($_SESSION['csrf_token']) ) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // For testing TODO remove later along with button in view below
 if ( isset($_POST['clear']) || ! isset($_SESSION['quizIsSet']) ) {
     session_unset();
+    session_regenerate_id();
     header( 'Location: index.php' );
     return;
 }
 
 if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion'])) {
+    if ( ! isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token'] ) {
+        die('CSRF token validation failed');
+    }
     getQuestion();
     header( 'Location: index.php' );
     return;
@@ -43,13 +51,15 @@ require_once 'head.php'; ?>
             <img id="f-img" src="{{ feedback.src }}" alt="" class="rounded-1">
         {{/if}}
 
-        <h3 class="pt-3">{{{ feedback.text }}}</h3></span>
+        <h3 class="pt-3">{{ feedback.text }}</h3></span>
     </div>
 
     <div id="form-div">
 
     <form method="post" action="" class="form-group pt-5">
         <div id="q-form" class="row">
+            <input type="hidden" name="csrf_token"
+                value="<?= $_SESSION['csrf_token'] ?>">
             <div class="col-9 text-center">
                 <input id="answer" type="text" name="answer" class="form-control"
                     value="{{ feedback.user_input }}" disabled>
