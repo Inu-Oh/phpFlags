@@ -6,15 +6,9 @@ header("Content-type: application/json; charset=utf-8");
 // only if user has entered an answer and feedbck has been set to true
 if ( isset($_SESSION['feedback']) ) {
     if ($_SESSION['feedback'] === TRUE ) {
-        $jsonData = file_get_contents('countries.json');
-        $countryList = json_decode($jsonData, true);
+        $countryList = require 'countries.php';
         $currentQuestion = $_SESSION['nextQuestion'];
         $feedback = $countryList[$currentQuestion];
-        // Sanitize data for use in HTML template
-        foreach ( $feedback as $key => &$value ) {
-            $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-        }
-        unset($value);
         // Add feedback data from session
         $feedback['correct'] = $_SESSION['correct'];
         $feedback['user_input'] = $_SESSION['userInput'];

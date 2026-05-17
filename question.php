@@ -3,20 +3,15 @@ session_start();
 header("Content-type: application/json; charset=utf-8");
 
 // Prapare array of question data to be sent via JSON to Handlebars template
-$jsonData = file_get_contents('countries.json');
-$countryList = json_decode($jsonData, true);
+$countryList = require 'countries.php';
 $currentQuestion = $_SESSION['nextQuestion'];
-$rawQuestion = $countryList[$currentQuestion];
-$question = array_map(function($value) {
-    return is_string($value) ? htmlspecialchars($value, ENT_QUOTES, 'UTF-8') : $value;
-}, $rawQuestion);
-
+$question = $countryList[$currentQuestion];
 // Conform data depnding on quiz type
 switch ( $_SESSION['currentQuiz'] ) {
     case 'flagCountry':
         $question['src'] = 'static/images/'.$question['code'].'.png';
         $question['text'] = 'Name the country of this flag';
-        $_SESSION['answer'] = $rawQuestion['country'];
+        $_SESSION['answer'] = $question['country'];
         if ($question['hint'] && $question['hint'][0] === "F") {
             $question['hint'] = substr($question['hint'], 2);
         } else {
@@ -27,18 +22,18 @@ switch ( $_SESSION['currentQuiz'] ) {
     case 'flagCapital':
         $question['src'] = 'static/images/'.$question['code'].'.png';
         $question['text'] = 'Name the capital of this flag';
-        $_SESSION['answer'] = $rawQuestion['capital'];
+        $_SESSION['answer'] = $question['capital'];
         unset($question['hint'], $question['country'], $question['capital']);
         break;
     case 'countryCapital':
         $question['text'] = 'What\'s the capital of '.$question['country'].'?';
-        $_SESSION['answer'] = $rawQuestion['capital'];
+        $_SESSION['answer'] = $question['capital'];
         $question['quiz'] = 'Capital quiz';
         unset($question['hint'], $question['capital']);
         break;
     case 'capitalCountry':
         $question['text'] = $question['capital'].' is the capital of which country?';
-        $_SESSION['answer'] = $rawQuestion['country'];
+        $_SESSION['answer'] = $question['country'];
         if ($question['hint'] && $question['hint'][0] === "C") {
             $question['hint'] = substr($question['hint'], 2);
         } else {

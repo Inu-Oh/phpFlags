@@ -1,4 +1,5 @@
 <?php
+require_once 'countries.php';
 
 // Get the next quiz question and save it to session
 function getQuestion() {
@@ -103,8 +104,7 @@ function setQuestions() {
 
 // Create lists of integers for use as quiz lists
 function quizLists() {
-    $jsonData = file_get_contents('countries.json');
-    $countries = json_decode($jsonData, true);
+    $countries = require 'countries.php';
     $countryIntList = range(0, count($countries) - 1);
     $capitalIntList = array();
     foreach ( $countries as $country ) {
