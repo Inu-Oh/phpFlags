@@ -70,13 +70,19 @@ function grade() {
 function scoreBoard() {
     $scoreBoard = '<div class="text-center p-3">
         <h3 id="score" class="bg-secondary text-light rounded py-1">';
-    if ( $_SESSION['score'] > 0 ) {
-        $scoreBoard.='You got '
-            .htmlspecialchars($_SESSION['score'], ENT_QUOTES, 'UTF-8').' out of '
-            .htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8').' right ';
+    if ( $_SESSION['count'] > 0 ) {
+        if ( $_SESSION['score'] == $_SESSION['count'] ) {
+            $scoreBoard .= 'Perfect score on '.
+                htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8').
+                ' questions ';
+        } else {
+            $scoreBoard .= 'You got '
+                .htmlspecialchars($_SESSION['score'], ENT_QUOTES, 'UTF-8').' out of '
+                .htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8').' right ';
+        }
+
     } else {
-        $scoreBoard.='Question '
-            .htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8');
+        $scoreBoard.='Starting new quiz';
     }
     if ( grade() ) {
         $scoreBoard.=' &nbsp; '.grade();

@@ -100,7 +100,8 @@ require_once 'head.php'; ?>
                 value="<?= $_SESSION['csrf_token'] ?>">
             <div class="col-9">
                 <input id="answer" type="text" name="answer" class="form-control"
-                    placeholder="..." autofocus autocomplete="off">
+                    placeholder="{{ question.placeholder }}" autofocus
+                    autocomplete="off">
             </div>
             <div class="col-3">
                 <input id="check-button" type="submit" 
