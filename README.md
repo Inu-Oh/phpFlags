@@ -1,44 +1,47 @@
 # phpFlags
-A flag quiz Web app written in php
+Simple PHP flag quiz app.
 
-This is in early development. The GUI is not worth sharing at this time.
+A geography quiz Web app written in PHP, testing knowledge of flags, country and capital city names. The app randomly chooses between four types of quizzes, then chooses a random question from each quiz question list, just under one thousand questions in total.
 
-The app randomly chooses between four types of quizzes, then chooses a random question from each quiz question list.
+## Quiz types
 - Guess country from flag
 - Guess capital from flag
 - Guess capital from country
 - Guess country from capital
 
-The app runs currently with no database needed to store quiz question details. All quiz data is stored in the 'countries.json' file as JSON data, from which questions are accessed in PHP files using jQuery with the help of Handlebars templates.
+## Features
+All quiz data is currenty stored in the 'countries.php' array file, from which questions are accessed by the main view pages using jQuery to embed JSON data in Handlebars stript templates. The app is now writting fully in PHP. I have eliminated most JavaScript elments.
 
 ## Planned development
-After working out the feedback and GUI, I will add SQL to store user data that will track learning progress for each country and enable users to return and review their what they have learned.
+### Quiz data storage
+Given concerns that storing quiz data as an array may not be the most secure choice, I will soon either make countries.php read-only or save it to a database and use PDO to get quiz question data for the GUI.
+### User progress
+Choosing an SQL schema to store user learning progress on all quiz questions. Planning how the user data will be best set up together with the quiz data.
 
 ## Gallery
-
-### Start Quiz - sample question for Guess capital city name from country
-!["Quiz start page with random question selected"](image.png)
+### Start Quiz - sample question for Guess country from capital city name
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/c78b8418-801a-4195-b5a0-53d4f5da5166" />
 
 ### Quiz Question - Guess country from flag
-!["Quiz question asking for name of country based on image of its flag"](image-3.png)
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/a3af0c73-5ec2-48a0-b080-2e1b6daf72d3" />
 
 ### Quiz question - Guess capital city name from flag
-!["Quiz question asking for name of capital city based on country's flag"](image-9.png)
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/5c116a90-4771-4ef0-a4a2-7ca1d503c06d" />
 
 ### Quiz question - Guess country from capital city name
-!["Quiz question asking for name of country based on its capital city name"](image-2.png)
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/4f21d0bb-4085-4bc9-8a20-cdbd67dc0809" />
 
 ### Feedback on country name guess from flag
-!["Quiz feedback on correct guess of country name based on its flag"](image-4.png)
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/adf907ab-606a-45f2-a612-7271a48077e2" />
 
 ### Feedback on capital city name guess from country - showing perfect score
-!["Feedback on correct answer for capital city name showing a perfect score"](image-1.png)
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/68a6dab0-00d2-4d1a-a683-13bf15f36e42" />
 
-### Feedback on capital city name guess from flag - misspelling 
-!["Feedback on correct answer for capital city name showing pointing out a spelling mistake"](image-6.png)
+### Feedback on capital city name guess from flag - misspelling feedback
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/d74849ed-b497-406d-9e6c-a5261025f21e" />
 
 ### Feedback on country name guess from flag - wrong guess
-!["Feedback on wrong answer for country name based on flag"](image-7.png)
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/69f4ec41-331c-4fff-86b2-033c96d63ec6" />
 
 ### Feedback on country name guess from capity city name - wrong guess
-!["Feedback on wrong answer for country name based on capital city name"](image-8.png)
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/763845b8-1b76-413c-bfb9-44d47f9313f2" />
