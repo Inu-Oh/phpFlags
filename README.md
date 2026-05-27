@@ -3,6 +3,8 @@ Simple PHP flag quiz app.
 
 A geography quiz Web app written in PHP, testing knowledge of flags, country and capital city names. The app randomly chooses between four types of quizzes, then chooses a random question from each quiz question list, just under one thousand questions in total.
 
+See below for SQL and PHP code for use to set up quiz quiestion data on MySQL.
+
 ## Quiz types
 - Guess country from flag
 - Guess capital from flag
@@ -14,7 +16,7 @@ All quiz data is currenty stored in the 'countries.php' array file, from which q
 
 ## Planned development
 ### Quiz data storage
-Given concerns that storing quiz data as an array may not be the most secure choice, I will soon either make countries.php read-only or save it to a database and use PDO to get quiz question data for the GUI.
+The quiz data is now stored in database and retrieved with PDO for each question. See earlier version for a pure PHP array implementation.
 ### User progress
 Choosing an SQL schema to store user learning progress on all quiz questions. Planning how the user data will be best set up together with the quiz data.
 
@@ -45,3 +47,97 @@ Choosing an SQL schema to store user learning progress on all quiz questions. Pl
 
 ### Feedback on country name guess from capity city name - wrong guess
 <img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/763845b8-1b76-413c-bfb9-44d47f9313f2" />
+
+## Setup Quiz Data in Database from CSV
+
+Before running this file create the following database and table.
+
+Create a database to store the quiz data.
+Set a username and password to access the database.
+
+```
+CREATE DATABASE flags DEFAULT CHARACTER SET utf8;
+CREATE USER 'username'@'localhost' IDENTIFIED BY 'enterYourPassword';
+GRANT ALL ON flags.* TO 'username'@'localhost'';
+CREATE USER 'username'@'127.0.0.1' IDENTIFIED BY 'enterYourPassword';
+GRANT ALL ON flags.* TO 'username'@'127.0.0.1';
+```
+
+Create table for countries / primary key and data will be populated from CSV
+
+```
+CREATE TABLE Countries (
+   pk SMALLINT NOT NULL,
+   country VARCHAR(128) NOT NULL,
+   capital VARCHAR(128),
+   code VARCHAR(12) NOT NULL,
+   hint VARCHAR(128),
+   PRIMARY KEY(pk),
+   UNIQUE(pk)
+) ENGINE = InnoDB DEFAULT CHARSET=utf8;
+```
+
+Create a pdo.php file with the following code, setting the username to match the values you used to create the database.
+
+```
+<?php
+
+if ( file_exists('../config.php') ) {
+    include_once('../config.php');
+}
+
+if ( ! isset($pdo) ) {
+    $pdo = new PDO(
+        'mysql:host=localhost;port=8889;dbname=flags', 'enterYourUserName', 'enterYourPassword'
+    );
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+}
+```
+
+Create a php file with the following code and visit the page in your browser to run it. 
+IMPORTANT: Delete the file after popuplating the database from the CSV file to prevent SQL injection. Edit the CSV file and rerun the file to edit the database. (The file name does not matter.)
+
+```
+<?php
+
+require_once 'pdo.php';
+
+$csvFile = 'countries.csv';
+$handle = fopen($csvFile, 'r');
+
+if ($handle) {
+    while ( ($csvData = fgetcsv($handle, 250, ",")) !== FALSE ) {
+        // Get the data for each row of the CSV file
+        $pk = intval($csvData[4]);
+        $country = $csvData[0];
+        $capital = ($csvData[1] != "0") ? $csvData[1] : NULL;
+        $countryCode = $csvData[2];
+        $hint = ($csvData[3] != "") ? $csvData[3] : NULL;
+
+        // Write each row of quiz data to the database
+        $bound = array(
+            ':pk' => $pk,
+            ':ct' => $country,
+            ':cp' => $capital,
+            ':cc' => $countryCode,
+            ':ht' => $hint 
+        );
+        
+        $stmt = $pdo->prepare('SELECT 1 FROM Countries WHERE pk = :pk');
+        $stmt->execute(array(':pk' => $pk));
+        if ( $stmt->fetchColumn() ) {
+            $stmt = $pdo->prepare('UPDATE Countries
+                SET country=:ct, capital=:cp, code=:cc, hint=:ht) 
+                WHERE pk=:pk');
+            $stmt->execute($bound);
+        } else {
+            $stmt = $pdo->prepare('INSERT INTO Countries
+                (pk, country, capital, code, hint) 
+                VALUES ( :pk, :ct, :cp, :cc, :ht )');
+            $stmt->execute($bound);
+        }
+    }
+    
+    fclose($handle);
+}
+```

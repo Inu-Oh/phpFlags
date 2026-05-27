@@ -105,10 +105,6 @@ function setQuestions($pdo) {
     shuffle($capitalIntList);
     $_SESSION['capitalCountry'] = $capitalIntList;
     $_SESSION['quizIsSet'] = TRUE;
-    var_dump($_SESSION['flagCountry'],
-    $_SESSION['flagCapital'],
-    $_SESSION['countryCapital'],
-    $_SESSION['capitalCountry']);
 }
 
 // Create lists of integers for use as quiz lists
