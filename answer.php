@@ -1,14 +1,15 @@
 <?php
 session_start();
 header("Content-type: application/json; charset=utf-8");
+require_once 'pdo.php';
 
 // Prapare array of question data to be sent via JSON to Handlebars template
 // only if user has entered an answer and feedbck has been set to true
 if ( isset($_SESSION['feedback']) ) {
     if ($_SESSION['feedback'] === TRUE ) {
-        $countryList = require 'countries.php';
-        $currentQuestion = $_SESSION['nextQuestion'];
-        $feedback = $countryList[$currentQuestion];
+        $stmt = $pdo->prepare('SELECT * FROM Countries WHERE pk = :pk');
+        $stmt->execute(array(':pk' => $_SESSION['nextQuestion']));
+        $feedback = $stmt->fetch(PDO::FETCH_ASSOC);
         // Add feedback data from session
         $feedback['correct'] = $_SESSION['correct'];
         $feedback['user_input'] = $_SESSION['userInput'];

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'utils.php';
+require_once 'pdo.php';
 
 if ( empty($_SESSION['csrf_token']) ) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -16,7 +17,7 @@ if ( isset($_POST['clear']) ) {
 
 if ( ! isset($_SESSION['quizIsSet']) ) {
 
-    setQuestions();
+    setQuestions($pdo);
     // Start new score session
     $_SESSION['count'] = 0;
     $_SESSION['score'] = 0;

@@ -1,5 +1,4 @@
 <?php
-require_once 'countries.php';
 
 // Get the next quiz question and save it to session
 function getQuestion() {
@@ -93,8 +92,8 @@ function scoreBoard() {
 }
 
 // Set up all quiz questions to session at start or restart
-function setQuestions() {
-    list($countryIntList, $capitalIntList) = quizLists();
+function setQuestions($pdo) {
+    list($countryIntList, $capitalIntList) = quizLists($pdo);
 
     // var_dump($countryIntList);
     shuffle($countryIntList);
@@ -106,12 +105,27 @@ function setQuestions() {
     shuffle($capitalIntList);
     $_SESSION['capitalCountry'] = $capitalIntList;
     $_SESSION['quizIsSet'] = TRUE;
+    var_dump($_SESSION['flagCountry'],
+    $_SESSION['flagCapital'],
+    $_SESSION['countryCapital'],
+    $_SESSION['capitalCountry']);
 }
 
 // Create lists of integers for use as quiz lists
-function quizLists() {
-    $countries = require 'countries.php';
-    $countryIntList = range(0, count($countries) - 1);
+function quizLists($pdo) {
+    $stmt = $pdo->prepare('SELECT pk, capital FROM Countries');
+    $stmt->execute(array());
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $count = 0;
+    $countries = array();
+    if ( ! empty($rows ) ) {
+        foreach ( $rows as $row ) {
+            $count++;
+            $countries[] = $row;
+        }
+    }
+
+    $countryIntList = range(0, $count - 1);
     $capitalIntList = array();
     foreach ( $countries as $country ) {
         if ( $country['capital'] == 0 ) continue;
