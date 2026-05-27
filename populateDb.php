@@ -17,6 +17,27 @@ if ($handle) {
         // Write it to the database
         var_dump($pk, $country, $capital, $countryCode, $hint);
         echo '<br><br>';
+        $bound = array(
+            ':pk' => $pk,
+            ':ct' => $country,
+            ':cp' => $capital,
+            ':cc' => $countryCode,
+            ':ht' => $hint 
+        );
+        
+        $stmt = $pdo->prepare('SELECT 1 FROM Countries WHERE pk = :pk');
+        $stmt->execute(array(':pk' => $pk));
+        if ( $stmt->fetchColumn() ) {
+            $stmt = $pdo->prepare('UPDATE Countries
+                SET country=:ct, capital=:cp, code=:cc, hint=:ht) 
+                WHERE pk=:pk');
+            $stmt->execute($bound);
+        } else {
+            $stmt = $pdo->prepare('INSERT INTO Countries
+                (pk, country, capital, code, hint) 
+                VALUES ( :pk, :ct, :cp, :cc, :ht )');
+            $stmt->execute($bound);
+        }
     }
     fclose($handle);
 }
