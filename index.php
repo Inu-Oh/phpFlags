@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'utils.php';
-require_once 'pdo.php';
+require_once 'src/libs/utils.php';
+require_once 'src/pdo.php';
 
 if ( empty($_SESSION['csrf_token']) ) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -55,7 +55,7 @@ if ( isset($_POST['check'])) {
     }
 } 
 
-require_once 'head.php'; ?>
+require_once 'src/inc/head.php'; ?>
 
 <div id="q-card" class="container pt-3 bg-light rounded-4">
     <?= scoreBoard(); ?>

@@ -86,7 +86,7 @@ if ( file_exists('../config.php') ) {
     include_once('../config.php');
 }
 
-if ( ! isset($pdo) ) {
+if ( ! isset( $pdo ) ) {
     $pdo = new PDO(
         'mysql:host=localhost;port=8889;dbname=flags', 'enterYourUserName', 'enterYourPassword'
     );
@@ -108,11 +108,11 @@ $handle = fopen($csvFile, 'r');
 if ($handle) {
     while ( ($csvData = fgetcsv($handle, 250, ",")) !== FALSE ) {
         // Get the data for each row of the CSV file
-        $pk = intval($csvData[4]);
+        $pk = intval( $csvData[4] );
         $country = $csvData[0];
-        $capital = ($csvData[1] != "0") ? $csvData[1] : NULL;
+        $capital = ( $csvData[1] != "0" ) ? $csvData[1] : NULL;
         $countryCode = $csvData[2];
-        $hint = ($csvData[3] != "") ? $csvData[3] : NULL;
+        $hint = ( $csvData[3] != "" ) ? $csvData[3] : NULL;
 
         // Write each row of quiz data to the database
         $bound = array(

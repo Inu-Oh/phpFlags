@@ -12,7 +12,7 @@ function getQuestion() {
     if ( count($_SESSION['countryCapital']) > 0 ) { 
         $quizzes[] = 'countryCapital';
     }
-    if ( count($_SESSION['flagCountry']) > 0 ) { 
+    if ( count($_SESSION['capitalCountry']) > 0 ) { 
         $quizzes[] = 'capitalCountry';
     }
     $randomQuiz = $quizzes[array_rand($quizzes)];
@@ -132,4 +132,13 @@ function quizLists($pdo) {
         'capitalIntList' => $capitalIntList
     );
     return array($countryIntList, $capitalIntList);
+}
+
+// Loads code from PHP a file and passes data to it
+function view(string $filename, array $data = []): void {
+    // Create variables from the associative array $data
+    foreach ( $data as $key => $value ) {
+        $$key = $value;
+    }
+    require_once __DIR__ . '/../inc/' . $filename . '.php';
 }

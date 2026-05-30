@@ -1,7 +1,7 @@
 <?php
 session_start();
 header("Content-type: application/json; charset=utf-8");
-require_once 'pdo.php';
+require_once 'src/pdo.php';
 
 // Prapare array of question data to be sent via JSON to Handlebars template
 $stmt = $pdo->prepare('SELECT * FROM Countries WHERE pk = :pk');
