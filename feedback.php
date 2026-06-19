@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'src/libs/utils.php';
+require_once __DIR__ . '/src/libs/utils.php';
 
 if ( empty($_SESSION['csrf_token']) ) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -23,7 +23,7 @@ if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion'])) {
     return;
 }
 
-require_once 'src/inc/head.php'; ?>
+view('head'); ?>
 
 <div id="q-card" class="container pt-3 bg-light rounded-4">
     <?= scoreBoard(); ?>

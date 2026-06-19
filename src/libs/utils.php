@@ -66,6 +66,16 @@ function grade() {
 }
 
 
+function is_get_request(): bool {
+    return strtoupper( $_SERVER['REQUEST_METHOD'] ) === 'GET';
+}
+
+
+function is_post_request(): bool {
+    return strtoupper( $_SERVER['REQUEST_METHOD'] ) === 'POST';
+}
+
+
 function scoreBoard() {
     $scoreBoard = '<div class="text-center p-3">
         <h3 id="score" class="bg-secondary text-light rounded py-1">';
@@ -77,7 +87,7 @@ function scoreBoard() {
         } else {
             $scoreBoard .= 'You got '
                 .htmlspecialchars($_SESSION['score'], ENT_QUOTES, 'UTF-8').' out of '
-                .htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8').' right ';
+                .htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8');
         }
 
     } else {

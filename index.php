@@ -1,18 +1,10 @@
 <?php
 session_start();
-require_once 'src/libs/utils.php';
-require_once 'src/pdo.php';
+require_once __DIR__ . '/src/libs/utils.php';
+require_once __DIR__ . '/src/pdo.php';
 
 if ( empty($_SESSION['csrf_token']) ) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-// For testing TODO remove later along with button in view below
-if ( isset($_POST['clear']) ) {
-    session_unset();
-    session_regenerate_id(true);
-    header( 'Location: index.php' );
-    return;
 }
 
 if ( ! isset($_SESSION['quizIsSet']) ) {
@@ -29,33 +21,43 @@ if ( ! isset($_SESSION['nextQuestion']) ) {
     getQuestion();
 }
 
-if ( isset($_POST['check'])) {
-    if ( ! isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token'] ) {
-        die('CSRF token validation failed');
-    }
-    if ( isset($_POST['answer']) && strlen($_POST['answer']) > 0 ) {
-        $_SESSION['userInput'] = htmlspecialchars($_POST['answer'], ENT_QUOTES, 'UTF-8');
-        $matching_chars = similar_text(
-            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['userInput'])),
-            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['answer'])),
-            $perc_accuracy );
-        if ( $perc_accuracy > 85 ) {
-            $_SESSION['correct'] = TRUE;    
-            $_SESSION['score']++;
-            if ( $perc_accuracy < 100 ) {
-                $_SESSION['misspelled'] = TRUE;
-            }
-        } else {
-            $_SESSION['correct'] = FALSE;
-        }
-        $_SESSION['count']++;
-        $_SESSION['feedback'] = TRUE;
-        header( 'Location: feedback.php' );
+if ( is_post_request() ) {
+    // For testing TODO remove later along with button in view below
+    if ( isset($_POST['clear']) ) {
+        session_unset();
+        session_regenerate_id(true);
+        header( 'Location: index.php' );
         return;
     }
-} 
 
-require_once 'src/inc/head.php'; ?>
+    if ( isset($_POST['check'])) {
+        if ( ! isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token'] ) {
+            die('CSRF token validation failed');
+        }
+        if ( isset($_POST['answer']) && strlen($_POST['answer']) > 0 ) {
+            $_SESSION['userInput'] = htmlspecialchars($_POST['answer'], ENT_QUOTES, 'UTF-8');
+            $matching_chars = similar_text(
+                iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['userInput'])),
+                iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['answer'])),
+                $perc_accuracy );
+            if ( $perc_accuracy > 85 ) {
+                $_SESSION['correct'] = TRUE;    
+                $_SESSION['score']++;
+                if ( $perc_accuracy < 100 ) {
+                    $_SESSION['misspelled'] = TRUE;
+                }
+            } else {
+                $_SESSION['correct'] = FALSE;
+            }
+            $_SESSION['count']++;
+            $_SESSION['feedback'] = TRUE;
+            header( 'Location: feedback.php' );
+            return;
+        }
+    }
+}
+
+view('head'); ?>
 
 <div id="q-card" class="container pt-3 bg-light rounded-4">
     <?= scoreBoard(); ?>

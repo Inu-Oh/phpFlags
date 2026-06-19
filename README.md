@@ -100,9 +100,9 @@ IMPORTANT: Delete the file after popuplating the database from the CSV file to p
 ```
 <?php
 
-require_once 'pdo.php';
+require_once __DIR__ . '/src/pdo.php';
 
-$csvFile = 'countries.csv';
+$csvFile = __DIR__ . '/static/countries.csv';
 $handle = fopen($csvFile, 'r');
 
 if ($handle) {

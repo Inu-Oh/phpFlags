@@ -1,18 +1,30 @@
 <?php
 session_start();
-require_once 'src/pdo.php';
-require_once 'src/libs/utils.php';
+require_once __DIR__ . '/src/pdo.php';
+require_once __DIR__ . '/src/libs/utils.php';
 
-if ( isset($_POST['register']) ) {
-    if ( isset($_POST['username']) && isset($_POST['email']) && isset($_POST['password']) ) {
-        $username = htmlspecialchars($_POST['username']);
+if ( is_post_request() ) {
+    if ( isset($_POST['username']) && isset($_POST['email']) 
+        && isset($_POST['password']) && isset($_POST['password2']) ) {
+        
         $email = htmlspecialchars($_POST['email']);
-        $password = password_hash(
-            htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8'),
-            PASSWORD_DEFAULT
-        );
+
+        // Verify email and make sure it's unique before saving
+
+        $username = htmlspecialchars($_POST['username']);
+
+        // Check if username is unique / Limit name chars allowed
+
+        if ( htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8') ==
+            htmlspecialchars($_POST['password2'], ENT_QUOTES, 'UTF-8')) {
+            $password = password_hash(
+                htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8'),
+                PASSWORD_DEFAULT
+            );
+        } else {
+            $_SESSION['flashMsg'] = "Passwords don<t match";
+        }
     }
-    
 }
 
 view('head', ['title' => 'Register']);
@@ -44,7 +56,7 @@ view('head', ['title' => 'Register']);
                 <a href="#" title="term of services">term of services</a>
             </label>
         </div>
-        <button type="submit">Register</button>
+        <button type="submit" name="register">Register</button>
         <footer>Already a member? <a href="login.php">Login here</a></footer>
     </form>
 </main>

@@ -1,7 +1,7 @@
 <?php
 session_start();
 header("Content-type: application/json; charset=utf-8");
-require_once 'src/pdo.php';
+require_once __DIR__ . '/src/pdo.php';
 
 // Prapare array of question data to be sent via JSON to Handlebars template
 // only if user has entered an answer and feedbck has been set to true
