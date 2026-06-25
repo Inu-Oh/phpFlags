@@ -3,7 +3,7 @@ Simple PHP flag quiz app.
 
 A geography quiz Web app written in PHP, testing knowledge of flags, country and capital city names. The app randomly chooses between four types of quizzes, then chooses a random question from each quiz question list, just under one thousand questions in total.
 
-See below for SQL and PHP code for use to set up quiz quiestion data on MySQL.
+See below for SQL and PHP code for use to set up quiz question data on PostgreSQL.
 
 ## Quiz types
 - Guess country from flag
@@ -56,25 +56,22 @@ Create a database to store the quiz data.
 Set a username and password to access the database.
 
 ```
-CREATE DATABASE flags DEFAULT CHARACTER SET utf8;
-CREATE USER 'username'@'localhost' IDENTIFIED BY 'enterYourPassword';
-GRANT ALL ON flags.* TO 'username'@'localhost'';
-CREATE USER 'username'@'127.0.0.1' IDENTIFIED BY 'enterYourPassword';
-GRANT ALL ON flags.* TO 'username'@'127.0.0.1';
+CREATE USER zephyr WITH PASSWORD '2wsx@WSXZAQ!zaq1';
+CREATE DATABASE flags WITH OWNER 'zephyr' ENCODING 'UTF8';
 ```
 
 Create table for countries / primary key and data will be populated from CSV
 
 ```
-CREATE TABLE Countries (
-   pk SMALLINT NOT NULL,
+CREATE TABLE countries (
+   pk SMALLINT,
    country VARCHAR(128) NOT NULL,
    capital VARCHAR(128),
    code VARCHAR(12) NOT NULL,
    hint VARCHAR(128),
    PRIMARY KEY(pk),
    UNIQUE(pk)
-) ENGINE = InnoDB DEFAULT CHARSET=utf8;
+);
 ```
 
 Create a pdo.php file with the following code, setting the username to match the values you used to create the database.
@@ -87,15 +84,19 @@ if ( file_exists('../config.php') ) {
 }
 
 if ( ! isset( $pdo ) ) {
-    $pdo = new PDO(
-        'mysql:host=localhost;port=8889;dbname=flags', 'enterYourUserName', 'enterYourPassword'
-    );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    try {
+	    $pdo = new PDO(
+			'pgsql:host=localhost;dbname=flags', 'userName', 'passWord',
+			[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+		);
+	} catch (PDOException $e) {
+		die("Connection failed: " . $e->getMessage());
+	}
 }
 ```
 
 Create a php file with the following code and visit the page in your browser to run it. 
-IMPORTANT: Delete the file after popuplating the database from the CSV file to prevent SQL injection. Edit the CSV file and rerun the file to edit the database. (The file name does not matter.)
+IMPORTANT: Delete the file after populating the database from the CSV file to prevent SQL injection. Edit the CSV file and rerun the file to edit the database. (The file name does not matter.)
 
 ```
 <?php
