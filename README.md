@@ -142,3 +142,18 @@ if ($handle) {
     fclose($handle);
 }
 ```
+
+Create a table to store user data. SQL for PostreSQL.
+
+```
+CREATE TABLE users (
+	user_id SERIAL,
+	username VARCHAR(32) NOT NULL UNIQUE,
+	email VARCHAR(128) NOT NULL UNIQUE,
+	password VARCHAR(64) NOT NULL,
+	is_admin BOOLEAN DEFAULT FALSE,
+	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	PRIMARY KEY (user_id)
+);
+```
