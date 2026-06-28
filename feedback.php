@@ -25,6 +25,8 @@ if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion'])) {
 
 view('head'); ?>
 
+<?php if ($_SESSION['username']) echo 'Logged in as ' . $_SESSION['username'] ?>
+
 <div id="q-card" class="container pt-3 bg-light rounded-4">
     <?= scoreBoard(); ?>
 
