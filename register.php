@@ -48,28 +48,36 @@ if ( is_post_request() ) {
         # Validate passwords. Check for match. Save as hash.
         if ( htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8') ==
             htmlspecialchars($_POST['password2'], ENT_QUOTES, 'UTF-8')) {
+            
+            # Salt the password before saving
+            $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
+            $salt = bin2hex(random_bytes(16)); // Generate random salt
+            $salted_pw = $password . $salt;
             $pw_hash = password_hash(
-                htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8'),
-                PASSWORD_DEFAULT
+                $salted_pw,
+                PASSWORD_BCRYPT
             );
+
+            # Save new user to database and redirect to login
+            $sql = 'INSERT INTO users (username, email, password)
+                        VALUES(:un, :em, :pw)';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(array(
+                ':un' => $username,
+                ':em' => $email,
+                ':pw' => $pw_hash,
+                ':sl' => $salt
+            ));
+            $_SESSION['user_id'] = $pdo->lastInsertId();
+            header( 'Location: login.php' );
+            return;
         } else {
             $_SESSION['flashMsg'] = "Passwords don't match";
             header( 'Location: register.php' );
             return;
         }
 
-        # Save new user to database and redirect to login
-        $sql = 'INSERT INTO users (username, email, password)
-                    VALUES(:un, :em, :pw)';
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(array(
-            ':un' => $username,
-            ':em' => $email,
-            ':pw' => $pw_hash
-        ));
-        $_SESSION['user_id'] = $pdo->lastInsertId();
-        header( 'Location: login.php' );
-        return;
+
     }
 }
 
