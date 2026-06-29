@@ -50,7 +50,7 @@ Choosing an SQL schema to store user learning progress on all quiz questions. Pl
 
 ## Setup Quiz Data in Database from CSV
 
-Before running this file create the following database and table.
+Before running this file create the following database and tables. All SQL is written for PostgreSQL.
 
 Create a database to store the quiz data.
 Set a username and password to access the database.
@@ -60,7 +60,7 @@ CREATE USER zephyr WITH PASSWORD '2wsx@WSXZAQ!zaq1';
 CREATE DATABASE flags WITH OWNER 'zephyr' ENCODING 'UTF8';
 ```
 
-Create table for countries / primary key and data will be populated from CSV
+Create table for countries / primary key and data will be populated from CSV.
 
 ```
 CREATE TABLE countries (
@@ -143,7 +143,7 @@ if ($handle) {
 }
 ```
 
-Create a table to store user data. SQL for PostreSQL.
+Create a table to store user data.
 
 ```
 CREATE TABLE users (
@@ -156,5 +156,29 @@ CREATE TABLE users (
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	PRIMARY KEY (user_id)
+);
+```
+
+Create a table to store four types of quizzes. This will support tracking user progress on each type of quiz for each flag.
+
+```
+CREATE TABLE quiz (
+	quiz_id SMALLINT,
+	quiz_name VARCHAR(32),
+	PRIMARY KEY (quiz_id)
+);
+```
+
+Create a table to store user progress on each quiz question. 
+
+```
+CREATE TABLE progress (
+	user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+	country_id SMALLINT REFERENCES countries(pk) ON DELETE CASCADE,
+	quiz_id SMALLINT REFERENCES countries(pk) ON DELETE CASCADE,
+	test_count SMALLINT DEFAULT 0,
+	correct_count SMALLINT DEFAULT 0,
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	PRIMARY KEY (user_id, country_id, quiz_id)
 );
 ```
