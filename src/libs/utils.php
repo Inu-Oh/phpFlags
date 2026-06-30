@@ -117,6 +117,16 @@ function setQuestions($pdo) {
     $_SESSION['quizIsSet'] = TRUE;
 }
 
+// Provide array of quiz types with the standard id for each
+function quizArray() {
+    $quizzes = array(
+        'flagCountry' => 1,
+        'flagCapital' => 2,
+        'countryCapital' => 3,
+        'capitalCountry' =>4
+    );
+}
+
 // Create lists of integers for use as quiz lists
 function quizLists($pdo) {
     $stmt = $pdo->prepare('SELECT pk, capital FROM Countries');
