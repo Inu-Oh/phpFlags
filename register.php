@@ -71,6 +71,9 @@ if ( is_post_request() ) {
                 ':sl' => $salt
             ));
             $_SESSION['user_id'] = $pdo->lastInsertId();
+
+            # TODO - Populate the user's progress for each quiz question
+
             header( 'Location: login.php' );
             return;
         } else {

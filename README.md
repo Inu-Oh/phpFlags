@@ -159,7 +159,7 @@ CREATE TABLE users (
 );
 ```
 
-Create a table to store four types of quizzes. This will support tracking user progress on each type of quiz for each flag.
+Create a table to store four types of quizzes. This will support tracking user progress on each type of quiz for each flag. Then run the INSERT statement to populate the table.
 
 ```
 CREATE TABLE quiz (
@@ -167,6 +167,14 @@ CREATE TABLE quiz (
 	quiz_name VARCHAR(32),
 	PRIMARY KEY (quiz_id)
 );
+```
+```
+INSERT INTO quiz (quiz_id, quiz_name)
+	VALUES 
+		(1, 'flagCountry'),
+		(2, 'flagCapital'),
+		(3, 'countryCapital'),
+		(4, 'capitalCountry');
 ```
 
 Create a table to store user progress on each quiz question. 

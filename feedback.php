@@ -23,6 +23,35 @@ if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion'])) {
     return;
 }
 
+# TODO - need to set up user progress data before this can be used
+// if ( isset($_SESSION['userName'])) {
+//     $stmt = $pdo->prepare('SELECT quiz_id FROM quiz WHERE quiz_name = :qn ');
+//     $stmt->execute(array(':qn' => $_SESSION['currentQuiz']));
+//     $row = $stmt->fetch(PDO::FETCH_ASSOC);
+//     $quizId = $row['quiz_id'];
+//     if ( $_SESSION['correct'] ) {
+//         $sql = 'UPDATE progress 
+//             SET test_count=test_count+1, correct_count=correct_count+1
+//             WHERE user_id=:ui AND country_id=:ci AND quiz_id = :qi';
+//         $stmt = $pdo->prepare($sql);
+//         $stmt->execute(array(
+//             ':ui' => $_SESSION['userId'],
+//             ':ci' => $_SESSION['nextQuestion'],
+//             ':qi' => $quizId
+//         ));
+//     } else {
+//         $sql = 'UPDATE progress 
+//             SET test_count=test_count+1
+//             WHERE user_id=:ui AND country_id=:ci AND quiz_id = :qi';
+//         $stmt = $pdo->prepare($sql);
+//         $stmt->execute(array(
+//             ':ui' => $_SESSION['userId'],
+//             ':ci' => $_SESSION['nextQuestion'],
+//             ':qi' => $quizId
+//         ));
+//     }
+// }
+
 view('head'); ?>
 
 <?php if (isset($_SESSION['username'])) echo 'Logged in as ' . $_SESSION['username'] ?>

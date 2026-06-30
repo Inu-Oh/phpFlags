@@ -48,7 +48,7 @@ if ( is_post_request() ) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ( ! empty($row) ) {
                 $_SESSION['username'] = $row['username'];
-                $_SESSION['user_id'] = $row['user_id'];
+                $_SESSION['userId'] = $row['user_id'];
                 $_SESSION['success'] = '<p style="color:green">Logged in</p>';
                 error_log("Login success for " . $username);
                 header( 'Location: index.php' );

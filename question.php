@@ -4,7 +4,7 @@ header("Content-type: application/json; charset=utf-8");
 require_once __DIR__ . '/src/pdo.php';
 
 // Prapare array of question data to be sent via JSON to Handlebars template
-$stmt = $pdo->prepare('SELECT * FROM Countries WHERE pk = :pk');
+$stmt = $pdo->prepare('SELECT * FROM countries WHERE pk = :pk');
 $stmt->execute(array(':pk' => $_SESSION['nextQuestion']));
 $question = $stmt->fetch(PDO::FETCH_ASSOC);
 // Conform data depnding on quiz type

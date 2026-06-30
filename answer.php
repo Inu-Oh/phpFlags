@@ -7,7 +7,7 @@ require_once __DIR__ . '/src/pdo.php';
 // only if user has entered an answer and feedbck has been set to true
 if ( isset($_SESSION['feedback']) ) {
     if ( $_SESSION['feedback'] === TRUE ) {
-        $stmt = $pdo->prepare('SELECT * FROM Countries WHERE pk = :pk');
+        $stmt = $pdo->prepare('SELECT * FROM countries WHERE pk = :pk');
         $stmt->execute(array(':pk' => $_SESSION['nextQuestion']));
         $feedback = $stmt->fetch(PDO::FETCH_ASSOC);
         // Add feedback data from session
