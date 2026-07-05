@@ -72,7 +72,42 @@ if ( is_post_request() ) {
             ));
             $_SESSION['userId'] = $pdo->lastInsertId();
 
-            # TODO - Initiate the user's progress for each quiz question
+            # Reset all quiz questions. Initiate user's progress for each quiz question.
+            setQuestions($pdo);
+            $quizzes = quizArray();
+            // TODO - fix the foreach loop it is not working WHY?
+            foreach ($quizzes as $quizName => $quizId) { 
+                foreach ($_SESSION[$quizName] as $countryId)
+                $sql = 'INSERT INTO progress (user_id, country_id, quiz_id)
+                            VALUES (:ui, :ci, :qi)';
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute(array(
+                    ':ui' => $_SESSION['userId'],
+                    ':ci' => $countryId,
+                    ':qi' => $quizId
+                ));
+            }
+            # Update the user data based on progress saved in session
+            if ( isset($_SESSION['sessProgress']) ) {
+                foreach ($_SESSION['sessProgress'] as $questionProgress) {
+                    list($quizId, $countryId, $correct) = $questionProgress;
+                    $primaryKey = array(
+                        ':ui' => $_SESSION['userId'],
+                        ':ci' => $countryId,
+                        ':qi' => $quizId
+                    );
+                    if ($correct) {
+                        $sql = 'UPDATE progress SET test_count=1, correct_count=1
+                                    WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
+                    } else {
+                        $sql = 'UPDATE progress SET test_count=1
+                                    WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
+                    }
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute($primaryKey);
+                }
+                unset($_SESSION['sessProgress']);
+            }
 
             header( 'Location: login.php' );
             return;

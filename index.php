@@ -44,37 +44,51 @@ if ( is_post_request() ) {
                 $_SESSION['correct'] = TRUE;    
                 $_SESSION['score']++;
                 if ( $perc_accuracy < 100 ) {
-                    $_SESSION['misspelled'] = TRUE;
+                        $_SESSION['misspelled'] = TRUE;
                 }
-                # TODO - need to set up user progress data before this can be used
-                // if ( isset($_SESSION['userName'])) {
-                //     $quizzes = quizArray();
-                //     $quizId = $quizzes[$_SESSION['currentQuiz']];
-                //     if ( $_SESSION['correct'] ) {
-                //         $sql = 'UPDATE progress 
-                //             SET test_count=test_count+1, correct_count=correct_count+1
-                //             WHERE user_id=:ui AND country_id=:ci AND quiz_id = :qi';
-                //         $stmt = $pdo->prepare($sql);
-                //         $stmt->execute(array(
-                //             ':ui' => $_SESSION['userId'],
-                //             ':ci' => $_SESSION['nextQuestion'],
-                //             ':qi' => $quizId
-                //         ));
-                //     } else {
-                //         $sql = 'UPDATE progress 
-                //             SET test_count=test_count+1
-                //             WHERE user_id=:ui AND country_id=:ci AND quiz_id = :qi';
-                //         $stmt = $pdo->prepare($sql);
-                //         $stmt->execute(array(
-                //             ':ui' => $_SESSION['userId'],
-                //             ':ci' => $_SESSION['nextQuestion'],
-                //             ':qi' => $quizId
-                //         ));
-                //     }
-                // }
             } else {
                 $_SESSION['correct'] = FALSE;
             }
+    
+            # Update user progress on question if logged in
+            $quizzes = quizArray();
+            $quizId = $quizzes[$_SESSION['currentQuiz']];
+            if ( isset($_SESSION['userName'])) {
+                if ( $_SESSION['correct'] ) {
+                    $sql = 'UPDATE progress 
+                        SET test_count=test_count+1, correct_count=correct_count+1
+                        WHERE user_id=:ui AND country_id=:ci AND quiz_id = :qi';
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute(array(
+                        ':ui' => $_SESSION['userId'],
+                        ':ci' => $_SESSION['nextQuestion'],
+                        ':qi' => $quizId
+                    ));
+                } else {
+                    $sql = 'UPDATE progress 
+                        SET test_count=test_count+1
+                        WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute(array(
+                        ':ui' => $_SESSION['userId'],
+                        ':ci' => $_SESSION['nextQuestion'],
+                        ':qi' => $quizId
+                    ));
+                }
+            } else {
+                
+                # Store progress data in case user creates an account or logs in
+                if ( ! isset($_SESSION['sessProgress'])) {
+                    $_SESSION['sessProgress'] = [];
+                }
+                $questionProgress = [
+                    $quizId,
+                    $_SESSION['nextQuestion'],
+                    $_SESSION['correct']
+                ];
+                $_SESSION['sessProgress'][] = $questionProgress;
+            }
+
             $_SESSION['count']++;
             $_SESSION['feedback'] = TRUE;
             header( 'Location: feedback.php' );
@@ -91,6 +105,19 @@ view('head'); ?>
     <?= scoreBoard(); ?>
 
     <div id="quiz-area"></div>
+    
+</div>
+
+<div>
+    <?php // Temp code to work out user progress settings
+    var_dump(
+        $_SESSION['currentQuiz'],
+        $_SESSION['sessProgress']
+        // $_SESSION['flagCountry'],
+        // $_SESSION['flagCapital'], 
+        // $_SESSION['countryCapital'],
+        // $_SESSION['capitalCountry']
+    );?>
 </div>
 
 <script id="quiz-template" type="text/x-handlebars-template">

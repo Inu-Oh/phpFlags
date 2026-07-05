@@ -119,11 +119,11 @@ function setQuestions($pdo) {
 
 // Provide array of quiz types with the standard id for each
 function quizArray() {
-    $quizzes = array(
+    return array(
         'flagCountry' => 1,
         'flagCapital' => 2,
         'countryCapital' => 3,
-        'capitalCountry' =>4
+        'capitalCountry' => 4
     );
 }
 

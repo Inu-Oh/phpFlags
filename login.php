@@ -50,6 +50,28 @@ if ( is_post_request() ) {
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['userId'] = $row['user_id'];
                 $_SESSION['success'] = '<p style="color:green">Logged in</p>';
+                
+                # Update any user progress made prior to login
+                if ( isset($_SESSION['sessProgress']) ) {
+                    foreach ($_SESSION['sessProgress'] as $questionProgress) {
+                        list($quizId, $countryId, $correct) = $questionProgress;
+                        $primaryKey = array(
+                            ':ui' => $_SESSION['userId'],
+                            ':ci' => $countryId,
+                            ':qi' => $quizId
+                        );
+                        if ($correct) {
+                            $sql = 'UPDATE progress SET test_count=1, correct_count=1
+                                        WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
+                        } else {
+                            $sql = 'UPDATE progress SET test_count=1
+                                        WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
+                        }
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute($primaryKey);
+                    }
+                    unset($_SESSION['sessProgress']);
+                }
                 error_log("Login success for " . $username);
                 header( 'Location: index.php' );
                 return;
