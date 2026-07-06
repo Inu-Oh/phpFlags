@@ -75,18 +75,19 @@ if ( is_post_request() ) {
             # Reset all quiz questions. Initiate user's progress for each quiz question.
             setQuestions($pdo);
             $quizzes = quizArray();
-            // TODO - fix the foreach loop it is not working WHY?
             foreach ($quizzes as $quizName => $quizId) { 
-                foreach ($_SESSION[$quizName] as $countryId)
-                $sql = 'INSERT INTO progress (user_id, country_id, quiz_id)
-                            VALUES (:ui, :ci, :qi)';
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute(array(
-                    ':ui' => $_SESSION['userId'],
-                    ':ci' => $countryId,
-                    ':qi' => $quizId
-                ));
+                foreach ($_SESSION[$quizName] as $countryId) {
+                    $sql = 'INSERT INTO progress (user_id, country_id, quiz_id)
+                                VALUES (:ui, :ci, :qi)';
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute(array(
+                        ':ui' => $_SESSION['userId'],
+                        ':ci' => $countryId,
+                        ':qi' => $quizId
+                    ));
+                }
             }
+             // TODO fix These are not saving counts correctly
             # Update the user data based on progress saved in session
             if ( isset($_SESSION['sessProgress']) ) {
                 foreach ($_SESSION['sessProgress'] as $questionProgress) {

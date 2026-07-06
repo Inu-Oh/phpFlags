@@ -50,7 +50,8 @@ if ( is_post_request() ) {
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['userId'] = $row['user_id'];
                 $_SESSION['success'] = '<p style="color:green">Logged in</p>';
-                
+
+                 // TODO fix These are not saving counts correctly
                 # Update any user progress made prior to login
                 if ( isset($_SESSION['sessProgress']) ) {
                     foreach ($_SESSION['sessProgress'] as $questionProgress) {

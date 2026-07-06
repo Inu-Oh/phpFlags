@@ -49,11 +49,11 @@ if ( is_post_request() ) {
             } else {
                 $_SESSION['correct'] = FALSE;
             }
-    
+            // TODO - fix These are no updating correctly
             # Update user progress on question if logged in
             $quizzes = quizArray();
             $quizId = $quizzes[$_SESSION['currentQuiz']];
-            if ( isset($_SESSION['userName'])) {
+            if ( isset($_SESSION['username'])) {
                 if ( $_SESSION['correct'] ) {
                     $sql = 'UPDATE progress 
                         SET test_count=test_count+1, correct_count=correct_count+1
@@ -76,7 +76,7 @@ if ( is_post_request() ) {
                     ));
                 }
             } else {
-                
+
                 # Store progress data in case user creates an account or logs in
                 if ( ! isset($_SESSION['sessProgress'])) {
                     $_SESSION['sessProgress'] = [];
@@ -111,6 +111,8 @@ view('head'); ?>
 <div>
     <?php // Temp code to work out user progress settings
     var_dump(
+        $_SESSION['username'],
+        $_SESSION['userId'],
         $_SESSION['currentQuiz'],
         $_SESSION['sessProgress']
         // $_SESSION['flagCountry'],
