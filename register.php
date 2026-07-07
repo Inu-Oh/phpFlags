@@ -72,7 +72,7 @@ if ( is_post_request() ) {
             ));
             $_SESSION['userId'] = $pdo->lastInsertId();
 
-            # Reset all quiz questions. Initiate user's progress for each quiz question.
+            # Reset all quiz lists. Initiate user's progress for each quiz question.
             setQuestions($pdo);
             $quizzes = quizArray();
             foreach ($quizzes as $quizName => $quizId) { 
@@ -87,7 +87,7 @@ if ( is_post_request() ) {
                     ));
                 }
             }
-             // TODO fix These are not saving counts correctly
+            
             # Update the user data based on progress saved in session
             if ( isset($_SESSION['sessProgress']) ) {
                 foreach ($_SESSION['sessProgress'] as $questionProgress) {

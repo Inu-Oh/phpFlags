@@ -99,27 +99,11 @@ if ( is_post_request() ) {
 
 view('head'); ?>
 
-<?php if (isset($_SESSION['username'])) echo 'Logged in as ' . $_SESSION['username'] ?>
-
 <div id="q-card" class="container pt-3 bg-light rounded-4">
     <?= scoreBoard(); ?>
 
     <div id="quiz-area"></div>
     
-</div>
-
-<div>
-    <?php // Temp code to work out user progress settings
-    var_dump(
-        $_SESSION['username'],
-        $_SESSION['userId'],
-        $_SESSION['currentQuiz'],
-        $_SESSION['sessProgress']
-        // $_SESSION['flagCountry'],
-        // $_SESSION['flagCapital'], 
-        // $_SESSION['countryCapital'],
-        // $_SESSION['capitalCountry']
-    );?>
 </div>
 
 <script id="quiz-template" type="text/x-handlebars-template">

@@ -1,3 +1,17 @@
+#nav-bar {
+    width: 33rem;
+    margin: 0 auto;
+}
+
+a {
+    color: navy !important;
+    text-decoration: none !important;
+}
+
+a:hover {
+    color: lightskyblue !important;
+}
+
 #q-card {
     width: 33rem;
     height: 35rem;

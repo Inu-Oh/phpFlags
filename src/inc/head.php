@@ -25,3 +25,18 @@
         </style>
     </head>
     <body class="p-5">
+
+        <nav id="nav-bar" 
+            class="nav mb-3 p-2 navbar navbar-light bg-light rounded-4">
+            <div class="container-fluid justify-content-around">
+                <?php 
+                    if ( isset($_SESSION['username']) ) {
+                        echo 'Logged in as ' . $_SESSION['username'] . 
+                        ' <a href="logout.php">Logout</a>';
+                    } else {
+                        echo '<a href="login.php">Login</a>
+                            <a href="register.php">Register</a>';
+                    }
+                ?>
+            </div>
+        </nav>
