@@ -30,6 +30,7 @@ if ( is_post_request() ) {
         return;
     }
 
+    // TODO reduce ammount of nested ifs in this section
     if ( isset($_POST['check'])) {
         if ( ! isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token'] ) {
             die('CSRF token validation failed');
@@ -49,11 +50,11 @@ if ( is_post_request() ) {
             } else {
                 $_SESSION['correct'] = FALSE;
             }
-            // TODO - fix These are no updating correctly
+
             # Update user progress on question if logged in
             $quizzes = quizArray();
             $quizId = $quizzes[$_SESSION['currentQuiz']];
-            if ( isset($_SESSION['username'])) {
+            if ( isset($_SESSION['username']) ) {
                 if ( $_SESSION['correct'] ) {
                     $sql = 'UPDATE progress 
                         SET test_count=test_count+1, correct_count=correct_count+1
@@ -75,10 +76,33 @@ if ( is_post_request() ) {
                         ':qi' => $quizId
                     ));
                 }
+                # Update the session record of user's progress for quiz features
+                if ( ! isset($_SESSION['userProgress'] )) {
+                    $_SESSION['userProgress'] = [];
+                    $sql = 'SELECT quiz_id, country_id, test_count, correct_count
+                                FROM progress WHERE user_id=:ui';
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute(array(':ui' => $_SESSION['userId']));
+                    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ( $rows as $row ) {
+                        $key = strval($row['quiz_id']) . "_" . strval($row['country_id']);
+                        $val = array($row['test_count'], $row['correct_count']);
+                        $_SESSION['userProgress'][$key] = $val;
+                    }
+                } else {
+                    $key = strval($quizId ). "_" . strval($_SERVER['nextQuestion']);
+                    list($testCount, $correctCount) = $_SESSION['userProgress'][$key];
+                    $testCount++;
+                    if ( $_SESSION['correct'] ) {
+                        $correctCount++;
+                    }
+                    $val = array($testCount, $correctCount);
+                    $_SESSION['userProgress'][$key] = $val;
+                }
             } else {
 
                 # Store progress data in case user creates an account or logs in
-                if ( ! isset($_SESSION['sessProgress'])) {
+                if ( ! isset($_SESSION['sessProgress']) ) {
                     $_SESSION['sessProgress'] = [];
                 }
                 $questionProgress = [
@@ -105,7 +129,7 @@ view('head'); ?>
     <div id="quiz-area"></div>
     
 </div>
-
+<!-- <?php if (isset($_SESSION['userProgress'])) {var_dump($_SESSION['userProgress']);}?> -->
 <script id="quiz-template" type="text/x-handlebars-template">
 <div class="px-3">
 

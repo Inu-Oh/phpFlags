@@ -12,6 +12,7 @@ if ( is_post_request() ) {
         die('CSRF token validation failed');
     }
 
+    // TODO - Refactor to reduce nested if statements
     # Check that all fields are posted
     if ( isset($_POST['username']) && isset($_POST['email']) 
         && isset($_POST['password']) && isset($_POST['password2']) ) {
@@ -87,7 +88,7 @@ if ( is_post_request() ) {
                     ));
                 }
             }
-            
+
             # Update the user data based on progress saved in session
             if ( isset($_SESSION['sessProgress']) ) {
                 foreach ($_SESSION['sessProgress'] as $questionProgress) {

@@ -19,6 +19,7 @@ if ( is_post_request() ) {
         }
     }
 
+    // TODO - refactor to reduce nested if statements
     if ( isset($_POST['username']) && isset($_POST['password'])) {
         unset($_SESSION['name']); # to logout current user in any
         
@@ -32,12 +33,12 @@ if ( is_post_request() ) {
         $username = htmlentities($_POST['username']);
         $stmt = $pdo->prepare("SELECT salt FROM users WHERE username = :un");
         $stmt->execute(array(':un' => $username));
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $saltRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ( ! empty($row) ) {
+        if ( ! empty($saltRow) ) {
             # Hash and validadate user password
             $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
-            $salt = $row['salt'];
+            $salt = $saltRow['salt'];
             $salted_pw = $password . $salt;
             $pw_hash = hash('md5', $salted_pw ); 
             $_SESSION['bug'] = 'Password '.$password . '<br>Salt ' . $salt
@@ -45,13 +46,12 @@ if ( is_post_request() ) {
             $sql = "SELECT * FROM users WHERE username = :un AND pw_hash = :pw";
             $stmt = $pdo->prepare($sql);
             $stmt->execute(array(':un' => $username, ':pw' => $pw_hash));
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ( ! empty($row) ) {
-                $_SESSION['username'] = $row['username'];
-                $_SESSION['userId'] = $row['user_id'];
+            $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ( ! empty($userRow) ) {
+                $_SESSION['username'] = $userRow['username'];
+                $_SESSION['userId'] = $userRow['user_id'];
                 $_SESSION['success'] = '<p style="color:green">Logged in</p>';
 
-                 // TODO fix These are not saving counts correctly
                 # Update any user progress made prior to login
                 if ( isset($_SESSION['sessProgress']) ) {
                     foreach ($_SESSION['sessProgress'] as $questionProgress) {
@@ -73,6 +73,9 @@ if ( is_post_request() ) {
                     }
                     unset($_SESSION['sessProgress']);
                 }
+
+                # TODO - Create session data that reflects the user's progress from DB
+
                 error_log("Login success for " . $username);
                 header( 'Location: index.php' );
                 return;
