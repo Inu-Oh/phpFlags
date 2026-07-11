@@ -89,6 +89,7 @@ if ( is_post_request() ) {
                 }
             }
 
+            // TODO - This is duplicated so put it in a function
             # Update the user data based on progress saved in session
             if ( isset($_SESSION['sessProgress']) ) {
                 foreach ($_SESSION['sessProgress'] as $questionProgress) {

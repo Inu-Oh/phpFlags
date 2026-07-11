@@ -52,6 +52,7 @@ if ( is_post_request() ) {
                 $_SESSION['userId'] = $userRow['user_id'];
                 $_SESSION['success'] = '<p style="color:green">Logged in</p>';
 
+                // TODO - This is duplicated so put it in a function
                 # Update any user progress made prior to login
                 if ( isset($_SESSION['sessProgress']) ) {
                     foreach ($_SESSION['sessProgress'] as $questionProgress) {
@@ -73,8 +74,6 @@ if ( is_post_request() ) {
                     }
                     unset($_SESSION['sessProgress']);
                 }
-
-                # TODO - Create session data that reflects the user's progress from DB
 
                 error_log("Login success for " . $username);
                 header( 'Location: index.php' );

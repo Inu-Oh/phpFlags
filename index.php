@@ -30,94 +30,36 @@ if ( is_post_request() ) {
         return;
     }
 
-    // TODO reduce ammount of nested ifs in this section
     if ( isset($_POST['check'])) {
         if ( ! isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token'] ) {
             die('CSRF token validation failed');
         }
-        if ( isset($_POST['answer']) && strlen($_POST['answer']) > 0 ) {
-            $_SESSION['userInput'] = htmlspecialchars($_POST['answer'], ENT_QUOTES, 'UTF-8');
-            $matching_chars = similar_text(
-                iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['userInput'])),
-                iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['answer'])),
-                $perc_accuracy );
-            if ( $perc_accuracy > 85 ) {
-                $_SESSION['correct'] = TRUE;    
-                $_SESSION['score']++;
-                if ( $perc_accuracy < 100 ) {
-                        $_SESSION['misspelled'] = TRUE;
-                }
-            } else {
-                $_SESSION['correct'] = FALSE;
-            }
 
-            # Update user progress on question if logged in
-            $quizzes = quizArray();
-            $quizId = $quizzes[$_SESSION['currentQuiz']];
-            if ( isset($_SESSION['username']) ) {
-                if ( $_SESSION['correct'] ) {
-                    $sql = 'UPDATE progress 
-                        SET test_count=test_count+1, correct_count=correct_count+1
-                        WHERE user_id=:ui AND country_id=:ci AND quiz_id = :qi';
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute(array(
-                        ':ui' => $_SESSION['userId'],
-                        ':ci' => $_SESSION['nextQuestion'],
-                        ':qi' => $quizId
-                    ));
-                } else {
-                    $sql = 'UPDATE progress 
-                        SET test_count=test_count+1
-                        WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute(array(
-                        ':ui' => $_SESSION['userId'],
-                        ':ci' => $_SESSION['nextQuestion'],
-                        ':qi' => $quizId
-                    ));
-                }
-                # Update the session record of user's progress for quiz features
-                if ( ! isset($_SESSION['userProgress'] )) {
-                    $_SESSION['userProgress'] = [];
-                    $sql = 'SELECT quiz_id, country_id, test_count, correct_count
-                                FROM progress WHERE user_id=:ui';
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute(array(':ui' => $_SESSION['userId']));
-                    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    foreach ( $rows as $row ) {
-                        $key = strval($row['quiz_id']) . "_" . strval($row['country_id']);
-                        $val = array($row['test_count'], $row['correct_count']);
-                        $_SESSION['userProgress'][$key] = $val;
-                    }
-                } else {
-                    $key = strval($quizId ). "_" . strval($_SERVER['nextQuestion']);
-                    list($testCount, $correctCount) = $_SESSION['userProgress'][$key];
-                    $testCount++;
-                    if ( $_SESSION['correct'] ) {
-                        $correctCount++;
-                    }
-                    $val = array($testCount, $correctCount);
-                    $_SESSION['userProgress'][$key] = $val;
-                }
-            } else {
+        # Check the user answer and spelling accuracy
+        $perc_accuracy = checkUserAnswer();
+        checkAnswerAccuracy($perc_accuracy);
 
-                # Store progress data in case user creates an account or logs in
-                if ( ! isset($_SESSION['sessProgress']) ) {
-                    $_SESSION['sessProgress'] = [];
-                }
-                $questionProgress = [
-                    $quizId,
-                    $_SESSION['nextQuestion'],
-                    $_SESSION['correct']
-                ];
-                $_SESSION['sessProgress'][] = $questionProgress;
-            }
+        $quizzes = quizArray();
+        $quizId = $quizzes[$_SESSION['currentQuiz']];
 
-            $_SESSION['count']++;
-            $_SESSION['feedback'] = TRUE;
-            header( 'Location: feedback.php' );
-            return;
+        if ( isset($_SESSION['username']) ) {
+
+            # Update logged in user progress in DB and session if user is logged in
+            updateUserProgressInDB($pdo, $quizId);
+            // TODO - use the data stored in session in future quiz features
+            updateUserProgressInSession($pdo, $quizId);
+
+        } else {
+
+            # Store anonymous progress data in case user creates an account or logs in
+            updateAnonProgress($quizId);
         }
+
+        $_SESSION['count']++;
+        $_SESSION['feedback'] = TRUE;
+
+        header( 'Location: feedback.php' );
+        return;
     }
 }
 
