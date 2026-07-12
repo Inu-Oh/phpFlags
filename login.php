@@ -28,26 +28,25 @@ if ( isPostRequest() ) {
             return;
         } 
 
-        # Check if username entered is valid
+        # Lookup username if valid and get salt
         $username = htmlentities($_POST['username']);
-        $stmt = $pdo->prepare("SELECT salt FROM users WHERE username = :un");
+        $stmt = $pdo->prepare("SELECT salt, pw_hash FROM users WHERE username = :un");
         $stmt->execute(array(':un' => $username));
         $saltRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ( ! empty($saltRow) ) {
 
-            # Hash and validadate user password
+            # Salt hash and validadate user password
             $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
             $salt = $saltRow['salt'];
             $salted_pw = $password . $salt;
-            $pw_hash = hash('md5', $salted_pw ); 
-            $_SESSION['bug'] = 'Password '.$password . '<br>Salt ' . $salt
-            . '<br>Salted PW ' . $salted_pw . '<br>PW Hash ' . $pw_hash;
+            $pw_hash = hash('sha256', $salted_pw ); 
             $sql = "SELECT * FROM users WHERE username = :un AND pw_hash = :pw";
             $stmt = $pdo->prepare($sql);
             $stmt->execute(array(':un' => $username, ':pw' => $pw_hash));
             $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
             if ( ! empty($userRow) ) {
+
                 $_SESSION['username'] = $userRow['username'];
                 $_SESSION['userId'] = $userRow['user_id'];
                 $_SESSION['success'] = '<p style="color:green">Logged in</p>';

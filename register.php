@@ -56,10 +56,9 @@ if ( isPostRequest() ) {
             $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
             $salt = bin2hex(random_bytes(16)); // Generate random salt
             $salted_pw = $password . $salt;
-            $pw_hash = hash('md5', $salted_pw ); 
-            $_SESSION['bug'] = 'Password '.$password . '<br>Salt ' . $salt
-            . '<br>Salted PW ' . $salted_pw . '<br>PW Hash ' . $pw_hash;
-            # Save new user to database and redirect to login
+            $pw_hash = hash('sha256', $salted_pw); 
+
+            # Save new user and hashed data to database
             $sql = 'INSERT INTO users (username, email, pw_hash, salt)
                         VALUES(:un, :em, :pw, :sl)';
             $stmt = $pdo->prepare($sql);
