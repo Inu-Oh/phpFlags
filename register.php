@@ -7,12 +7,10 @@ if ( empty($_SESSION['csrf_token']) ) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-if ( is_post_request() ) {
-    if ( $_POST['csrf_token'] !== $_SESSION['csrf_token'] ) {
-        die('CSRF token validation failed');
-    }
+if ( isPostRequest() ) {
+    
+    verifyCsrfOrDie();
 
-    // TODO - Refactor to reduce nested if statements
     # Check that all fields are posted
     if ( isset($_POST['username']) && isset($_POST['email']) 
         && isset($_POST['password']) && isset($_POST['password2']) ) {
@@ -89,38 +87,18 @@ if ( is_post_request() ) {
                 }
             }
 
-            // TODO - This is duplicated so put it in a function
-            # Update the user data based on progress saved in session
-            if ( isset($_SESSION['sessProgress']) ) {
-                foreach ($_SESSION['sessProgress'] as $questionProgress) {
-                    list($quizId, $countryId, $correct) = $questionProgress;
-                    $primaryKey = array(
-                        ':ui' => $_SESSION['userId'],
-                        ':ci' => $countryId,
-                        ':qi' => $quizId
-                    );
-                    if ($correct) {
-                        $sql = 'UPDATE progress SET test_count=1, correct_count=1
-                                    WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
-                    } else {
-                        $sql = 'UPDATE progress SET test_count=1
-                                    WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
-                    }
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute($primaryKey);
-                }
-                unset($_SESSION['sessProgress']);
-            }
+            # Update the user prgross in DB based on progress saved in session
+            updateUserProgressFromSessionToDB($pdo);
 
             header( 'Location: login.php' );
             return;
+
         } else {
+
             $_SESSION['error'] = "Passwords don't match";
             header( 'Location: register.php' );
             return;
         }
-
-
     }
 }
 

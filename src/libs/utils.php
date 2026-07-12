@@ -91,13 +91,13 @@ function grade() {
     return $grade;
 }
 
-
-function is_get_request(): bool {
+// TODO - implement use in index.php, feedback.php and other pages
+function isGetRequest(): bool {
     return strtoupper( $_SERVER['REQUEST_METHOD'] ) === 'GET';
 }
 
 
-function is_post_request(): bool {
+function isPostRequest(): bool {
     return strtoupper( $_SERVER['REQUEST_METHOD'] ) === 'POST';
 }
 
@@ -207,6 +207,30 @@ function updateUserProgressInSession($pdo, $quizId) {
     }
 }
 
+// After login / registration update user progress in Postress DB from session data
+function updateUserProgressFromSessionToDB($pdo) {
+    if ( isset($_SESSION['sessProgress']) ) {
+        foreach ( $_SESSION['sessProgress'] as $questionProgress)  {
+            list($quizId, $countryId, $correct) = $questionProgress;
+            $primaryKey = array(
+                ':ui' => $_SESSION['userId'],
+                ':ci' => $countryId,
+                ':qi' => $quizId
+            );
+            if ( $correct ) {
+                $sql = 'UPDATE progress SET test_count=1, correct_count=1
+                            WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
+            } else {
+                $sql = 'UPDATE progress SET test_count=1
+                            WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
+            }
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($primaryKey);
+        }
+        unset($_SESSION['sessProgress']);
+    }
+}
+
 // Provide array of quiz types with the standard id for each
 function quizArray() {
     return array(
@@ -224,7 +248,7 @@ function quizLists($pdo) {
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $count = 0;
     $countries = array();
-    if ( ! empty($rows ) ) {
+    if ( ! empty($rows) ) {
         foreach ( $rows as $row ) {
             $count++;
             $countries[] = $row;
@@ -242,6 +266,12 @@ function quizLists($pdo) {
         'capitalIntList' => $capitalIntList
     );
     return array($countryIntList, $capitalIntList);
+}
+
+function verifyCsrfOrDie() {
+    if ( ! isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token'] ) {
+        die('CSRF token validation failed');
+    }
 }
 
 // Loads code from PHP a file and passes data to it

@@ -6,21 +6,23 @@ if ( empty($_SESSION['csrf_token']) ) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// For testing TODO remove later along with button in view below
-if ( isset($_POST['clear']) || ! isset($_SESSION['quizIsSet']) ) {
-    session_unset();
-    session_regenerate_id(true);
-    header( 'Location: index.php' );
-    return;
-}
-
-if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion'])) {
-    if ( ! isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token'] ) {
-        die('CSRF token validation failed');
+if ( isPostRequest() ) {
+    // For testing TODO remove later along with button in view below
+    if ( isset($_POST['clear']) || ! isset($_SESSION['quizIsSet']) ) {
+        session_unset();
+        session_regenerate_id(true);
+        header( 'Location: index.php' );
+        return;
     }
-    getQuestion();
-    header( 'Location: index.php' );
-    return;
+
+    if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion'])) {
+
+        verifyCsrfOrDie();
+        
+        getQuestion();
+        header( 'Location: index.php' );
+        return;
+    }
 }
 
 view('head'); ?>

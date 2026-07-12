@@ -7,21 +7,24 @@ if ( empty($_SESSION['csrf_token']) ) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-if ( ! isset($_SESSION['quizIsSet']) ) {
+if ( isGetRequest() ) {
+    if ( ! isset($_SESSION['quizIsSet']) ) {
 
-    setQuestions($pdo);
-    // Start new score session
-    $_SESSION['count'] = 0;
-    $_SESSION['score'] = 0;
-    $_SESSION['feedback'] = FALSE;
-    getQuestion();
+        setQuestions($pdo);
+        // Start new score session
+        $_SESSION['count'] = 0;
+        $_SESSION['score'] = 0;
+        $_SESSION['feedback'] = FALSE;
+        getQuestion();
+    }
+
+    if ( ! isset($_SESSION['nextQuestion']) ) {
+        getQuestion();
+    }
 }
 
-if ( ! isset($_SESSION['nextQuestion']) ) {
-    getQuestion();
-}
+if ( isPostRequest() ) {
 
-if ( is_post_request() ) {
     // For testing TODO remove later along with button in view below
     if ( isset($_POST['clear']) ) {
         session_unset();
@@ -31,9 +34,8 @@ if ( is_post_request() ) {
     }
 
     if ( isset($_POST['check'])) {
-        if ( ! isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token'] ) {
-            die('CSRF token validation failed');
-        }
+
+        verifyCsrfOrDie();
 
         # Check the user answer and spelling accuracy
         $perc_accuracy = checkUserAnswer();

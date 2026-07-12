@@ -7,7 +7,7 @@ if ( empty($_SESSION['csrf_token']) ) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-if ( is_post_request() ) {
+if ( isPostRequest() ) {
     if ( $_POST['csrf_token'] !== $_SESSION['csrf_token'] ) {
         die('CSRF token validation failed');
     }
@@ -19,7 +19,6 @@ if ( is_post_request() ) {
         }
     }
 
-    // TODO - refactor to reduce nested if statements
     if ( isset($_POST['username']) && isset($_POST['password'])) {
         unset($_SESSION['name']); # to logout current user in any
         
@@ -36,6 +35,7 @@ if ( is_post_request() ) {
         $saltRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ( ! empty($saltRow) ) {
+
             # Hash and validadate user password
             $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
             $salt = $saltRow['salt'];
@@ -52,32 +52,13 @@ if ( is_post_request() ) {
                 $_SESSION['userId'] = $userRow['user_id'];
                 $_SESSION['success'] = '<p style="color:green">Logged in</p>';
 
-                // TODO - This is duplicated so put it in a function
                 # Update any user progress made prior to login
-                if ( isset($_SESSION['sessProgress']) ) {
-                    foreach ($_SESSION['sessProgress'] as $questionProgress) {
-                        list($quizId, $countryId, $correct) = $questionProgress;
-                        $primaryKey = array(
-                            ':ui' => $_SESSION['userId'],
-                            ':ci' => $countryId,
-                            ':qi' => $quizId
-                        );
-                        if ($correct) {
-                            $sql = 'UPDATE progress SET test_count=1, correct_count=1
-                                        WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
-                        } else {
-                            $sql = 'UPDATE progress SET test_count=1
-                                        WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
-                        }
-                        $stmt = $pdo->prepare($sql);
-                        $stmt->execute($primaryKey);
-                    }
-                    unset($_SESSION['sessProgress']);
-                }
+                updateUserProgressFromSessionToDB($pdo);
 
                 error_log("Login success for " . $username);
                 header( 'Location: index.php' );
                 return;
+
             } else {
                 $_SESSION['error'] = '<p style="color:red">Incorrect password</p>';
                 error_log("Login fail for " . $username);
@@ -85,6 +66,7 @@ if ( is_post_request() ) {
                 return;
             }
         } else {
+
             $_SESSION['error'] = '<p style="color:red">Username not found</p>';
             header( 'Location: login.php' );
             return;
