@@ -1,4 +1,8 @@
 <?php
+define("FLAG_COUNTRY", 1);
+define("FLAG_CAPITAL", 2);
+define("COUNTRY_CAPITAL", 3);
+define("CAPITAL_COUNTRY", 4);
 
 // Check answer accuracy and store result in session
 function checkAnswerAccuracy($perc_accuracy) {
@@ -143,17 +147,17 @@ function setQuestions($pdo) {
     $_SESSION['quizIsSet'] = TRUE;
 }
 
-// Update anonymous progress data in case user creates an account or logs in
+// Update anonymous progress after each test in case user creates an account or logs in
 function updateAnonProgress($quizId) {
-    if ( ! isset($_SESSION['sessProgress']) ) {
-        $_SESSION['sessProgress'] = [];
+    if ( ! isset($_SESSION['anonProgress']) ) {
+        $_SESSION['anonProgress'] = [];
     }
     $questionProgress = [
         $quizId,
         $_SESSION['nextQuestion'],
         $_SESSION['correct']
     ];
-    $_SESSION['sessProgress'][] = $questionProgress;
+    $_SESSION['anonProgress'][] = $questionProgress;
 }
 
 // Update the logged in user's progress in the PostgreSQL database
@@ -207,10 +211,10 @@ function updateUserProgressInSession($pdo, $quizId) {
     }
 }
 
-// After login / registration update user progress in Postress DB from session data
+// At login / signup update user progress in Postress DB from anonymous session data
 function updateUserProgressFromSessionToDB($pdo) {
-    if ( isset($_SESSION['sessProgress']) ) {
-        foreach ( $_SESSION['sessProgress'] as $questionProgress)  {
+    if ( isset($_SESSION['anonProgress']) ) {
+        foreach ( $_SESSION['anonProgress'] as $questionProgress)  {
             list($quizId, $countryId, $correct) = $questionProgress;
             $primaryKey = array(
                 ':ui' => $_SESSION['userId'],
@@ -227,17 +231,17 @@ function updateUserProgressFromSessionToDB($pdo) {
             $stmt = $pdo->prepare($sql);
             $stmt->execute($primaryKey);
         }
-        unset($_SESSION['sessProgress']);
+        unset($_SESSION['anonProgress']);
     }
 }
 
-// Provide array of quiz types with the standard id for each
+// Provide array of quiz types with a constant id used in DB for each
 function quizArray() {
     return array(
-        'flagCountry' => 1,
-        'flagCapital' => 2,
-        'countryCapital' => 3,
-        'capitalCountry' => 4
+        'flagCountry' => FLAG_COUNTRY,
+        'flagCapital' => FLAG_CAPITAL,
+        'countryCapital' => COUNTRY_CAPITAL,
+        'capitalCountry' => CAPITAL_COUNTRY
     );
 }
 
