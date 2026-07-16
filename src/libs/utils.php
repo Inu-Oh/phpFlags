@@ -164,25 +164,21 @@ function updateAnonProgress($quizId) {
 function updateUserProgressInDB($pdo, $quizId) {
     if ( $_SESSION['correct'] ) {
         $sql = 'UPDATE progress 
-            SET test_count=test_count+1, correct_count=correct_count+1
+            SET test_count=test_count+1, correct_count=correct_count+1,
+            updated_at = NOW()
             WHERE user_id=:ui AND country_id=:ci AND quiz_id = :qi';
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(array(
-            ':ui' => $_SESSION['userId'],
-            ':ci' => $_SESSION['nextQuestion'],
-            ':qi' => $quizId
-        ));
+        
     } else {
         $sql = 'UPDATE progress 
-            SET test_count=test_count+1
+            SET test_count=test_count+1, updated_at = NOW()
             WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(array(
-            ':ui' => $_SESSION['userId'],
-            ':ci' => $_SESSION['nextQuestion'],
-            ':qi' => $quizId
-        ));
     }
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(array(
+        ':ui' => $_SESSION['userId'],
+        ':ci' => $_SESSION['nextQuestion'],
+        ':qi' => $quizId
+    ));
 }
 
 // Make a session copy of logged in user progress from database to track in session
@@ -222,10 +218,12 @@ function updateUserProgressFromSessionToDB($pdo) {
                 ':qi' => $quizId
             );
             if ( $correct ) {
-                $sql = 'UPDATE progress SET test_count=1, correct_count=1
+                $sql = 'UPDATE progress 
+                            SET test_count=1, correct_count=1, updated_at = NOW()
                             WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
             } else {
-                $sql = 'UPDATE progress SET test_count=1
+                $sql = 'UPDATE progress
+                            SET test_count=1, updated_at = NOW()
                             WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
             }
             $stmt = $pdo->prepare($sql);
