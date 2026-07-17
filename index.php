@@ -66,10 +66,11 @@ if ( isPostRequest() ) {
 }
 
 view('head'); ?>
+
 <main>
     <div id="openNavBtn" class="btn btn-sm btn-outline-secondary" 
         onclick="openNav()">Menu</div>
-        
+
     <div id="q-card" class="container pt-3 bg-light rounded-4">
 
         <?= scoreBoard(); ?>

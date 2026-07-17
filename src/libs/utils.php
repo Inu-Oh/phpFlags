@@ -72,6 +72,23 @@ function getQuestion() {
     $_SESSION['feedback'] = FALSE;
 }
 
+
+function getUserStats() {
+    $total = $seen = $correct = 0;
+    foreach ( $_SESSION['userProgress'] as $questionProgress ) {
+        $total++;
+        if ( $questionProgress[0] > 0 ) {
+            $seen++;
+            $correct += $questionProgress[1] / $questionProgress[0];
+        }
+    }
+    $accuracy = round(($correct / $seen) * 100);
+    $_SESSION['userTested'] = $seen;
+    $_SESSION['userAccuracy'] = $accuracy;
+    $_SESSION['questionCount'] = $total;
+}
+
+
 // return grade based on percentage score
 function grade() {
     if ($_SESSION['count'] > 0) {
@@ -107,22 +124,33 @@ function isPostRequest(): bool {
 
 
 function scoreBoard() {
+    if ( isset($_SESSION['username']) ) {
+        $seen = $_SESSION['userTested'];
+        $score = $_SESSION['userAccuracy'] . '%';
+        $conjunction = ' on ';
+    } else {
+        $seen = $_SESSION['count'];
+        $score = $_SESSION['score'];
+        $conjunction = ' out of ';
+    }
+
     $scoreBoard = '<div class="text-center p-3">
         <h3 id="score" class="bg-secondary text-light rounded py-1">';
-    if ( $_SESSION['count'] > 0 ) {
-        if ( $_SESSION['score'] == $_SESSION['count'] ) {
+    if ( $seen > 0 ) {
+        if ( $score == $seen ) {
             $scoreBoard .= 'Perfect score on '.
-                htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8').
-                ' questions ';
+                htmlspecialchars($seen, ENT_QUOTES, 'UTF-8').
+                ' cards ';
         } else {
             $scoreBoard .= 'You got '
-                .htmlspecialchars($_SESSION['score'], ENT_QUOTES, 'UTF-8').' out of '
-                .htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8');
+                .htmlspecialchars($score, ENT_QUOTES, 'UTF-8').$conjunction
+                .htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') . ' cards';
         }
 
     } else {
         $scoreBoard.='Starting new quiz';
     }
+
     if ( grade() ) {
         $scoreBoard.=' &nbsp; '.grade();
     }
