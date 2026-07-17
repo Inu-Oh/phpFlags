@@ -28,10 +28,13 @@ if ( isPostRequest() ) {
 view('head'); ?>
 
 <div id="q-card" class="container pt-3 bg-light rounded-4">
+
     <?= scoreBoard(); ?>
 
     <div id="quiz-area"></div>
+
 </div>
+</main>
 
 <script id="quiz-feedback" type="text/x-handlebars-template">
 <div class="px-3">

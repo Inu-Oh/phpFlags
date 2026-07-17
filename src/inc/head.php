@@ -18,25 +18,31 @@
         <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
         <link rel="stylesheet" href="static/css/style.css">
-        <style>
-            body {
-                font-family: Arial, sans-serif;
+        <script>
+            function openNav() {
+                $('#sideNavbar').width("23rem");
             }
-        </style>
+
+            function closeNav() {
+                $("#sideNavbar").width("0");
+            }
+        </script>
     </head>
     <body class="p-5">
 
-        <nav id="nav-bar" 
-            class="nav mb-3 p-2 navbar navbar-light bg-light rounded-4">
-            <div class="container-fluid justify-content-around">
-                <?php 
-                    if ( isset($_SESSION['username']) ) {
-                        echo 'Logged in as ' . $_SESSION['username'] . 
-                        ' <a href="logout.php">Logout</a>';
-                    } else {
-                        echo '<a href="login.php">Login</a>
-                            <a href="register.php">Register</a>';
-                    }
-                ?>
-            </div>
+        <nav id="sideNavbar" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">
+                &times;
+            </a>
+            
+            <?php 
+                if ( isset($_SESSION['username']) ) {
+                    echo '<span id="userId"> Logged in as ' . $_SESSION['username'] . 
+                    '</span><a href="logout.php">Logout</a>';
+                } else {
+                    echo '<a href="login.php">Login</a>
+                        <a href="register.php">Register</a>';
+                }
+            ?>
+
         </nav>

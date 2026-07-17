@@ -66,14 +66,19 @@ if ( isPostRequest() ) {
 }
 
 view('head'); ?>
+<main>
+    <div id="openNavBtn" class="btn btn-sm btn-outline-secondary" 
+        onclick="openNav()">Menu</div>
+        
+    <div id="q-card" class="container pt-3 bg-light rounded-4">
 
-<div id="q-card" class="container pt-3 bg-light rounded-4">
-    <?= scoreBoard(); ?>
+        <?= scoreBoard(); ?>
 
-    <div id="quiz-area"></div>
-    
-</div>
-<!-- <?php if (isset($_SESSION['userProgress'])) {var_dump($_SESSION['userProgress']);}?> -->
+        <div id="quiz-area"></div>
+
+    </div>
+</main>
+
 <script id="quiz-template" type="text/x-handlebars-template">
 <div class="px-3">
 
