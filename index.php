@@ -33,13 +33,13 @@ if ( isPostRequest() ) {
         return;
     }
 
-    if ( isset($_POST['check'])) {
+    if ( isset($_POST['check']) ) {
 
         verifyCsrfOrDie();
 
         # Check the user answer and spelling accuracy
-        $perc_accuracy = checkUserAnswer();
-        checkAnswerAccuracy($perc_accuracy);
+        $percAccuracy = checkUserAnswer();
+        checkAnswerAccuracy($percAccuracy);
 
         $quizzes = quizArray();
         $quizId = $quizzes[$_SESSION['currentQuiz']];
@@ -57,7 +57,7 @@ if ( isPostRequest() ) {
             updateAnonProgress($quizId);
         }
 
-        $_SESSION['count']++;
+        updateScore($pdo, $quizId, $percAccuracy);
         $_SESSION['feedback'] = TRUE;
 
         header( 'Location: feedback.php' );
@@ -73,7 +73,7 @@ view('head'); ?>
 
     <div id="q-card" class="container pt-3 bg-light rounded-4">
 
-        <?= scoreBoard(); ?>
+        <?= scoreBoard($pdo, $_SESSION['currentQuiz']); ?>
 
         <div id="quiz-area"></div>
 

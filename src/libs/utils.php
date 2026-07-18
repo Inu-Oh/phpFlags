@@ -73,8 +73,11 @@ function getQuestion() {
 }
 
 
-function getUserStats() {
+function getUserStats($pdo, $quizId) {
     $total = $seen = $correct = 0;
+    if ( ! isset($_SESSION['userProgress']) ) {
+        updateUserProgressInSession($pdo, $quizId);
+    }
     foreach ( $_SESSION['userProgress'] as $questionProgress ) {
         $total++;
         if ( $questionProgress[0] > 0 ) {
@@ -82,16 +85,22 @@ function getUserStats() {
             $correct += $questionProgress[1] / $questionProgress[0];
         }
     }
-    $accuracy = round(($correct / $seen) * 100);
+    if ( $seen > 0 ) {
+        $accuracy = ( $correct / $seen ) * 100;
+    } else {
+        $accuracy = "?"; # TODO - change this to an appropriate value
+    }
+    
     $_SESSION['userTested'] = $seen;
     $_SESSION['userAccuracy'] = $accuracy;
+    $_SESSION['userCorrect'] = $correct;
     $_SESSION['questionCount'] = $total;
 }
 
 
 // return grade based on percentage score
 function grade() {
-    if ($_SESSION['count'] > 0) {
+    if ( $_SESSION['count'] > 0 ) {
         $perc = intval(($_SESSION['score'] / $_SESSION['count']) * 100);
         if ( $perc > 85 ) {
             $grade = '<i class="fa-regular fa-face-grin-stars"></i>';
@@ -123,10 +132,13 @@ function isPostRequest(): bool {
 }
 
 
-function scoreBoard() {
+function scoreBoard($pdo, $quizId=FALSE) {
     if ( isset($_SESSION['username']) ) {
+        if ( ! isset($_SESSION['userTested']) || ! isset($_SESSION['userAccuracy']) ) {
+            getUserStats($pdo, $quizId);
+        }
         $seen = $_SESSION['userTested'];
-        $score = $_SESSION['userAccuracy'] . '%';
+        $score = round($_SESSION['userAccuracy']) . '%';
         $conjunction = ' on ';
     } else {
         $seen = $_SESSION['count'];
@@ -138,13 +150,13 @@ function scoreBoard() {
         <h3 id="score" class="bg-secondary text-light rounded py-1">';
     if ( $seen > 0 ) {
         if ( $score == $seen ) {
-            $scoreBoard .= 'Perfect score on '.
-                htmlspecialchars($seen, ENT_QUOTES, 'UTF-8').
+            $scoreBoard .= 'Perfect score on ' .
+                htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') .
                 ' cards ';
         } else {
             $scoreBoard .= 'You got '
-                .htmlspecialchars($score, ENT_QUOTES, 'UTF-8').$conjunction
-                .htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') . ' cards';
+                . htmlspecialchars($score, ENT_QUOTES, 'UTF-8') . $conjunction
+                . htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') . ' cards';
         }
 
     } else {
@@ -152,9 +164,9 @@ function scoreBoard() {
     }
 
     if ( grade() ) {
-        $scoreBoard.=' &nbsp; '.grade();
+        $scoreBoard .= ' &nbsp; ' . grade();
     }
-    $scoreBoard.='</h3></div>';
+    $scoreBoard .= '</h3></div>';
 
     return $scoreBoard;
 }
@@ -186,6 +198,25 @@ function updateAnonProgress($quizId) {
         $_SESSION['correct']
     ];
     $_SESSION['anonProgress'][] = $questionProgress;
+}
+
+
+function updateScore($pdo, $quizId, $percAccuracy) {
+    if ( isset($_SESSION['username'])) {
+        if ( ! isset($_SESSION['userTested']) || ! isset($_SESSION['userAccuracy']) ||
+            ! isset($_SESSION['questionCount']) || ! $_SESSION['userCorrect'] ) {
+            getUserStats($pdo, $quizId);
+        }
+        $_SESSION['userTested']++;
+        if ( $percAccuracy > 85 ) {
+            $_SESSION['userCorrect'] += 1;
+        } else {
+            $_SESSION['userCorrect'] -= 1;
+        }
+        $_SESSION['userAccuracy'] = ($_SESSION['userCorrect'] / $_SESSION['userTested']) * 100;
+    } else {
+        $_SESSION['count']++;
+    }
 }
 
 // Update the logged in user's progress in the PostgreSQL database
@@ -223,7 +254,7 @@ function updateUserProgressInSession($pdo, $quizId) {
             $val = array($row['test_count'], $row['correct_count']);
             $_SESSION['userProgress'][$key] = $val;
         }
-    } else {
+    } else if ( $quizId ) {
         $key = strval($quizId ). "_" . strval($_SESSION['nextQuestion']);
         list($testCount, $correctCount) = $_SESSION['userProgress'][$key];
         $testCount++;

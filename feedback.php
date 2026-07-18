@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/src/libs/utils.php';
+require_once __DIR__ . '/src/pdo.php';
 
 if ( empty($_SESSION['csrf_token']) ) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -15,7 +16,7 @@ if ( isPostRequest() ) {
         return;
     }
 
-    if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion'])) {
+    if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion']) ) {
 
         verifyCsrfOrDie();
         
@@ -29,7 +30,7 @@ view('head'); ?>
 
 <div id="q-card" class="container pt-3 bg-light rounded-4">
 
-    <?= scoreBoard(); ?>
+    <?= scoreBoard($pdo, $_SESSION['currentQuiz']); ?>
 
     <div id="quiz-area"></div>
 
