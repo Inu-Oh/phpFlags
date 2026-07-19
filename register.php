@@ -48,16 +48,16 @@ if ( isPostRequest() ) {
             return;
         }
 
-        # Validate passwords. Check for match. Save as hash.
+        # Validate passwords. Check for match.
         if ( htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8') ==
             htmlspecialchars($_POST['password2'], ENT_QUOTES, 'UTF-8') ) {
             
-            # Salt the password before saving
+            # Hash the password before saving
             $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
             $options = [ 'cost' => 12 ];
             $pw_hash = password_hash($password, PASSWORD_BCRYPT, $options); 
 
-            # Save new user and hashed data to database
+            # Save new user data and hash to database
             $sql = 'INSERT INTO users (username, email, pw_hash) VALUES(:un, :em, :pw)';
             $stmt = $pdo->prepare($sql);
             $stmt->execute(array(
