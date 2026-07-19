@@ -50,23 +50,20 @@ if ( isPostRequest() ) {
 
         # Validate passwords. Check for match. Save as hash.
         if ( htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8') ==
-            htmlspecialchars($_POST['password2'], ENT_QUOTES, 'UTF-8')) {
+            htmlspecialchars($_POST['password2'], ENT_QUOTES, 'UTF-8') ) {
             
             # Salt the password before saving
             $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
-            $salt = bin2hex(random_bytes(16)); // Generate random salt
-            $salted_pw = $password . $salt;
-            $pw_hash = hash('sha256', $salted_pw); 
+            $options = [ 'cost' => 12 ];
+            $pw_hash = password_hash($password, PASSWORD_BCRYPT, $options); 
 
             # Save new user and hashed data to database
-            $sql = 'INSERT INTO users (username, email, pw_hash, salt)
-                        VALUES(:un, :em, :pw, :sl)';
+            $sql = 'INSERT INTO users (username, email, pw_hash) VALUES(:un, :em, :pw)';
             $stmt = $pdo->prepare($sql);
             $stmt->execute(array(
                 ':un' => $username,
                 ':em' => $email,
                 ':pw' => $pw_hash,
-                ':sl' => $salt
             ));
             $_SESSION['userId'] = $pdo->lastInsertId();
 

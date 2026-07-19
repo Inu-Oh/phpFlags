@@ -79,6 +79,7 @@ function getUserStats($pdo, $quizId) {
         updateUserProgressInSession($pdo, $quizId);
     }
     foreach ( $_SESSION['userProgress'] as $questionProgress ) {
+        # TODO - Improve this logic to count total of tested rather than number of tested
         $total++;
         if ( $questionProgress[0] > 0 ) {
             $seen++;
@@ -88,7 +89,7 @@ function getUserStats($pdo, $quizId) {
     if ( $seen > 0 ) {
         $accuracy = ( $correct / $seen ) * 100;
     } else {
-        $accuracy = "?"; # TODO - change this to an appropriate value
+        $accuracy = 0; # TODO - review and change this to an appropriate value if need
     }
     
     $_SESSION['userTested'] = $seen;
@@ -97,11 +98,15 @@ function getUserStats($pdo, $quizId) {
     $_SESSION['questionCount'] = $total;
 }
 
-
-// return grade based on percentage score
+// Return grade based on percentage score
 function grade() {
-    if ( $_SESSION['count'] > 0 ) {
-        $perc = intval(($_SESSION['score'] / $_SESSION['count']) * 100);
+    if ( $_SESSION['count'] > 0 || isset($_SESSION['userAccuracy']) ) {
+        if ( isset($_SESSION['userAccuracy'])) {
+            $perc = round($_SESSION['userAccuracy']);
+        } else {
+            $perc = round(($_SESSION['score'] / $_SESSION['count']) * 100);
+        }
+        
         if ( $perc > 85 ) {
             $grade = '<i class="fa-regular fa-face-grin-stars"></i>';
         } elseif ( $perc > 70 ) {
@@ -148,19 +153,25 @@ function scoreBoard($pdo, $quizId=FALSE) {
 
     $scoreBoard = '<div class="text-center p-3">
         <h3 id="score" class="bg-secondary text-light rounded py-1">';
+
+    if ( $seen != 1 ) {
+        $card_s = ' cards ';
+    } else {
+        $card_s = ' card ';
+    }
+
     if ( $seen > 0 ) {
-        if ( $score == $seen ) {
+        if ( $score == $seen || $score == '100%' ) {
             $scoreBoard .= 'Perfect score on ' .
-                htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') .
-                ' cards ';
+                htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') . $card_s;
         } else {
             $scoreBoard .= 'You got '
                 . htmlspecialchars($score, ENT_QUOTES, 'UTF-8') . $conjunction
-                . htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') . ' cards';
-        }
+                . htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') . $card_s;
 
+        }
     } else {
-        $scoreBoard.='Starting new quiz';
+        $scoreBoard .= 'Starting new quiz';
     }
 
     if ( grade() ) {
@@ -204,15 +215,13 @@ function updateAnonProgress($quizId) {
 function updateScore($pdo, $quizId, $percAccuracy) {
     if ( isset($_SESSION['username'])) {
         if ( ! isset($_SESSION['userTested']) || ! isset($_SESSION['userAccuracy']) ||
-            ! isset($_SESSION['questionCount']) || ! $_SESSION['userCorrect'] ) {
+            ! isset($_SESSION['questionCount']) || ! isset($_SESSION['userCorrect']) ) {
             getUserStats($pdo, $quizId);
         }
         $_SESSION['userTested']++;
         if ( $percAccuracy > 85 ) {
             $_SESSION['userCorrect'] += 1;
-        } else {
-            $_SESSION['userCorrect'] -= 1;
-        }
+        } 
         $_SESSION['userAccuracy'] = ($_SESSION['userCorrect'] / $_SESSION['userTested']) * 100;
     } else {
         $_SESSION['count']++;

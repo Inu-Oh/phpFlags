@@ -20,7 +20,7 @@ if ( isPostRequest() ) {
     }
 
     if ( isset($_POST['username']) && isset($_POST['password'])) {
-        unset($_SESSION['name']); # to logout current user in any
+        unset($_SESSION['name']); # to logout current user if any
         
         if ( strlen($_POST['username']) < 1 || strlen($_POST['password']) < 1 ) {
             $_SESSION['error'] = '<p style="color:red">User name and password are required</p>';
@@ -28,27 +28,19 @@ if ( isPostRequest() ) {
             return;
         } 
 
-        # Lookup username if valid and get salt
+        # Lookup username
         $username = htmlentities($_POST['username']);
-        $stmt = $pdo->prepare("SELECT salt, pw_hash FROM users WHERE username = :un");
+        $sql = "SELECT user_id, pw_hash FROM users WHERE username = :un";
+        $stmt = $pdo->prepare($sql);
         $stmt->execute(array(':un' => $username));
-        $saltRow = $stmt->fetch(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ( ! empty($saltRow) ) {
-
-            # Salt hash and validadate user password
+        if ( ! empty($row) ) {
+            # Validadate user password
             $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
-            $salt = $saltRow['salt'];
-            $salted_pw = $password . $salt;
-            $pw_hash = hash('sha256', $salted_pw ); 
-            $sql = "SELECT * FROM users WHERE username = :un AND pw_hash = :pw";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute(array(':un' => $username, ':pw' => $pw_hash));
-            $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ( ! empty($userRow) ) {
-
-                $_SESSION['username'] = $userRow['username'];
-                $_SESSION['userId'] = $userRow['user_id'];
+            if ( password_verify($password, (string)$row['pw_hash'] ) ) {
+                $_SESSION['username'] = $username;
+                $_SESSION['userId'] = $row['user_id'];
                 $_SESSION['success'] = '<p style="color:green">Logged in</p>';
 
                 # Update any user progress made prior to login
@@ -57,7 +49,6 @@ if ( isPostRequest() ) {
                 error_log("Login success for " . $username);
                 header( 'Location: index.php' );
                 return;
-
             } else {
                 $_SESSION['error'] = '<p style="color:red">Incorrect password</p>';
                 error_log("Login fail for " . $username);
@@ -65,7 +56,6 @@ if ( isPostRequest() ) {
                 return;
             }
         } else {
-
             $_SESSION['error'] = '<p style="color:red">Username not found</p>';
             header( 'Location: login.php' );
             return;
