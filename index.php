@@ -3,25 +3,7 @@ session_start();
 require_once __DIR__ . '/src/libs/utils.php';
 require_once __DIR__ . '/src/pdo.php';
 
-if ( empty($_SESSION['csrf_token']) ) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-if ( isGetRequest() ) {
-    if ( ! isset($_SESSION['quizIsSet']) ) {
-
-        setQuestions($pdo);
-        // Start new score session
-        $_SESSION['count'] = 0;
-        $_SESSION['score'] = 0;
-        $_SESSION['feedback'] = FALSE;
-        getQuestion();
-    }
-
-    if ( ! isset($_SESSION['nextQuestion']) ) {
-        getQuestion();
-    }
-}
+if ( empty($_SESSION['csrf_token']) ) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 if ( isPostRequest() ) {
 
@@ -37,23 +19,24 @@ if ( isPostRequest() ) {
 
         verifyCsrfOrDie();
 
-        # Check the user answer and spelling accuracy
-        $percAccuracy = checkUserAnswer();
-        checkAnswerAccuracy($percAccuracy);
+        // Check the user answer and spelling accuracy
+        $percAccuracy = checkUserAnswer(); # Returns percent value of answer
+        checkAnswerAccuracy($percAccuracy); # Would return true or false
 
+        // Get current quiz data
         $quizzes = quizArray();
         $quizId = $quizzes[$_SESSION['currentQuiz']];
 
         if ( isset($_SESSION['username']) ) {
 
-            # Update logged in user progress in DB and session if user is logged in
+            // Update logged in user progress in DB and session if user is logged in
             updateUserProgressInDB($pdo, $quizId);
-            // TODO - use the data stored in session in future quiz features
+            # TODO - use the data stored in session in future quiz features
             updateUserProgressInSession($pdo, $quizId);
 
         } else {
 
-            # Store anonymous progress data in case user creates an account or logs in
+            // Store anonymous progress data in case user creates an account or logs in
             updateAnonProgress($quizId);
         }
 
@@ -63,6 +46,24 @@ if ( isPostRequest() ) {
         header( 'Location: feedback.php' );
         return;
     }
+}
+
+if ( isGetRequest() ) {
+    if ( ! isset($_SESSION['quizIsSet']) ) {
+
+        setQuestions($pdo);
+        // Start new score session
+        $_SESSION['count'] = 0;
+        $_SESSION['score'] = 0;   
+        getQuestion();
+    }
+
+    // Get question data if it is not set
+    if ( ! isset($_SESSION['nextQuestion']) ) getQuestion();
+
+    // Clear unneded data from session
+    if ( isset($_SESSION['answer']) ) unset($_SESSION['answer']);
+    if ( isset($_SESSION['correct']) ) unset($_SESSION['correct']);
 }
 
 view('head'); ?>

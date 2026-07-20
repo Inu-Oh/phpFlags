@@ -3,9 +3,7 @@ session_start();
 require_once __DIR__ . '/src/libs/utils.php';
 require_once __DIR__ . '/src/pdo.php';
 
-if ( empty($_SESSION['csrf_token']) ) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+if ( empty($_SESSION['csrf_token']) ) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 if ( isPostRequest() ) {
     // For testing TODO remove later along with button in view below
@@ -16,6 +14,7 @@ if ( isPostRequest() ) {
         return;
     }
 
+    // Get data for next quiz question when user clicks 'Next'
     if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion']) ) {
 
         verifyCsrfOrDie();
@@ -23,6 +22,20 @@ if ( isPostRequest() ) {
         getQuestion();
         header( 'Location: index.php' );
         return;
+    }
+}
+
+if ( isGetRequest() ) {
+    // Prevent opening feedback page when user clicks browser back arrow
+    if ( ! isset($_SESSION['feedback']) || ! $_SESSION['feedback'] ) {
+        header( 'Location: index.php' );
+        return;
+    }
+
+    // Clear unneeded data from session
+    if ( isset($_SESSION['username']) ) {
+        if ( isset($_SESSION['count']) ) unset($_SESSION['count']);
+        if ( isset($_SESSION['score']) ) unset($_SESSION['score']);
     }
 }
 

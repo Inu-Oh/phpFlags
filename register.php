@@ -23,7 +23,7 @@ if ( isPostRequest() ) {
             header( 'Location: register.php' );
             return;
         }
-        // Make sure it's unique
+        // Make sure email is unique
         $stmt = $pdo->prepare('SELECT email FROM users WHERE email = :em');
         $stmt->execute(array(':em' => $email ));
         if ( $stmt->fetchColumn() ) {
@@ -39,7 +39,7 @@ if ( isPostRequest() ) {
             header( 'Location: register.php' );
             return;
         }
-        // Make sure it's unique
+        // Make sure username is unique
         $stmt = $pdo->prepare('SELECT username FROM users WHERE username = :un');
         $stmt->execute(array(':un' => $username));
         if ( $stmt->fetchColumn() ) {
@@ -98,6 +98,11 @@ if ( isPostRequest() ) {
     }
 }
 
+if ( isGetRequest() && isset($_SESSION['username']) ) {
+    header( 'Location: index.php' );
+    return;
+}
+
 view('head', ['title' => 'Register']);
 
 ?>
@@ -109,12 +114,11 @@ view('head', ['title' => 'Register']);
                 echo '<span class="fs-4 fw-bold">' . $_SESSION['error'] . '</span>';
                 unset($_SESSION['error']);
             }
-        ?>
-            <?php
-        if ( isset($_SESSION['bug']) ) {
-            echo '<span class="fs-4 fw-bold">' . $_SESSION['bug'] . '</span>';
-            unset($_SESSION['bug']);
-        }
+
+            if ( isset($_SESSION['bug']) ) {
+                echo '<span class="fs-4 fw-bold">' . $_SESSION['bug'] . '</span>';
+                unset($_SESSION['bug']);
+            }
         ?>
     </h3>
     <form action="register.php" method="post" class="form-group col-7 pb-5">

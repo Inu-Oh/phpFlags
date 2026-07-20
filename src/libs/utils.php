@@ -5,50 +5,42 @@ define("COUNTRY_CAPITAL", 3);
 define("CAPITAL_COUNTRY", 4);
 
 // Check answer accuracy and store result in session
-function checkAnswerAccuracy($perc_accuracy) {
-    if ( $perc_accuracy > 85 ) {
+function checkAnswerAccuracy($percAccuracy): void {
+    if ( $percAccuracy > 85 ) {
         $_SESSION['correct'] = TRUE;    
         $_SESSION['score']++;
-        // TODO - Separate misspell check from the rest of this logic
-        if ( $perc_accuracy < 100 ) {
-                $_SESSION['misspelled'] = TRUE;
-        }
+        if ( $percAccuracy < 100 ) $_SESSION['misspelled'] = TRUE;
+
     } else {
         $_SESSION['correct'] = FALSE;
     }
 }
 
 // Check the user answer for a match and return accuracy
-function checkUserAnswer() {
+function checkUserAnswer(): float {
     if ( isset($_POST['answer']) && strlen($_POST['answer']) > 0 ) {
             $_SESSION['userInput'] = htmlspecialchars($_POST['answer'], ENT_QUOTES, 'UTF-8');
-            $matching_chars = similar_text(
+            $matchingChars = similar_text(
                 iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['userInput'])),
                 iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['answer'])),
-                $perc_accuracy );
+                $percAccuracy );
         }
-    return $perc_accuracy;
+    return $percAccuracy;
 }
 
 // Get the next quiz question and save it to session
-function getQuestion() {
+function getQuestion(): void {
+
+    // Make an array of all quizzes to choose from
     $quizzes = array();
-    if ( count($_SESSION['flagCountry']) > 0 ) { 
-        $quizzes[] = 'flagCountry';
-    }
-    if ( count($_SESSION['flagCapital']) > 0 ) { 
-        $quizzes[] = 'flagCapital';
-    }
-    if ( count($_SESSION['countryCapital']) > 0 ) { 
-        $quizzes[] = 'countryCapital';
-    }
-    if ( count($_SESSION['capitalCountry']) > 0 ) { 
-        $quizzes[] = 'capitalCountry';
-    }
+    if ( count($_SESSION['flagCountry']) > 0 ) $quizzes[] = 'flagCountry';
+    if ( count($_SESSION['flagCapital']) > 0 ) $quizzes[] = 'flagCapital';
+    if ( count($_SESSION['countryCapital']) > 0 ) $quizzes[] = 'countryCapital';
+    if ( count($_SESSION['capitalCountry']) > 0 ) $quizzes[] = 'capitalCountry';
+    
+    // Choose a random question from a rendomly selected quiz list
     $randomQuiz = $quizzes[array_rand($quizzes)];
-    if ( isset($_SESSION['nextQuestion']) ) {
-        unset($_SESSION['nextQuestion']);
-    }
+    if ( isset($_SESSION['nextQuestion']) ) unset($_SESSION['nextQuestion']);
     $_SESSION['currentQuiz'] = $randomQuiz;
     switch ($randomQuiz) {
         case 'flagCountry':
@@ -64,34 +56,30 @@ function getQuestion() {
             $_SESSION['nextQuestion'] = array_pop($_SESSION['capitalCountry']);
             break;
     }
-    if ( ! isset($_SESSION['nextQuestion']) ) {
-        getQuestion();
-    }
+    if ( ! isset($_SESSION['nextQuestion']) ) getQuestion();
 
     $_SESSION['loaded'] = TRUE;
     $_SESSION['feedback'] = FALSE;
 }
 
 
-function getUserStats($pdo, $quizId) {
+function getUserStats($pdo, $quizId): void {
+
+    if ( ! isset($_SESSION['userProgress']) ) updateUserProgressInSession($pdo, $quizId);
+
+    # Calculate user's performance on all questions overall
     $total = $seen = $correct = 0;
-    if ( ! isset($_SESSION['userProgress']) ) {
-        updateUserProgressInSession($pdo, $quizId);
-    }
     foreach ( $_SESSION['userProgress'] as $questionProgress ) {
-        # TODO - Improve this logic to count total of tested rather than number of tested
-        $total++;
         if ( $questionProgress[0] > 0 ) {
-            $seen++;
+            $seen += $questionProgress[0];
             $correct += $questionProgress[1] / $questionProgress[0];
         }
+        $total++;
     }
-    if ( $seen > 0 ) {
-        $accuracy = ( $correct / $seen ) * 100;
-    } else {
-        $accuracy = 0; # TODO - review and change this to an appropriate value if need
-    }
+
+    $accuracy = ( $seen > 0 ) ? ( $correct / $seen ) * 100 : 0;
     
+    // Store calculated performance data in session
     $_SESSION['userTested'] = $seen;
     $_SESSION['userAccuracy'] = $accuracy;
     $_SESSION['userCorrect'] = $correct;
@@ -99,8 +87,10 @@ function getUserStats($pdo, $quizId) {
 }
 
 // Return grade based on percentage score
-function grade() {
-    if ( $_SESSION['count'] > 0 || isset($_SESSION['userAccuracy']) ) {
+function grade(): string {
+    if ( ( isset($_SESSION['count']) && $_SESSION['count'] > 0 ) || 
+        isset($_SESSION['userAccuracy']) ) {
+            
         if ( isset($_SESSION['userAccuracy'])) {
             $perc = round($_SESSION['userAccuracy']);
         } else {
@@ -126,7 +116,7 @@ function grade() {
     return $grade;
 }
 
-// TODO - implement use in index.php, feedback.php and other pages
+
 function isGetRequest(): bool {
     return strtoupper( $_SERVER['REQUEST_METHOD'] ) === 'GET';
 }
@@ -136,8 +126,8 @@ function isPostRequest(): bool {
     return strtoupper( $_SERVER['REQUEST_METHOD'] ) === 'POST';
 }
 
-
-function scoreBoard($pdo, $quizId=FALSE) {
+// Creates HTML for scoreboard
+function scoreBoard($pdo, $quizId=FALSE): string {
     if ( isset($_SESSION['username']) ) {
         if ( ! isset($_SESSION['userTested']) || ! isset($_SESSION['userAccuracy']) ) {
             getUserStats($pdo, $quizId);
@@ -154,39 +144,31 @@ function scoreBoard($pdo, $quizId=FALSE) {
     $scoreBoard = '<div class="text-center p-3">
         <h3 id="score" class="bg-secondary text-light rounded py-1">';
 
-    if ( $seen != 1 ) {
-        $card_s = ' cards ';
-    } else {
-        $card_s = ' card ';
-    }
+    $card_s = ( $seen != 1 ) ? ' cards ' : ' card ';
 
     if ( $seen > 0 ) {
         if ( $score == $seen || $score == '100%' ) {
-            $scoreBoard .= 'Perfect score on ' .
+            $scoreBoard .= 'Perfect score - ' .
                 htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') . $card_s;
         } else {
             $scoreBoard .= 'You got '
                 . htmlspecialchars($score, ENT_QUOTES, 'UTF-8') . $conjunction
                 . htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') . $card_s;
-
         }
     } else {
         $scoreBoard .= 'Starting new quiz';
     }
-
-    if ( grade() ) {
-        $scoreBoard .= ' &nbsp; ' . grade();
-    }
+    
+    if ( grade() ) $scoreBoard .= ' &nbsp; ' . grade();
     $scoreBoard .= '</h3></div>';
 
     return $scoreBoard;
 }
 
 // Set up all quiz questions to session at start or restart
-function setQuestions($pdo) {
+function setQuestions($pdo): void {
     list($countryIntList, $capitalIntList) = quizLists($pdo);
 
-    // var_dump($countryIntList);
     shuffle($countryIntList);
     $_SESSION['flagCountry'] = $countryIntList;
     shuffle($capitalIntList);
@@ -199,7 +181,7 @@ function setQuestions($pdo) {
 }
 
 // Update anonymous progress after each test in case user creates an account or logs in
-function updateAnonProgress($quizId) {
+function updateAnonProgress($quizId): void {
     if ( ! isset($_SESSION['anonProgress']) ) {
         $_SESSION['anonProgress'] = [];
     }
@@ -212,16 +194,14 @@ function updateAnonProgress($quizId) {
 }
 
 
-function updateScore($pdo, $quizId, $percAccuracy) {
+function updateScore($pdo, $quizId, $percAccuracy): void {
     if ( isset($_SESSION['username'])) {
         if ( ! isset($_SESSION['userTested']) || ! isset($_SESSION['userAccuracy']) ||
             ! isset($_SESSION['questionCount']) || ! isset($_SESSION['userCorrect']) ) {
             getUserStats($pdo, $quizId);
         }
         $_SESSION['userTested']++;
-        if ( $percAccuracy > 85 ) {
-            $_SESSION['userCorrect'] += 1;
-        } 
+        if ( $percAccuracy > 85 ) $_SESSION['userCorrect']++;
         $_SESSION['userAccuracy'] = ($_SESSION['userCorrect'] / $_SESSION['userTested']) * 100;
     } else {
         $_SESSION['count']++;
@@ -229,7 +209,7 @@ function updateScore($pdo, $quizId, $percAccuracy) {
 }
 
 // Update the logged in user's progress in the PostgreSQL database
-function updateUserProgressInDB($pdo, $quizId) {
+function updateUserProgressInDB($pdo, $quizId): void {
     if ( $_SESSION['correct'] ) {
         $sql = 'UPDATE progress 
             SET test_count=test_count+1, correct_count=correct_count+1,
@@ -250,7 +230,7 @@ function updateUserProgressInDB($pdo, $quizId) {
 }
 
 // Make a session copy of logged in user progress from database to track in session
-function updateUserProgressInSession($pdo, $quizId) {
+function updateUserProgressInSession($pdo, $quizId): void {
     if ( ! isset($_SESSION['userProgress'] )) {
         $_SESSION['userProgress'] = [];
         $sql = 'SELECT quiz_id, country_id, test_count, correct_count
@@ -263,20 +243,18 @@ function updateUserProgressInSession($pdo, $quizId) {
             $val = array($row['test_count'], $row['correct_count']);
             $_SESSION['userProgress'][$key] = $val;
         }
-    } else if ( $quizId ) {
+    } elseif ( $quizId ) {
         $key = strval($quizId ). "_" . strval($_SESSION['nextQuestion']);
         list($testCount, $correctCount) = $_SESSION['userProgress'][$key];
         $testCount++;
-        if ( $_SESSION['correct'] ) {
-            $correctCount++;
-        }
+        if ( $_SESSION['correct'] ) $correctCount++; # TODO REview Does this duplicate update score?
         $val = array($testCount, $correctCount);
         $_SESSION['userProgress'][$key] = $val;
     }
 }
 
 // At login / signup update user progress in Postress DB from anonymous session data
-function updateUserProgressFromSessionToDB($pdo) {
+function updateUserProgressFromSessionToDB($pdo): void {
     if ( isset($_SESSION['anonProgress']) ) {
         foreach ( $_SESSION['anonProgress'] as $questionProgress)  {
             list($quizId, $countryId, $correct) = $questionProgress;
@@ -302,7 +280,7 @@ function updateUserProgressFromSessionToDB($pdo) {
 }
 
 // Provide array of quiz types with a constant id used in DB for each
-function quizArray() {
+function quizArray(): array {
     return array(
         'flagCountry' => FLAG_COUNTRY,
         'flagCapital' => FLAG_CAPITAL,
@@ -312,7 +290,7 @@ function quizArray() {
 }
 
 // Create lists of integers for use as quiz lists
-function quizLists($pdo) {
+function quizLists($pdo): array {
     $stmt = $pdo->prepare('SELECT pk, capital FROM Countries');
     $stmt->execute(array());
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -344,11 +322,10 @@ function verifyCsrfOrDie() {
     }
 }
 
-// Loads code from PHP a file and passes data to it
+// Loads code from PHP file and passes data to it
 function view(string $filename, array $data = []): void {
     // Create variables from the associative array $data
-    foreach ( $data as $key => $value ) {
-        $$key = $value;
-    }
+    foreach ( $data as $key => $value ) $$key = $value;
+
     require_once __DIR__ . '/../inc/' . $filename . '.php';
 }

@@ -8,19 +8,16 @@ if ( empty($_SESSION['csrf_token']) ) {
 }
 
 if ( isPostRequest() ) {
-    if ( $_POST['csrf_token'] !== $_SESSION['csrf_token'] ) {
-        die('CSRF token validation failed');
-    }
 
-    if ( isset($_POST['cancel'])) {
-        if ($_POST['cancel'] == 'Cancel') {
-            header('Location: index.php');
-            return;
-        }
+    verifyCsrfOrDie();
+
+    if ( isset($_POST['cancel']) && $_POST['cancel'] == 'Cancel') {
+        header( 'Location: index.php' );
+        return;
     }
 
     if ( isset($_POST['username']) && isset($_POST['password'])) {
-        unset($_SESSION['name']); # to logout current user if any
+        unset($_SESSION['username'], $_SESSION['userId']); # to logout current user if any
         
         if ( strlen($_POST['username']) < 1 || strlen($_POST['password']) < 1 ) {
             $_SESSION['error'] = '<p style="color:red">User name and password are required</p>';
@@ -63,6 +60,11 @@ if ( isPostRequest() ) {
     }
 }
 
+if ( isGetRequest() && isset($_SESSION['username']) ) {
+    header( 'Location: index.php' );
+    return;
+}
+
 view('head', ['title' => 'Login']);
 ?>
 
@@ -78,8 +80,7 @@ view('head', ['title' => 'Login']);
             echo '<span class="fs-4 fw-bold">' . $_SESSION['error'] . '</span>';
             unset($_SESSION['error']);
         }
-    ?>
-    <?php
+
         if ( isset($_SESSION['bug']) ) {
             echo '<span class="fs-4 fw-bold">' . $_SESSION['bug'] . '</span>';
             unset($_SESSION['bug']);
