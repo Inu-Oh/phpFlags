@@ -48,6 +48,10 @@ Choosing an SQL schema to store user learning progress on all quiz questions. Pl
 ### Feedback on country name guess from capity city name - wrong guess
 <img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/763845b8-1b76-413c-bfb9-44d47f9313f2" />
 
+## Add config.php
+
+For this app to work, it needs a config.php file that will start a secure session environment. For example, this video provides config.php code : https://www.youtube.com/watch?v=FbLYsTHJKDw
+
 ## Setup Quiz Data in Database from CSV
 
 Before running this file create the following database and tables. All SQL is written for PostgreSQL.
@@ -56,8 +60,8 @@ Create a database to store the quiz data.
 Set a username and password to access the database.
 
 ```
-CREATE USER zephyr WITH PASSWORD '2wsx@WSXZAQ!zaq1';
-CREATE DATABASE flags WITH OWNER 'zephyr' ENCODING 'UTF8';
+CREATE USER username WITH PASSWORD 'password';
+CREATE DATABASE flags WITH OWNER 'username' ENCODING 'UTF8';
 ```
 
 Create table for countries / primary key and data will be populated from CSV.
@@ -86,7 +90,7 @@ if ( file_exists('../config.php') ) {
 if ( ! isset( $pdo ) ) {
     try {
 	    $pdo = new PDO(
-			'pgsql:host=localhost;dbname=flags', 'userName', 'passWord',
+			'pgsql:host=localhost;dbname=flags', 'username', 'password',
 			[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
 		);
 	} catch (PDOException $e) {
