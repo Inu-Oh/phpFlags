@@ -1,23 +1,15 @@
 <?php
-session_start();
-require_once __DIR__ . '/src/libs/utils.php';
+require_once __DIR__ . '/src/config/config.php';
 require_once __DIR__ . '/src/pdo.php';
+require_once __DIR__ . '/src/libs/utils.php';
 
 if ( empty($_SESSION['csrf_token']) ) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 if ( isPostRequest() ) {
 
-    // For testing TODO remove later along with button in view below
-    if ( isset($_POST['clear']) ) {
-        session_unset();
-        session_regenerate_id(true);
-        header( 'Location: index.php' );
-        return;
-    }
+    verifyCsrfOrDie();
 
     if ( isset($_POST['check']) ) {
-
-        verifyCsrfOrDie();
 
         // Check the user answer and spelling accuracy
         $percAccuracy = checkUserAnswer(); # Returns percent value of answer
@@ -31,7 +23,6 @@ if ( isPostRequest() ) {
 
             // Update logged in user progress in DB and session if user is logged in
             updateUserProgressInDB($pdo, $quizId);
-            # TODO - use the data stored in session in future quiz features
             updateUserProgressInSession($pdo, $quizId);
 
         } else {
@@ -128,9 +119,6 @@ view('head'); ?>
                     name="check" value="Check">
             </div>
         </div>
-
-        <!-- <input class="btn btn-outline-danger me-3" type="submit"
-            value="Clear session" name="clear"> -->
     </form>
 
     </div>

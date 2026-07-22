@@ -1,5 +1,7 @@
 pdo.php
 del/
+config/
+config.php
 test_iconv.php
 clearSess.php
 countries.php

@@ -1,21 +1,19 @@
 <?php
-session_start();
+require_once __DIR__ . '/src/config/config.php';
 require_once __DIR__ . '/src/pdo.php';
 require_once __DIR__ . '/src/libs/utils.php';
 
-if ( empty($_SESSION['csrf_token']) ) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+if ( empty($_SESSION['csrf_token']) ) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 if ( isPostRequest() ) {
     
     verifyCsrfOrDie();
 
-    # Check that all fields are posted
+    // Check that all fields are posted
     if ( isset($_POST['username']) && isset($_POST['email']) 
         && isset($_POST['password']) && isset($_POST['password2']) ) {
         
-        # Validate email
+        // Validate email
         $email = htmlspecialchars($_POST['email']);
         if ( ! filter_var( $email, FILTER_VALIDATE_EMAIL )
             || strlen($email) > 128 ) {
@@ -32,7 +30,7 @@ if ( isPostRequest() ) {
             return;
         }
 
-        # Validate username
+        // Validate username
         $username = htmlspecialchars($_POST['username']);
         if ( strlen($username) > 32 ) {
             $_SESSION['error'] = "Choose a shorter username";
@@ -48,16 +46,16 @@ if ( isPostRequest() ) {
             return;
         }
 
-        # Validate passwords. Check for match.
+        // Validate password. Check for match.
         if ( htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8') ==
             htmlspecialchars($_POST['password2'], ENT_QUOTES, 'UTF-8') ) {
             
-            # Hash the password before saving
+            // Hash the password before saving
             $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
             $options = [ 'cost' => 12 ];
             $pw_hash = password_hash($password, PASSWORD_BCRYPT, $options); 
 
-            # Save new user data and hash to database
+            // Save new user data and hash to database
             $sql = 'INSERT INTO users (username, email, pw_hash) VALUES(:un, :em, :pw)';
             $stmt = $pdo->prepare($sql);
             $stmt->execute(array(
@@ -67,7 +65,7 @@ if ( isPostRequest() ) {
             ));
             $_SESSION['userId'] = $pdo->lastInsertId();
 
-            # Reset all quiz lists. Initiate user's progress for each quiz question.
+            // Reset all quiz lists. Initiate user's progress for each quiz question.
             setQuestions($pdo);
             $quizzes = quizArray();
             foreach ($quizzes as $quizName => $quizId) { 
@@ -83,7 +81,7 @@ if ( isPostRequest() ) {
                 }
             }
 
-            # Update the user prgross in DB based on progress saved in session
+            // Update the user prgross in DB based on progress saved in session
             updateUserProgressFromSessionToDB($pdo);
 
             header( 'Location: login.php' );

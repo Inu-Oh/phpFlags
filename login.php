@@ -1,31 +1,35 @@
 <?php
-session_start();
+require_once __DIR__ . '/src/config/config.php';
 require_once __DIR__ . '/src/pdo.php';
 require_once __DIR__ . '/src/libs/utils.php';
 
-if ( empty($_SESSION['csrf_token']) ) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+if ( empty($_SESSION['csrf_token']) ) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 if ( isPostRequest() ) {
 
     verifyCsrfOrDie();
 
+    // Redirect to home page if user cancels login
     if ( isset($_POST['cancel']) && $_POST['cancel'] == 'Cancel') {
+
         header( 'Location: index.php' );
         return;
     }
 
     if ( isset($_POST['username']) && isset($_POST['password'])) {
-        unset($_SESSION['username'], $_SESSION['userId']); # to logout current user if any
+
+        // Logout current user if any
+        unset($_SESSION['username'], $_SESSION['userId']); 
         
+        // Show error flash message if name or password are not entered
         if ( strlen($_POST['username']) < 1 || strlen($_POST['password']) < 1 ) {
+
             $_SESSION['error'] = '<p style="color:red">User name and password are required</p>';
             header( 'Location: login.php' );
             return;
         } 
 
-        # Lookup username
+        // Lookup username
         $username = htmlentities($_POST['username']);
         $sql = "SELECT user_id, pw_hash FROM users WHERE username = :un";
         $stmt = $pdo->prepare($sql);
@@ -33,26 +37,32 @@ if ( isPostRequest() ) {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ( ! empty($row) ) {
-            # Validadate user password
+
+            // Validadate user password
             $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
             if ( password_verify($password, (string)$row['pw_hash'] ) ) {
+
                 $_SESSION['username'] = $username;
                 $_SESSION['userId'] = $row['user_id'];
                 $_SESSION['success'] = '<p style="color:green">Logged in</p>';
 
-                # Update any user progress made prior to login
+                // Update any user progress made prior to login
                 updateUserProgressFromSessionToDB($pdo);
 
                 error_log("Login success for " . $username);
                 header( 'Location: index.php' );
                 return;
-            } else {
+            
+                } else {
+                // Show error flash message if password is incorrect
                 $_SESSION['error'] = '<p style="color:red">Incorrect password</p>';
                 error_log("Login fail for " . $username);
                 header( 'Location: login.php' );
                 return;
             }
         } else {
+
+            // Show error flash message if username is not found
             $_SESSION['error'] = '<p style="color:red">Username not found</p>';
             header( 'Location: login.php' );
             return;
