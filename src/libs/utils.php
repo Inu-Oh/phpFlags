@@ -1,4 +1,5 @@
 <?php
+// Constants for quiz lists
 define("FLAG_COUNTRY", 1);
 define("FLAG_CAPITAL", 2);
 define("COUNTRY_CAPITAL", 3);
@@ -60,6 +61,44 @@ function getQuestion(): void {
 
     $_SESSION['loaded'] = TRUE;
     $_SESSION['feedback'] = FALSE;
+}
+
+// Return list of questions from user's learned questions ordered from low to high grade
+function getUserPracticeList() {
+
+    // Create an array of practice questions with value grading each question
+    $_SESSION['practiceList'] = array();
+
+    foreach ( $_SESSION['userProgress'] as $key => $questionProgress ) {
+        list( $views, $correct ) = $questionProgress;
+        if ( $views > 0 ) {
+            $questionAccuracy = $correct / $views;
+            $_SESSION['practiceList'][$key] = $questionAccuracy;
+        }
+    }
+    
+    # Order the array from lowest to highest grade
+    asort( $_SESSION['practiceList'] );
+}
+
+// Return random list of questions from user's learned question set
+function getUserReviewList() {
+
+    // Make a list of all previously tested questions from user progress
+    $_SESSION['reviewList'] = array();
+
+    foreach ( ($_SESSION['userProgress']) as $key => $questionProgress ) {
+        list($views, $_) = $questionProgress;
+        if ( $views > 0 ) {
+            $quizAndQuestionIds = explode("_", $key);
+            $quizId = intval( $quizAndQuestionIds[0] );
+            $questionId = intval( $quizAndQuestionIds[1] );
+            $_SESSION['reviewList'][] = array( $quizId, $questionId );
+        }
+    }
+
+    // Order the list randomly
+    shuffle( $_SESSION['reviewList'] );
 }
 
 
