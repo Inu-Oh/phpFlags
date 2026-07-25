@@ -35,15 +35,47 @@
                 &times;
             </a>
             
-            <?php 
-                if ( isset($_SESSION['username']) ) {
-                    echo '<span id="userId"> Logged in as ' . $_SESSION['username'] . 
-                    '</span><a href="logout.php">Logout</a>';
-                } else {
-                    echo '<a href="login.php">Login</a>
-                        <a href="register.php">Register</a>';
-                }
-            ?>
+<?php 
+    if ( isset( $_SESSION['username'] ) ) {
+        echo '<span id="userId">' . $_SESSION['username'] . 
+        '</span><a href="logout.php">Logout</a>';
+        if ( isset( $_SESSION['username'] ) && isset( $_SESSION['quizMode'] ) ) {
+
+            if ( $_SESSION['quizMode'] == 'practice' ) {
+                echo '<form action="switchMode.php" method="post">
+                    <input type="hidden" value="' . $_SESSION['csrf_token'] . '"
+                        name="csrf_token">
+                    <input class="nav-submit-link" type="submit" value="Learn"
+                        name="learn">
+                    <input class="nav-submit-link" type="submit" value="Review"
+                        name="review">
+                </form>';
+
+            } else { # Case: ( $_SESSION['quizMode'] == 'review' )
+                echo '<form action="switchMode.php" method="post">
+                    <input type="hidden" value="' . $_SESSION['csrf_token'] . '"
+                        name="csrf_token">
+                    <input class="nav-submit-link" type="submit" value="Learn"
+                        name="learn">
+                    <input class="nav-submit-link" type="submit" value="Practice"
+                        name="practice">
+                </form>';
+            }
+        } else {
+            echo '<form action="switchMode.php" method="post">
+                <input type="hidden" value="' . $_SESSION['csrf_token'] . '"
+                    name="csrf_token">
+                <input class="nav-submit-link" type="submit" value="Practice"
+                    name="practice">
+                <input class="nav-submit-link" type="submit" value="Review"
+                    name="review">
+            </form>';
+        }
+    } else {
+        echo '<a href="login.php">Login</a>
+            <a href="register.php">Register</a>';
+    }
+?>
 
         </nav>
 

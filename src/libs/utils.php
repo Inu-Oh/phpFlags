@@ -29,9 +29,8 @@ function checkUserAnswer(): float {
     return $percAccuracy;
 }
 
-// Get the next quiz question and save it to session
-function getQuestion(): void {
-
+// Get question for learn quiz mode
+function getLearnQuestion() {
     // Make an array of all quizzes to choose from
     $quizzes = array();
     if ( count($_SESSION['flagCountry']) > 0 ) $quizzes[] = 'flagCountry';
@@ -57,11 +56,65 @@ function getQuestion(): void {
             $_SESSION['nextQuestion'] = array_pop($_SESSION['capitalCountry']);
             break;
     }
-    if ( ! isset($_SESSION['nextQuestion']) ) getQuestion();
+    if ( ! isset($_SESSION['nextQuestion']) ) getLearnQuestion();
 
     $_SESSION['loaded'] = TRUE;
     $_SESSION['feedback'] = FALSE;
 }
+
+// Get the next quiz question and save it to session
+function getQuestion(): void {
+
+    if ( ! isset( $_SESSION['quizMode'] ) ) {
+
+        getLearnQuestion();
+
+    } elseif ( $_SESSION['quizMode'] == 'practice' ) {
+    
+        getPracticeQuestion();
+    
+    } else {
+
+        getReviewQuestion();
+    }
+}
+
+// Get question for practice quiz mode 
+function getPracticeQuestion() {
+
+    if ( count( $_SESSION['practiceList'] ) > 0 ) {
+
+        $nextQuestion = array_keys( $_SESSION['practiceList'] )[0];
+        array_shift( $_SESSION['practiceList'] );
+        list( $quizId, $questionId ) = explode("_", $nextQuestion);
+        switch ( intval($quizId) ) {
+            case 1 :
+                $_SESSION['currentQuiz'] = 'flagCountry';
+                break;
+            case 2:
+                $_SESSION['currentQuiz'] = 'flagCapital';
+                break;
+            case 3:
+                $_SESSION['currentQuiz'] = 'countryCapital';
+                break;
+            case 4:
+                $_SESSION['currentQuiz'] = 'capitalCountry';
+                break;
+        }
+        $_SESSION['nextQuestion'] = intval($questionId);
+
+    } else {
+        // Switch to learn mode if no more practice questions
+        unset( $_SESSION['practiceList'], $_SESSION['quizMode'] );
+
+        // TODO - Add flash message that practice questions are finished
+
+        getQuestion();
+    }
+}
+
+// Get question for review quiz mode
+function getReviewQuestion() {}
 
 // Return list of questions from user's learned questions ordered from low to high grade
 function getUserPracticeList() {

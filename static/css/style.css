@@ -29,7 +29,11 @@ body {
     transition: 0.5s; /* 0.5 second transition effect to slide the sidenav */
 }
 
-.sidenav a, #userId {
+#userId {
+    font-size: 1.1rem;
+}
+
+.sidenav a, #userId, .nav-submit-link {
     padding: 0.5rem 0.5rem 0.5rem 2rem;
     text-decoration: none;
     font-size: 1.6rem;
@@ -38,11 +42,19 @@ body {
     transition: 0.3s;
 }
 
-#userId {
-    font-size: 1.1rem;
+.nav-submit-link {
+    border: none;
+    background: none;
+    color: #126;
+    cursor: pointer;
 }
 
-.sidenav a:hover {
+#userId {
+    color: black;
+    font-weight: bold;
+}
+
+.sidenav a:hover, .nav-submit-link:hover {
     color: lightskyblue !important;
 }
 
@@ -53,6 +65,8 @@ body {
     font-size: 2.3rem;
     margin-left: 3.6rem;
 }
+
+
 
 @media screen and (max-height: 450px) {
     .sidenav {padding-top: 0.7rem;}
