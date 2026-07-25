@@ -30,7 +30,6 @@ if ( isGetRequest() ) {
     // Clear unneeded data from session
     if ( isset($_SESSION['username']) ) {
 
-        if ( isset($_SESSION['count']) ) unset($_SESSION['count']);
         if ( isset($_SESSION['score']) ) unset($_SESSION['score']);
     }
 }

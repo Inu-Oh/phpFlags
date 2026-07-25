@@ -87,24 +87,10 @@ function getPracticeQuestion() {
         $nextQuestion = array_keys( $_SESSION['practiceList'] )[0];
         array_shift( $_SESSION['practiceList'] );
         list( $quizId, $questionId ) = explode("_", $nextQuestion);
-        switch ( intval($quizId) ) {
-            case 1 :
-                $_SESSION['currentQuiz'] = 'flagCountry';
-                break;
-            case 2:
-                $_SESSION['currentQuiz'] = 'flagCapital';
-                break;
-            case 3:
-                $_SESSION['currentQuiz'] = 'countryCapital';
-                break;
-            case 4:
-                $_SESSION['currentQuiz'] = 'capitalCountry';
-                break;
-        }
-        $_SESSION['nextQuestion'] = intval($questionId);
+        setQuizAndQuestion($quizId, $questionId);
 
     } else {
-        // Switch to learn mode if no more practice questions
+        // Switch to learn mode if no more practice questions ends
         unset( $_SESSION['practiceList'], $_SESSION['quizMode'] );
 
         // TODO - Add flash message that practice questions are finished
@@ -114,7 +100,23 @@ function getPracticeQuestion() {
 }
 
 // Get question for review quiz mode
-function getReviewQuestion() {}
+function getReviewQuestion() {
+
+    if ( count( $_SESSION['reviewList'] ) > 0 ) {
+        
+        $nextQuestion = array_shift( $_SESSION['reviewList'] );
+        list( $quizId, $questionId ) = $nextQuestion;
+        setQuizAndQuestion($quizId, $questionId);
+
+    } else {
+        // Switch to learn mode if no more practice questions ends
+        unset( $_SESSION['reviewList'], $_SESSION['quizMode'] );
+
+        // TODO - Add flash message that practice questions are finished
+
+        getQuestion();
+    }
+}
 
 // Return list of questions from user's learned questions ordered from low to high grade
 function getUserPracticeList() {
@@ -126,7 +128,9 @@ function getUserPracticeList() {
         list( $views, $correct ) = $questionProgress;
         if ( $views > 0 ) {
             $questionAccuracy = $correct / $views;
-            $_SESSION['practiceList'][$key] = $questionAccuracy;
+            if ( $questionAccuracy < 0.8 ) {
+                $_SESSION['practiceList'][$key] = $questionAccuracy;
+            }
         }
     }
     
@@ -241,11 +245,11 @@ function scoreBoard($pdo, $quizId=FALSE): string {
     if ( $seen > 0 ) {
         if ( $score == $seen || $score == '100%' ) {
             $scoreBoard .= 'Perfect score - ' .
-                htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') . $card_s;
+                htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8') . $card_s;
         } else {
             $scoreBoard .= 'You got '
                 . htmlspecialchars($score, ENT_QUOTES, 'UTF-8') . $conjunction
-                . htmlspecialchars($seen, ENT_QUOTES, 'UTF-8') . $card_s;
+                . htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8') . $card_s;
         }
     } else {
         $scoreBoard .= 'Starting new quiz';
@@ -272,6 +276,25 @@ function setQuestions($pdo): void {
     $_SESSION['quizIsSet'] = TRUE;
 }
 
+// Helper function for getting review and practice questions
+function setQuizAndQuestion($quizId, $questionId) {
+        switch ( intval($quizId) ) {
+        case 1 :
+            $_SESSION['currentQuiz'] = 'flagCountry';
+            break;
+        case 2:
+            $_SESSION['currentQuiz'] = 'flagCapital';
+            break;
+        case 3:
+            $_SESSION['currentQuiz'] = 'countryCapital';
+            break;
+        case 4:
+            $_SESSION['currentQuiz'] = 'capitalCountry';
+            break;
+    }
+    $_SESSION['nextQuestion'] = intval($questionId);
+}
+
 // Update anonymous progress after each test in case user creates an account or logs in
 function updateAnonProgress($quizId): void {
     if ( ! isset($_SESSION['anonProgress']) ) {
@@ -287,17 +310,24 @@ function updateAnonProgress($quizId): void {
 
 
 function updateScore($pdo, $quizId, $percAccuracy): void {
+
     if ( isset($_SESSION['username'])) {
+
         if ( ! isset($_SESSION['userTested']) || ! isset($_SESSION['userAccuracy']) ||
             ! isset($_SESSION['questionCount']) || ! isset($_SESSION['userCorrect']) ) {
+
             getUserStats($pdo, $quizId);
         }
+
         $_SESSION['userTested']++;
+
         if ( $percAccuracy > 85 ) $_SESSION['userCorrect']++;
+        # TODO - need to get count of views and correct for current question to 
+        # correct this function    
         $_SESSION['userAccuracy'] = ($_SESSION['userCorrect'] / $_SESSION['userTested']) * 100;
-    } else {
-        $_SESSION['count']++;
     }
+    // Increment count only when quiz is in learn mode
+    if ( ! isset($_SESSION['quizMode']) ) $_SESSION['count']++;
 }
 
 // Update the logged in user's progress in the PostgreSQL database
@@ -324,18 +354,26 @@ function updateUserProgressInDB($pdo, $quizId): void {
 // Make a session copy of logged in user progress from database to track in session
 function updateUserProgressInSession($pdo, $quizId): void {
     if ( ! isset($_SESSION['userProgress'] )) {
+
         $_SESSION['userProgress'] = [];
         $sql = 'SELECT quiz_id, country_id, test_count, correct_count
                     FROM progress WHERE user_id=:ui';
         $stmt = $pdo->prepare($sql);
         $stmt->execute(array(':ui' => $_SESSION['userId']));
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $totalTested = 0;
         foreach ( $rows as $row ) {
+            if ( $row['test_count'] > 0 ) {
+                $totalTested++;
+            }
             $key = strval($row['quiz_id']) . "_" . strval($row['country_id']);
             $val = array($row['test_count'], $row['correct_count']);
             $_SESSION['userProgress'][$key] = $val;
         }
+        $_SESSION['count'] = $totalTested;
+
     } elseif ( $quizId ) {
+
         $key = strval($quizId ). "_" . strval($_SESSION['nextQuestion']);
         list($testCount, $correctCount) = $_SESSION['userProgress'][$key];
         $testCount++;
