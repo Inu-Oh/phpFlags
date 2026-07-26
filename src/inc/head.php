@@ -79,4 +79,6 @@
 
         </nav>
 
-        <div><?php print_r(array_keys($_SESSION));?></div>
+        <!-- <div><?php # var_dump( $_SESSION['practiceList'] , $_SESSION['userProgress']);
+                    # print_r(array_keys($_SESSION));
+        ?></div> -->

@@ -84,10 +84,10 @@ function getPracticeQuestion() {
 
     if ( count( $_SESSION['practiceList'] ) > 0 ) {
 
-        $nextQuestion = array_keys( $_SESSION['practiceList'] )[0];
-        array_shift( $_SESSION['practiceList'] );
-        list( $quizId, $questionId ) = explode("_", $nextQuestion);
-        setQuizAndQuestion($quizId, $questionId);
+        $nextQuestion = array_shift( $_SESSION['practiceList'] );
+        $quizId = $nextQuestion['quizId'];
+        $questionId = $nextQuestion['questionId'];
+        setQuizAndQuestion($quizId, $questionId) ;
 
     } else {
         // Switch to learn mode if no more practice questions ends
@@ -125,17 +125,29 @@ function getUserPracticeList() {
     $_SESSION['practiceList'] = array();
 
     foreach ( $_SESSION['userProgress'] as $key => $questionProgress ) {
+
         list( $views, $correct ) = $questionProgress;
+
         if ( $views > 0 ) {
             $questionAccuracy = $correct / $views;
+
             if ( $questionAccuracy < 0.8 ) {
-                $_SESSION['practiceList'][$key] = $questionAccuracy;
+
+                $quizId = intval( round( $key / 10000 ) );
+                $questionId = $key % 10000;
+                $_SESSION['practiceList'][] = array(
+                    'quizId' => $quizId,
+                    'questionId' => $questionId,
+                    'accuracy' => $questionAccuracy
+                );
             }
         }
     }
     
-    # Order the array from lowest to highest grade
-    asort( $_SESSION['practiceList'] );
+    # Order the array from lowest to highest accuracy score per question
+    usort( $_SESSION['practiceList'], function( $a, $b ) {
+        return $a['accuracy'] <=> $b['accuracy'];
+    });
 }
 
 // Return random list of questions from user's learned question set
@@ -147,9 +159,8 @@ function getUserReviewList() {
     foreach ( ($_SESSION['userProgress']) as $key => $questionProgress ) {
         list($views, $_) = $questionProgress;
         if ( $views > 0 ) {
-            $quizAndQuestionIds = explode("_", $key);
-            $quizId = intval( $quizAndQuestionIds[0] );
-            $questionId = intval( $quizAndQuestionIds[1] );
+            $quizId = intval( round( $key / 10000 ) );
+            $questionId = $key % 10000;
             $_SESSION['reviewList'][] = array( $quizId, $questionId );
         }
     }
@@ -278,7 +289,7 @@ function setQuestions($pdo): void {
 
 // Helper function for getting review and practice questions
 function setQuizAndQuestion($quizId, $questionId) {
-        switch ( intval($quizId) ) {
+    switch ( intval($quizId) ) {
         case 1 :
             $_SESSION['currentQuiz'] = 'flagCountry';
             break;
@@ -366,7 +377,7 @@ function updateUserProgressInSession($pdo, $quizId): void {
             if ( $row['test_count'] > 0 ) {
                 $totalTested++;
             }
-            $key = strval($row['quiz_id']) . "_" . strval($row['country_id']);
+            $key = $row['quiz_id'] * 10000 + $row['country_id'];
             $val = array($row['test_count'], $row['correct_count']);
             $_SESSION['userProgress'][$key] = $val;
         }
@@ -374,7 +385,7 @@ function updateUserProgressInSession($pdo, $quizId): void {
 
     } elseif ( $quizId ) {
 
-        $key = strval($quizId ). "_" . strval($_SESSION['nextQuestion']);
+        $key = $quizId * 10000 + $_SESSION['nextQuestion'];
         list($testCount, $correctCount) = $_SESSION['userProgress'][$key];
         $testCount++;
         if ( $_SESSION['correct'] ) $correctCount++; # TODO REview Does this duplicate update score?
