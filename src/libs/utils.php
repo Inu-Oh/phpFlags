@@ -105,10 +105,11 @@ function getPracticeQuestion() {
         setQuizAndQuestion($quizId, $questionId) ;
 
     } else {
-        // Switch to learn mode if no more practice questions ends
+        // Switch to learn mode if no more practice questions
         unset( $_SESSION['practiceList'], $_SESSION['quizMode'] );
 
-        // TODO - Add flash message that practice questions are finished
+        $_SESSION['message'] = "You completed all the practice questions.
+                                Resuming learning questions.";
 
         getQuestion();
     }
@@ -124,10 +125,11 @@ function getReviewQuestion() {
         setQuizAndQuestion($quizId, $questionId);
 
     } else {
-        // Switch to learn mode if no more practice questions ends
+        // Switch to learn mode if no more practice questions
         unset( $_SESSION['reviewList'], $_SESSION['quizMode'] );
 
-        // TODO - Add flash message that practice questions are finished
+        $_SESSION['message'] = "You completed all the review questions.
+                                Resuming learning questions.";
 
         getQuestion();
     }
@@ -194,7 +196,7 @@ function getUserStats($pdo, $quizId): void {
     foreach ( $_SESSION['userProgress'] as $questionProgress ) {
         if ( $questionProgress[0] > 0 ) {
             $seen += $questionProgress[0];
-            $correct += $questionProgress[1] / $questionProgress[0];
+            $correct += $questionProgress[1];
         }
         $total++;
     }
@@ -203,9 +205,9 @@ function getUserStats($pdo, $quizId): void {
     
     // Store calculated performance data in session
     $_SESSION['userTested'] = $seen;
-    $_SESSION['userAccuracy'] = $accuracy;
     $_SESSION['userCorrect'] = $correct;
     $_SESSION['questionCount'] = $total;
+    $_SESSION['userAccuracy'] = $accuracy;
 }
 
 // Return grade based on percentage score
@@ -346,10 +348,8 @@ function updateScore($pdo, $quizId, $percAccuracy): void {
         }
 
         $_SESSION['userTested']++;
-
         if ( $percAccuracy > 85 ) $_SESSION['userCorrect']++;
-        # TODO - need to get count of views and correct for current question to 
-        # correct this function    
+
         $_SESSION['userAccuracy'] = ($_SESSION['userCorrect'] / $_SESSION['userTested']) * 100;
     }
     // Increment count only when quiz is in learn mode

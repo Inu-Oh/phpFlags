@@ -79,6 +79,10 @@
 
         </nav>
 
-        <!-- <div><?php # var_dump( $_SESSION['practiceList'] , $_SESSION['userProgress']);
-                    # print_r(array_keys($_SESSION));
-        ?></div> -->
+<?php
+    if ( isset( $_SESSION['message'] ) ) {
+        echo('<span class="ts-3 fw-bold text-danger">'
+            . $_SESSION['message'] . '</span>');
+        unset( $_SESSION['message'] );
+    }
+?>
