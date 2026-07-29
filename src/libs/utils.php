@@ -19,14 +19,29 @@ function checkAnswerAccuracy($percAccuracy): void {
 
 // Check the user answer for a match and return accuracy
 function checkUserAnswer(): float {
-    if ( isset($_POST['answer']) && strlen($_POST['answer']) > 0 ) {
-            $_SESSION['userInput'] = htmlspecialchars($_POST['answer'], ENT_QUOTES, 'UTF-8');
-            $matchingChars = similar_text(
-                iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['userInput'])),
-                iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['answer'])),
-                $percAccuracy );
-        }
+    if ( isset( $_POST['answer'] ) && strlen( $_POST['answer'] ) > 0 ) {
+        $_SESSION['userInput'] = htmlspecialchars($_POST['answer'], ENT_QUOTES, 'UTF-8');
+        $matchingChars = similar_text(
+            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['userInput'])),
+            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower(
+                htmlspecialchars($_SESSION['answer']))
+            ),
+            $percAccuracy
+        );
+    }
+
     return $percAccuracy;
+}
+
+// Prevent showing HTML code for select few special chars in user feedback
+function cleanUpUserInputForOutput() {
+        
+    if ( str_contains( $_SESSION['userInput'], '&#039;' ) ) {
+        $_SESSION['userInput'] = str_replace( '&#039;', "'", $_SESSION['userInput'] );
+    }
+    if ( str_contains( $_SESSION['userInput'], '&#045;' ) ) {
+        $_SESSION['userInput'] = str_replace( '&#045;', "-", $_SESSION['userInput'] );
+    }
 }
 
 // Get question for learn quiz mode

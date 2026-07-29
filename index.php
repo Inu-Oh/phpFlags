@@ -15,6 +15,9 @@ if ( isPostRequest() ) {
         $percAccuracy = checkUserAnswer(); # Returns percent value of answer
         checkAnswerAccuracy($percAccuracy); # Would return true or false
 
+        // Prevent showing HTML code for hyphen and apostrophe in feedback
+        cleanUpUserInputForOutput();
+
         // Get current quiz data
         $quizzes = quizArray();
         $quizId = $quizzes[$_SESSION['currentQuiz']];
