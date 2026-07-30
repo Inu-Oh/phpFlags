@@ -36,6 +36,7 @@ if ( isPostRequest() ) {
 
         updateScore($pdo, $quizId, $percAccuracy);
         $_SESSION['feedback'] = TRUE;
+        $_SESSION['loaded'] = FALSE;
 
         header( 'Location: feedback.php' );
         return;
@@ -43,6 +44,11 @@ if ( isPostRequest() ) {
 }
 
 if ( isGetRequest() ) {
+    if ( ! isset( $_SESSION['loaded'] ) || $_SESSION['loaded'] == FALSE ) {
+        header( 'Location: feedback.php' );
+        return;
+    }
+
     if ( ! isset($_SESSION['quizIsSet']) ) {
 
         setQuestions($pdo);
