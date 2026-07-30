@@ -35,6 +35,8 @@ if ( isPostRequest() ) {
         }
 
         updateScore($pdo, $quizId, $percAccuracy);
+
+        // These session variables are set to prevent user hitting the back arrow
         $_SESSION['feedback'] = TRUE;
         $_SESSION['loaded'] = FALSE;
 
@@ -44,10 +46,6 @@ if ( isPostRequest() ) {
 }
 
 if ( isGetRequest() ) {
-    if ( ! isset( $_SESSION['loaded'] ) || $_SESSION['loaded'] == FALSE ) {
-        header( 'Location: feedback.php' );
-        return;
-    }
 
     if ( ! isset($_SESSION['quizIsSet']) ) {
 
@@ -60,6 +58,12 @@ if ( isGetRequest() ) {
 
     // Get question data if it is not set
     if ( ! isset($_SESSION['nextQuestion']) ) getQuestion();
+
+    // Prevent user hitting back arrow to move from feedback back to quiz question
+    if ( $_SESSION['loaded'] == FALSE ) {
+        header( 'Location: feedback.php' );
+        return;
+    }
 
     // Clear unneded data from session
     if ( isset($_SESSION['answer']) ) unset($_SESSION['answer']);
