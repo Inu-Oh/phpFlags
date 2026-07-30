@@ -29,7 +29,12 @@ switch ( $_SESSION['currentQuiz'] ) {
         $question['text'] = 'Name the capital of this flag';
         $question['placeholder'] = 'Capital city name ...';
         $_SESSION['answer'] = $question['capital'];
-        unset($question['hint'], $question['country'], $question['capital']);
+        if ($question['hint'] && $question['hint'][0] === "F") {
+            $question['hint'] = substr($question['hint'], 2);
+        } else {
+            unset($question['hint']);
+        }
+        unset($question['country'], $question['capital']);
         break;
 
     case 'countryCapital':

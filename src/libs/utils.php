@@ -34,7 +34,7 @@ function checkUserAnswer(): float {
 }
 
 // Prevent showing HTML code for select few special chars in user feedback
-function cleanUpUserInputForOutput() {
+function cleanUpUserInputForOutput(): void {
         
     if ( str_contains( $_SESSION['userInput'], '&#039;' ) ) {
         $_SESSION['userInput'] = str_replace( '&#039;', "'", $_SESSION['userInput'] );
@@ -45,7 +45,7 @@ function cleanUpUserInputForOutput() {
 }
 
 // Get question for learn quiz mode
-function getLearnQuestion() {
+function getLearnQuestion(): void {
     // Make an array of all quizzes to choose from
     $quizzes = array();
     if ( count($_SESSION['flagCountry']) > 0 ) $quizzes[] = 'flagCountry';
@@ -95,7 +95,7 @@ function getQuestion(): void {
 }
 
 // Get question for practice quiz mode 
-function getPracticeQuestion() {
+function getPracticeQuestion(): void {
 
     if ( count( $_SESSION['practiceList'] ) > 0 ) {
 
@@ -116,7 +116,7 @@ function getPracticeQuestion() {
 }
 
 // Get question for review quiz mode
-function getReviewQuestion() {
+function getReviewQuestion(): void {
 
     if ( count( $_SESSION['reviewList'] ) > 0 ) {
         
@@ -136,7 +136,7 @@ function getReviewQuestion() {
 }
 
 // Return list of questions from user's learned questions ordered from low to high grade
-function getUserPracticeList() {
+function getUserPracticeList(): void {
 
     // Create an array of practice questions with value grading each question
     $_SESSION['practiceList'] = array();
@@ -252,6 +252,8 @@ function isPostRequest(): bool {
 
 // Creates HTML for scoreboard
 function scoreBoard($pdo, $quizId=FALSE): string {
+
+    // Set up data to use in scoreboard depending on user or anonymous data
     if ( isset($_SESSION['username']) ) {
         if ( ! isset($_SESSION['userTested']) || ! isset($_SESSION['userAccuracy']) ) {
             getUserStats($pdo, $quizId);
@@ -264,25 +266,47 @@ function scoreBoard($pdo, $quizId=FALSE): string {
         $score = $_SESSION['score'];
         $conjunction = ' out of ';
     }
+    $card_s = ( $seen != 1 ) ? ' cards ' : ' card ';
 
     $scoreBoard = '<div class="text-center p-3">
         <h3 id="score" class="bg-secondary text-light rounded py-1">';
 
-    $card_s = ( $seen != 1 ) ? ' cards ' : ' card ';
+    // Text output for review and practice quiz modes
+    if ( isset( $_SESSION['quizMode'] ) ) {
+        $scoreBoard .=  '<span class="text-warning fw-bold">' . 
+                            htmlspecialchars( ucwords( $_SESSION['quizMode'] ) ) . 
+                        '</span>&nbsp;&nbsp; ';
+        
+        if ( $_SESSION['quizMode'] == 'practice' ) {
+            $scoreBoard .= htmlspecialchars( count( $_SESSION['practiceList'] ) );
 
-    if ( $seen > 0 ) {
-        if ( $score == $seen || $score == '100%' ) {
-            $scoreBoard .= 'Perfect score - ' .
-                htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8') . $card_s;
-        } else {
-            $scoreBoard .= 'You got '
-                . htmlspecialchars($score, ENT_QUOTES, 'UTF-8') . $conjunction
-                . htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8') . $card_s;
+        } elseif ( $_SESSION['quizMode'] == 'review' ) {
+            $scoreBoard .= htmlspecialchars( count( $_SESSION['reviewList'] ) );
         }
+        
+        $scoreBoard .= ' to go &nbsp; ' . 
+            '<span class="text-warning">' .
+                htmlspecialchars($score, ENT_QUOTES, 'UTF-8') .
+            '</span>';
+
+    // Text output for learning quiz mode
     } else {
-        $scoreBoard .= 'Starting new quiz';
+        if ( $seen > 0 ) {
+            if ( $score == $seen || $score == '100%' ) {
+                $scoreBoard .= 'Perfect score - ' .
+                    htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8') . $card_s;
+
+            } else {
+                $scoreBoard .= 'You got '
+                    . htmlspecialchars($score, ENT_QUOTES, 'UTF-8') . $conjunction
+                    . htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8') . $card_s;
+            }
+        } else {
+            $scoreBoard .= 'Starting new quiz';
+        }
     }
     
+    // Add emoji to emphasize score level
     if ( grade() ) $scoreBoard .= ' &nbsp; ' . grade();
     $scoreBoard .= '</h3></div>';
 
