@@ -72,9 +72,6 @@ function getLearnQuestion(): void {
             break;
     }
     if ( ! isset($_SESSION['nextQuestion']) ) getLearnQuestion();
-
-    $_SESSION['loaded'] = TRUE;
-    $_SESSION['feedback'] = FALSE;
 }
 
 // Get the next quiz question and save it to session
@@ -92,6 +89,10 @@ function getQuestion(): void {
 
         getReviewQuestion();
     }
+
+    // This setting prevents loading feedback page if user click back arrow
+    $_SESSION['loaded'] = TRUE;
+    $_SESSION['feedback'] = FALSE;
 }
 
 // Get question for practice quiz mode 
