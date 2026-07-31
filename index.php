@@ -73,9 +73,6 @@ if ( isGetRequest() ) {
 view('head'); ?>
 
 <main>
-    <div id="openNavBtn" class="btn btn-sm btn-outline-secondary" 
-        onclick="openNav()">Menu</div>
-
     <div id="q-card" class="container pt-3 bg-light rounded-4">
 
         <?= scoreBoard($pdo, $_SESSION['currentQuiz']); ?>
@@ -140,6 +137,7 @@ view('head'); ?>
 
 <script>
 $(document).ready(function() {
+
     $.getJSON('question.php', function(question) {
         window.console && console.log(question);
         var source = $('#quiz-template').html();
@@ -148,6 +146,20 @@ $(document).ready(function() {
         context.question = question;
         $('#quiz-area').replaceWith(template(context));
     }).fail( function() { alert('getJSON question fail'); } );
+
+
+    function adjustSidenav() {
+        const $sidenav = $('#sideNavbar');
+        if ( $(window).width() < 890 ) {
+            $sidenav.width(0);
+        } else {
+            $sidenav.width("21%");
+        }
+    }
+
+    $(window).on('resize', adjustSidenav);
+
+    adjustSidenav();
 });
 </script>
 

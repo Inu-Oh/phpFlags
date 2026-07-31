@@ -2,15 +2,6 @@ body {
     font-family: Arial, sans-serif;
 }
 
-#openNavBtn {
-    position: fixed;
-    top: 1.3rem;
-    left: 2.9rem;
-    float: left;
-    z-index: 1;
-    opacity: 0.8;
-}
-
 .sidenav {
     height: 100%;
     width: 0;
@@ -18,40 +9,30 @@ body {
     z-index: 2;
     top: 0;
     left: 0;
-    background-image: linear-gradient(
-        to right, 
-        rgba(233, 233, 233, 0.9), 
-        rgba(233, 233, 233, 0.7), 
-        rgba(233, 233, 233, 0)
-    );
     overflow-y: hidden; /* Disable horizontal scroll */
     padding-top: 3.5rem;
-    transition: 0.5s; /* 0.5 second transition effect to slide the sidenav */
+    /* TODOD - keep the transition for new nav */
+    /* transition: 0.05s; /* 0.5 second transition effect to slide the sidenav */
 }
 
-#userId {
-    font-size: 1.1rem;
-}
-
-.sidenav a, #userId, .nav-submit-link {
-    padding: 0.5rem 0.5rem 0.5rem 2rem;
+.sidenav a, .nav-submit-link {
+    /* padding: 0.5rem 0.5rem 0.5rem 2rem; */
     text-decoration: none;
-    font-size: 1.6rem;
+    font-size: 1.1rem;
     color: #126;
     display: block;
     transition: 0.3s;
-}
-
-.nav-submit-link {
     border: none;
     background: none;
-    color: #126;
     cursor: pointer;
 }
 
-#userId {
-    color: black;
-    font-weight: bold;
+#modesTitle {
+    font-size: 1.2rem;
+}
+
+.info-text {
+    font-size: 0.7rem;
 }
 
 .sidenav a:hover, .nav-submit-link:hover {
@@ -65,8 +46,6 @@ body {
     font-size: 2.3rem;
     margin-left: 3.6rem;
 }
-
-
 
 @media screen and (max-height: 450px) {
     .sidenav {padding-top: 0.7rem;}
