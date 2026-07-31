@@ -17,6 +17,7 @@ if ( isset($_SESSION['feedback']) ) {
         $feedback['correct'] = $_SESSION['correct'];
         $feedback['user_input'] = $_SESSION['userInput'];
         $feedback['answer'] = $_SESSION['answer'];
+        $feedback['src'] = 'static/images/'.$feedback['code'].'.png';
         if ( isset($_SESSION['misspelled']) && $_SESSION['misspelled'] === TRUE ) {
             $feedback['misspelled'] = TRUE;
         }
@@ -25,12 +26,10 @@ if ( isset($_SESSION['feedback']) ) {
         switch ( $_SESSION['currentQuiz'] ) {
 
             case 'flagCountry':
-                $feedback['src'] = 'static/images/'.$feedback['code'].'.png';
                 $feedback['text'] = 'This is the flag of '.$feedback['country'];
                 break;
 
             case 'flagCapital':
-                $feedback['src'] = 'static/images/'.$feedback['code'].'.png';
                 $feedback['text'] = 'This flag belongs to '.$feedback['country'].
                     ' whose capital is '.$feedback['capital'];
                 break;
