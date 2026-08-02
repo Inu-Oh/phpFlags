@@ -71,6 +71,7 @@ if ( isGetRequest() ) {
     if ( isset($_SESSION['correct']) ) unset($_SESSION['correct']);
 
     $scoreBoard = scoreBoard( $pdo, $_SESSION['currentQuiz'] );
+    updateInfoPane();
 }
 
 view('head'); ?>

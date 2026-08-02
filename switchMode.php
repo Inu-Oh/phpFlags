@@ -34,8 +34,6 @@ if ( isPostRequest() ) {
         getUserReviewList();
         $_SESSION['quizMode'] = 'review';
     }
-
-    updateScore();
 }
 
 header( 'Location: index.php' );

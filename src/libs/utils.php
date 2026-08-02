@@ -317,8 +317,6 @@ function scoreBoard($pdo, $quizId=FALSE): string {
     if ( grade() ) $scoreBoard .= ' &nbsp; ' . grade();
     $scoreBoard .= '</h3></div>';
 
-    updateInfoPane();
-
     return $scoreBoard;
 }
 
