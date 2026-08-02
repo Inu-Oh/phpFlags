@@ -39,6 +39,7 @@ if ( isPostRequest() ) {
         // These session variables are set to prevent user hitting the back arrow
         $_SESSION['feedback'] = TRUE;
         $_SESSION['loaded'] = FALSE;
+        $_SESSION['testedCards']++;
 
         header( 'Location: feedback.php' );
         return;
@@ -51,8 +52,8 @@ if ( isGetRequest() ) {
 
         setQuestions($pdo);
         // Start new score session
-        $_SESSION['count'] = 0;
-        $_SESSION['score'] = 0;   
+        $_SESSION['score'] = 0;
+        $_SESSION['testedCards'] = 0;
         getQuestion();
     }
 
@@ -68,14 +69,26 @@ if ( isGetRequest() ) {
     // Clear unneded data from session
     if ( isset($_SESSION['answer']) ) unset($_SESSION['answer']);
     if ( isset($_SESSION['correct']) ) unset($_SESSION['correct']);
+
+    $scoreBoard = scoreBoard( $pdo, $_SESSION['currentQuiz'] );
 }
 
 view('head'); ?>
 
+<body class="p-5">
+
+<?php require_once __DIR__ . '/src/inc/nav.php'; ?>
+
 <main>
     <div id="q-card" class="container pt-3 bg-light rounded-4">
 
-        <?= scoreBoard($pdo, $_SESSION['currentQuiz']); ?>
+        <?php if ( isset( $_SESSION['message'] ) ) {
+            echo( '<span class="ts-3 fw-bold text-danger">'
+                . $_SESSION['message'] . '</span>' );
+            unset( $_SESSION['message'] );
+        } else { 
+            echo  $scoreBoard; 
+        } ?>
 
         <div id="quiz-area"></div>
 
@@ -150,10 +163,13 @@ $(document).ready(function() {
 
     function adjustSidenav() {
         const $sidenav = $('#sideNavbar');
+        const $infoPane = $('#infoPane');
         if ( $(window).width() < 890 ) {
             $sidenav.width(0);
+            $infoPane.width(0);
         } else {
             $sidenav.width("21%");
+            $infoPane.width("21%");
         }
     }
 

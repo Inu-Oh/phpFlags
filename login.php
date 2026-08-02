@@ -78,41 +78,41 @@ if ( isGetRequest() && isset($_SESSION['username']) ) {
 view('head', ['title' => 'Login']);
 ?>
 
-<title>Dandan Atsukunaru Login Page</title>
-
-</head>
-<body>
-<div class="container p-4">
-    <h1>Please Log In</h1>
-
-    <?php
-        if ( isset($_SESSION['error']) ) {
-            echo '<span class="fs-4 fw-bold">' . $_SESSION['error'] . '</span>';
-            unset($_SESSION['error']);
-        }
-
-        if ( isset($_SESSION['bug']) ) {
-            echo '<span class="fs-4 fw-bold">' . $_SESSION['bug'] . '</span>';
-            unset($_SESSION['bug']);
-        }
-    ?>
-    <form method="POST" action="login.php" class="form-group col-7 pb-5">
-        <input type="hidden" name="csrf_token"
-            value="<?= $_SESSION['csrf_token'] ?>">
-        <div class="form-floating pb-2">
-            <input class="form-control" type="text" name="username" id="username">
-            <label for="usernam">Username</label>
-        </div>
-        <div class="form-floating pb-2">
-            <input class="form-control" type="password" name="password" id="password">
-            <label for="password">Password</label>
-        </div>
-        <input class="btn btn-outline-primary me-3" type="submit" 
-            onclick="return doValidate();" value="Log In">
-        <input class="btn btn-outline-danger text-dark" type="submit" 
-            name="cancel" value="Cancel">
-    </form>
+<body class="p-5">
+<main>
+    <div id="q-card" class="container p-3 bg-light rounded-4">
+        <h1 class="m-3"> <?php            
+            if ( isset($_SESSION['error']) ) {
+                echo '<span class="text-danger">'.$_SESSION['error'].'</span>';
+                unset($_SESSION['error']);
+            } else if ( isset($_SESSION['bug']) ) {
+                echo '<span class="text-danger">'.$_SESSION['bug'].'</span>';
+                unset($_SESSION['bug']);
+            } else {
+                echo 'Please Log In';
+            }
+        ?> </h1>
+        <form method="POST" action="login.php" class="form-group m-3">
+            <input type="hidden" name="csrf_token"
+                value="<?= $_SESSION['csrf_token'] ?>">
+            <div class="form-floating my-5">
+                <input class="form-control" type="text" name="username" id="username">
+                <label for="usernam">Username</label>
+            </div>
+            <div class="form-floating my-5">
+                <input class="form-control" type="password" name="password" id="password">
+                <label for="password">Password</label>
+            </div>
+            <div class="form-group">
+                <input class="btn btn-outline-primary me-3" type="submit" 
+                    onclick="return doValidate();" value="Log In">
+                <input class="btn btn-outline-danger text-dark" type="submit" 
+                    name="cancel" value="Cancel">
+            </div>
+        </form>
     </div>
+</main>
+
 <script>
 function doValidate() {
     console.log('Validating...');

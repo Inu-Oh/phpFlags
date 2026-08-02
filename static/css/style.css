@@ -2,17 +2,24 @@ body {
     font-family: Arial, sans-serif;
 }
 
-.sidenav {
+.sidenav, #infoPane {
     height: 100%;
     width: 0;
-    position: fixed; /* Stay in place */
-    z-index: 2;
+    position: fixed;
     top: 0;
-    left: 0;
     overflow-y: hidden; /* Disable horizontal scroll */
     padding-top: 3.5rem;
     /* TODOD - keep the transition for new nav */
     /* transition: 0.05s; /* 0.5 second transition effect to slide the sidenav */
+}
+
+.sidenav {    
+    left: 0;
+}
+
+#infoPane {
+    right: 0;
+    width: 21%;
 }
 
 .sidenav a, .nav-submit-link {

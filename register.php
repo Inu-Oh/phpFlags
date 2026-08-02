@@ -104,45 +104,45 @@ if ( isGetRequest() && isset($_SESSION['username']) ) {
 view('head', ['title' => 'Register']);
 
 ?>
+<body class="p-5">
 <main>
-    <h1 class="fs-2">Sign Up</h1>
-    <h3>
-        <?php 
+    <div id="q-card" class="container p-3 bg-light rounded-4">
+        <h1 class="m-3"> <?php            
             if ( isset($_SESSION['error']) ) {
-                echo '<span class="fs-4 fw-bold">' . $_SESSION['error'] . '</span>';
+                echo '<span class="text-danger">'.$_SESSION['error'].'</span>';
                 unset($_SESSION['error']);
-            }
-
-            if ( isset($_SESSION['bug']) ) {
-                echo '<span class="fs-4 fw-bold">' . $_SESSION['bug'] . '</span>';
+            } else if ( isset($_SESSION['bug']) ) {
+                echo '<span class="text-danger">'.$_SESSION['bug'].'</span>';
                 unset($_SESSION['bug']);
+            } else {
+                echo 'Sign Up';
             }
-        ?>
-    </h3>
-    <form action="register.php" method="post" class="form-group col-7 pb-5">
-        <input type="hidden" name="csrf_token"
-            value="<?= $_SESSION['csrf_token'] ?>">
-        <div class="form-floating pb-2">
-            <input class="form-control" type="text" name="username" id="username">
-            <label for="username">Username:</label>
-        </div>
-        <div class="form-floating pb-2">
-            <input class="form-control" type="email" name="email" id="email">
-            <label for="email">Email:</label>
-        </div>
-        <div class="form-floating pb-2">
-            <input class="form-control" type="password" name="password" id="password">
-            <label for="password">Password:</label>
-        </div>
-        <div class="form-floating pb-2">
-            <input class="form-control" type="password" name="password2" id="password2">
-            <label for="password2">Password Again:</label>
-        </div>
-        <button class="btn btn-success" type="submit" name="register">
-            Register
-        </button>
-    </form>
-    <footer>Already a member? <a href="login.php">Login here</a></footer>
+        ?> </h1>
+        <form action="register.php" method="post" class="form-group m-3">
+            <input type="hidden" name="csrf_token"
+                value="<?= $_SESSION['csrf_token'] ?>">
+            <div class="form-floating my-4">
+                <input class="form-control" type="text" name="username" id="username">
+                <label for="username">Username</label>
+            </div>
+            <div class="form-floating my-4">
+                <input class="form-control" type="email" name="email" id="email">
+                <label for="email">Email</label>
+            </div>
+            <div class="form-floating my-4">
+                <input class="form-control" type="password" name="password" id="password">
+                <label for="password">Password</label>
+            </div>
+            <div class="form-floating my-4">
+                <input class="form-control" type="password" name="password2" id="password2">
+                <label for="password2">Password Again</label>
+            </div>
+            <button class="btn btn-success" type="submit" name="register">
+                Register
+            </button>
+            <div class="my-4">Already a member? <a href="login.php">Login here</a></div>
+        </form>
+    </div>
 </main>
 </body>
 <script>

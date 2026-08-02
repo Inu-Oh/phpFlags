@@ -36,13 +36,15 @@ if ( isGetRequest() ) {
 
 view('head'); ?>
 
-<div id="q-card" class="container pt-3 bg-light rounded-4">
+<body class="p-5">
+<main>
+    <div id="q-card" class="container pt-3 bg-light rounded-4">
 
-    <?= scoreBoard($pdo, $_SESSION['currentQuiz']); ?>
+        <?= scoreBoard($pdo, $_SESSION['currentQuiz']); ?>
 
-    <div id="quiz-area"></div>
+        <div id="quiz-area"></div>
 
-</div>
+    </div>
 </main>
 
 <script id="quiz-feedback" type="text/x-handlebars-template">

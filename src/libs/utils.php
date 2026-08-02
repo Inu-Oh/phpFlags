@@ -48,10 +48,10 @@ function cleanUpUserInputForOutput(): void {
 function getLearnQuestion(): void {
     // Make an array of all quizzes to choose from
     $quizzes = array();
-    if ( count($_SESSION['flagCountry']) > 0 ) $quizzes[] = 'flagCountry';
-    if ( count($_SESSION['flagCapital']) > 0 ) $quizzes[] = 'flagCapital';
-    if ( count($_SESSION['countryCapital']) > 0 ) $quizzes[] = 'countryCapital';
-    if ( count($_SESSION['capitalCountry']) > 0 ) $quizzes[] = 'capitalCountry';
+    if ( count( $_SESSION['flagCountry'] ) > 0 ) $quizzes[] = 'flagCountry';
+    if ( count( $_SESSION['flagCapital'] ) > 0 ) $quizzes[] = 'flagCapital';
+    if ( count( $_SESSION['countryCapital'] ) > 0 ) $quizzes[] = 'countryCapital';
+    if ( count( $_SESSION['capitalCountry'] ) > 0 ) $quizzes[] = 'capitalCountry';
     
     // Choose a random question from a rendomly selected quiz list
     $randomQuiz = $quizzes[array_rand($quizzes)];
@@ -71,7 +71,7 @@ function getLearnQuestion(): void {
             $_SESSION['nextQuestion'] = array_pop($_SESSION['capitalCountry']);
             break;
     }
-    if ( ! isset($_SESSION['nextQuestion']) ) getLearnQuestion();
+    if ( ! isset($_SESSION['nextQuestion']) ) getLearnQuestion();  
 }
 
 // Get the next quiz question and save it to session
@@ -147,6 +147,7 @@ function getUserPracticeList(): void {
         list( $views, $correct ) = $questionProgress;
 
         if ( $views > 0 ) {
+
             $questionAccuracy = $correct / $views;
 
             if ( $questionAccuracy < 0.8 ) {
@@ -175,8 +176,11 @@ function getUserReviewList() {
     $_SESSION['reviewList'] = array();
 
     foreach ( ($_SESSION['userProgress']) as $key => $questionProgress ) {
+
         list($views, $_) = $questionProgress;
+
         if ( $views > 0 ) {
+
             $quizId = intval( round( $key / 10000 ) );
             $questionId = $key % 10000;
             $_SESSION['reviewList'][] = array( $quizId, $questionId );
@@ -193,33 +197,35 @@ function getUserStats($pdo, $quizId): void {
     if ( ! isset($_SESSION['userProgress']) ) updateUserProgressInSession($pdo, $quizId);
 
     # Calculate user's performance on all questions overall
-    $total = $seen = $correct = 0;
+    $total = $testCount = $testedCards = $correct = 0;
     foreach ( $_SESSION['userProgress'] as $questionProgress ) {
+
         if ( $questionProgress[0] > 0 ) {
-            $seen += $questionProgress[0];
+            $testCount += $questionProgress[0];
+            $testedCards ++ ;
             $correct += $questionProgress[1];
         }
-        $total++;
     }
 
-    $accuracy = ( $seen > 0 ) ? ( $correct / $seen ) * 100 : 0;
+    $accuracy = ( $testCount > 0 ) ? ( $correct / $testCount ) * 100 : 0;
     
     // Store calculated performance data in session
-    $_SESSION['userTested'] = $seen;
+    $_SESSION['testedCards'] = $testedCards;
+    $_SESSION['testCount'] = $testCount;
     $_SESSION['userCorrect'] = $correct;
-    $_SESSION['questionCount'] = $total;
+    $_SESSION['questionCount'] = count( $_SESSION['userProgress'] );
     $_SESSION['userAccuracy'] = $accuracy;
 }
 
 // Return grade based on percentage score
 function grade(): string {
-    if ( ( isset($_SESSION['count']) && $_SESSION['count'] > 0 ) || 
+    if ( ( isset($_SESSION['testCount']) && $_SESSION['testCount'] > 0 ) || 
         isset($_SESSION['userAccuracy']) ) {
             
         if ( isset($_SESSION['userAccuracy'])) {
             $perc = round($_SESSION['userAccuracy']);
         } else {
-            $perc = round(($_SESSION['score'] / $_SESSION['count']) * 100);
+            $perc = round(($_SESSION['score'] / $_SESSION['testCount']) * 100);
         }
         
         if ( $perc > 85 ) {
@@ -256,17 +262,17 @@ function scoreBoard($pdo, $quizId=FALSE): string {
 
     // Set up data to use in scoreboard depending on user or anonymous data
     if ( isset($_SESSION['username']) ) {
-        if ( ! isset($_SESSION['userTested']) || ! isset($_SESSION['userAccuracy']) ) {
+        if ( ! isset($_SESSION['userAccuracy']) ) {
             getUserStats($pdo, $quizId);
         }
-        $seen = $_SESSION['userTested'];
+        
         $score = round($_SESSION['userAccuracy']) . '%';
         $conjunction = ' on ';
     } else {
-        $seen = $_SESSION['count'];
         $score = $_SESSION['score'];
         $conjunction = ' out of ';
     }
+    $seen = $_SESSION['testedCards'];
     $card_s = ( $seen != 1 ) ? ' cards ' : ' card ';
 
     $scoreBoard = '<div class="text-center p-3">
@@ -295,12 +301,12 @@ function scoreBoard($pdo, $quizId=FALSE): string {
         if ( $seen > 0 ) {
             if ( $score == $seen || $score == '100%' ) {
                 $scoreBoard .= 'Perfect score - ' .
-                    htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8') . $card_s;
+                    htmlspecialchars($_SESSION['testedCards'], ENT_QUOTES, 'UTF-8') . $card_s;
 
             } else {
                 $scoreBoard .= 'You got '
                     . htmlspecialchars($score, ENT_QUOTES, 'UTF-8') . $conjunction
-                    . htmlspecialchars($_SESSION['count'], ENT_QUOTES, 'UTF-8') . $card_s;
+                    . htmlspecialchars($_SESSION['testedCards'], ENT_QUOTES, 'UTF-8') . $card_s;
             }
         } else {
             $scoreBoard .= 'Starting new quiz';
@@ -310,6 +316,8 @@ function scoreBoard($pdo, $quizId=FALSE): string {
     // Add emoji to emphasize score level
     if ( grade() ) $scoreBoard .= ' &nbsp; ' . grade();
     $scoreBoard .= '</h3></div>';
+
+    updateInfoPane();
 
     return $scoreBoard;
 }
@@ -327,6 +335,11 @@ function setQuestions($pdo): void {
     shuffle($capitalIntList);
     $_SESSION['capitalCountry'] = $capitalIntList;
     $_SESSION['quizIsSet'] = TRUE;
+
+    $_SESSION['questionCount'] = count( $_SESSION['flagCountry'] ) + 
+                                count( $_SESSION['flagCapital'] ) +
+                                count( $_SESSION['countryCapital'] ) +
+                                count( $_SESSION['capitalCountry'] );
 }
 
 // Helper function for getting review and practice questions
@@ -362,23 +375,28 @@ function updateAnonProgress($quizId): void {
 }
 
 
+function updateInfoPane(): void {
+    
+    $_SESSION['cardsRemaining'] = $_SESSION['questionCount'] - $_SESSION['testedCards'];
+
+}
+
+
 function updateScore($pdo, $quizId, $percAccuracy): void {
 
     if ( isset($_SESSION['username'])) {
 
-        if ( ! isset($_SESSION['userTested']) || ! isset($_SESSION['userAccuracy']) ||
+        if ( ! isset($_SESSION['testCount']) || ! isset($_SESSION['userAccuracy']) ||
             ! isset($_SESSION['questionCount']) || ! isset($_SESSION['userCorrect']) ) {
 
             getUserStats($pdo, $quizId);
         }
 
-        $_SESSION['userTested']++;
+        $_SESSION['testCount']++;
         if ( $percAccuracy > 85 ) $_SESSION['userCorrect']++;
 
-        $_SESSION['userAccuracy'] = ($_SESSION['userCorrect'] / $_SESSION['userTested']) * 100;
+        $_SESSION['userAccuracy'] = ($_SESSION['userCorrect'] / $_SESSION['testCount']) * 100;
     }
-    // Increment count only when quiz is in learn mode
-    if ( ! isset($_SESSION['quizMode']) ) $_SESSION['count']++;
 }
 
 // Update the logged in user's progress in the PostgreSQL database
@@ -421,7 +439,7 @@ function updateUserProgressInSession($pdo, $quizId): void {
             $val = array($row['test_count'], $row['correct_count']);
             $_SESSION['userProgress'][$key] = $val;
         }
-        $_SESSION['count'] = $totalTested;
+        $_SESSION['testedCards'] = $totalTested;
 
     } elseif ( $quizId ) {
 
