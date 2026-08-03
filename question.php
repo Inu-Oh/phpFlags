@@ -16,6 +16,7 @@ switch ( $_SESSION['currentQuiz'] ) {
         $question['text'] = 'Name the country of this flag';
         $question['placeholder'] = 'Country name ...';
         $_SESSION['answer'] = $question['country'];
+        $_SESSION['distractor'] = array($question['capital'], 'capital', 'country');
         if ($question['hint'] && $question['hint'][0] === "F") {
             $question['hint'] = substr($question['hint'], 2);
         } else {
@@ -29,6 +30,7 @@ switch ( $_SESSION['currentQuiz'] ) {
         $question['text'] = 'Name the capital of this flag';
         $question['placeholder'] = 'Capital city name ...';
         $_SESSION['answer'] = $question['capital'];
+        $_SESSION['distractor'] = array($question['country'], 'country', 'capital');
         if ($question['hint'] && $question['hint'][0] === "F") {
             $question['hint'] = substr($question['hint'], 2);
         } else {
@@ -42,6 +44,7 @@ switch ( $_SESSION['currentQuiz'] ) {
         $question['text'] = 'What\'s the capital of '.$question['country'].'?';
         $question['placeholder'] = 'Capital city name ...';
         $_SESSION['answer'] = $question['capital'];
+        $_SESSION['distractor'] = array($question['country'], 'country', 'capital');
         unset($question['hint'], $question['capital']);
         break;
 
@@ -50,6 +53,7 @@ switch ( $_SESSION['currentQuiz'] ) {
         $question['text'] = $question['capital'].' is the capital of which country?';
         $question['placeholder'] = 'Country name ...';
         $_SESSION['answer'] = $question['country'];
+        $_SESSION['distractor'] = array($question['capital'], 'capital', 'country');
         if ($question['hint'] && $question['hint'][0] === "C") {
             $question['hint'] = substr($question['hint'], 2);
         } else {

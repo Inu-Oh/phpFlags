@@ -12,8 +12,16 @@ if ( isPostRequest() ) {
     if ( isset($_POST['check']) ) {
 
         // Check the user answer and spelling accuracy
+        if ( isset( $_POST['answer'] ) && strlen( $_POST['answer'] ) > 1 ) {
         $percAccuracy = checkUserAnswer(); # Returns percent value of answer
         checkAnswerAccuracy($percAccuracy); # Would return true or false
+
+        // ...or return to question card if no input provided
+        } else {
+            $_SESSION['message'] = 'Write your answer in the check field';
+            header( 'Location: index.php' );
+            return;
+        }
 
         // Prevent showing HTML code for hyphen and apostrophe in feedback
         cleanUpUserInputForOutput();
@@ -84,8 +92,9 @@ view('head'); ?>
     <div id="q-card" class="container pt-3 bg-light rounded-4">
 
         <?php if ( isset( $_SESSION['message'] ) ) {
-            echo( '<span class="ts-3 fw-bold text-danger">'
-                . $_SESSION['message'] . '</span>' );
+            echo( '<div class="text-center p-3">
+                <h3 id="score" class="fs-4 bg-secondary fw-bold text-warning rounded py-1">'
+                . $_SESSION['message'] . '</h3></div>' );
             unset( $_SESSION['message'] );
         } else { 
             echo  $scoreBoard; 

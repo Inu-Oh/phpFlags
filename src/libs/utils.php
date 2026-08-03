@@ -18,19 +18,35 @@ function checkAnswerAccuracy($percAccuracy): void {
 }
 
 // Check the user answer for a match and return accuracy
-function checkUserAnswer(): float {
-    if ( isset( $_POST['answer'] ) && strlen( $_POST['answer'] ) > 0 ) {
-        $_SESSION['userInput'] = htmlspecialchars($_POST['answer'], ENT_QUOTES, 'UTF-8');
-        $matchingChars = similar_text(
-            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['userInput'])),
-            iconv('UTF-8', 'ASCII//TRANSLIT', strtolower(
-                htmlspecialchars($_SESSION['answer']))
-            ),
-            $percAccuracy
-        );
-    }
+function checkUserAnswer(): ?float {
+    $_SESSION['userInput'] = htmlspecialchars($_POST['answer'], ENT_QUOTES, 'UTF-8');
+    $matchingChars = similar_text(
+        iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['userInput'])),
+        iconv('UTF-8', 'ASCII//TRANSLIT', strtolower(
+            htmlspecialchars($_SESSION['answer']))
+        ),
+        $percAccuracy
+    );
 
-    return $percAccuracy;
+    // Check if user entered distractor instead of question answer
+    $matchDistractor = similar_text(
+        iconv('UTF-8', 'ASCII//TRANSLIT', strtolower($_SESSION['userInput'])),
+        iconv('UTF-8', 'ASCII//TRANSLIT', strtolower(
+            htmlspecialchars($_SESSION['distractor'][0]))
+        ),
+        $distractorAccuracy
+    );
+    // Redirect back to question card if user entered distractor
+    if ( $percAccuracy <= 85 && $distractorAccuracy > 85 ) {
+        $_SESSION['message'] = 'Enter the ' .
+            htmlspecialchars($_SESSION['distractor'][2]) . ' not the ' . 
+            htmlspecialchars($_SESSION['distractor'][1]);
+
+            header( 'Location: index.php' );
+            exit();
+    } else {
+        return $percAccuracy;
+    }  
 }
 
 // Prevent showing HTML code for select few special chars in user feedback
