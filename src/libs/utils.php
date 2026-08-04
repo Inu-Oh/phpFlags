@@ -131,10 +131,16 @@ function getPracticeQuestion(): void {
         setQuizAndQuestion( $quizId, $questionId ) ;
 
     } else {
-        // Switch to learn mode if no more practice questions
+        // Switch to learn mode if no more practice questions...
         unset( $_SESSION['practiceList'], $_SESSION['quizMode'] );
 
         $_SESSION['message'] = "Practice complete";
+
+            // ... or to review mode if no questions to learn
+            if ( count( $_SESSION['questionCount'] ) <= 0 ) {
+                header( 'Location: switchMode.php/switchMode.php?mode=review' );
+                exit();
+            }
 
         getQuestion();
     }
@@ -150,8 +156,14 @@ function getReviewQuestion(): void {
         setQuizAndQuestion( $quizId, $questionId );
 
     } else {
-        // Switch to learn mode if no more practice questions
+        // Switch to learn mode if no more practice questions...
         unset( $_SESSION['reviewList'], $_SESSION['quizMode'] );
+
+            // ... or restart review mode if no questions to learn
+            if ( count( $_SESSION['questionCount'] ) <= 0 ) {
+                header( 'Location: switchMode.php/switchMode.php?mode=review' );
+                exit();
+            }
 
         $_SESSION['message'] = "Review comlplete";
 
