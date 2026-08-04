@@ -63,6 +63,14 @@ function cleanUpUserInputForOutput(): void {
 
 // Get question for learn quiz mode
 function getLearnQuestion(): void {
+
+    // TODO - test this - Autoredirect to review mode if all cards are learned
+    if ( $_SESSION['questionCount'] <= 0 ) {
+
+            header( 'Location: switchMode.php/switchMode.php?mode=review' );
+            exit();
+        }
+
     // Make an array of all quizzes to choose from
     $quizzes = array();
     if ( count( $_SESSION['flagCountry'] ) > 0 ) $quizzes[] = 'flagCountry';

@@ -47,8 +47,10 @@ if ( isPostRequest() ) {
         // These session variables are set to prevent user hitting the back arrow
         $_SESSION['feedback'] = TRUE;
         $_SESSION['loaded'] = FALSE;
-        $_SESSION['testedCards']++;
-
+        if ( ! isset( $_SESSION['quizMode'] ) ) {
+            $_SESSION['testedCards']++;
+        }
+        
         header( 'Location: feedback.php' );
         return;
     }

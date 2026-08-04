@@ -1,6 +1,9 @@
 <aside id="infoPane" class="bg-light">
     <div class="card card-body m-3 p-4 bg-light border-5 border-white rounded-4">
         <div class="card-title fs-5 py-1">
+            Rank &nbsp;<span class="card-text fs-6"><?= $_SESSION['level'] ?></span>
+        </div>
+        <div class="card-title fs-5 py-1">
             Cards &nbsp;<span class="card-text fs-6"><?= $_SESSION['cardsRemaining'] ?></span>
         </div>
         <div class="card-title fs-5 py-1">
@@ -31,9 +34,6 @@
             } ?>
 
             </span>
-        </div>
-        <div class="card-title fs-5 py-1">
-            Rank &nbsp;<span class="card-text fs-6"><?= $_SESSION['level'] ?></span>
         </div>
     </div>
 </aside>

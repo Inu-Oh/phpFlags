@@ -107,7 +107,7 @@ $(document).ready(function() {
         $('#quiz-area').replaceWith(template(context));
     }).fail( function() { alert('getJSON feedback fail'); } );
 
-    function adjustSidenav() {
+    function adjustPanes() {
         const $falseNav = $('#falseNavbar');
         const $infoPane = $('#infoPane');
         if ( $(window).width() < 890 ) {
@@ -119,9 +119,9 @@ $(document).ready(function() {
         }
     }
 
-    $(window).on('resize', adjustSidenav);
+    $(window).on('resize', adjustPanes);
 
-    adjustSidenav();
+    adjustPanes();
 });
 </script>
 
