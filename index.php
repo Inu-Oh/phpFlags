@@ -87,6 +87,7 @@ view('head'); ?>
 <body class="p-5">
 
 <?php require_once __DIR__ . '/src/inc/nav.php'; ?>
+<?php require_once __DIR__ . '/src/inc/infoPane.php'; ?>
 
 <main>
     <div id="q-card" class="container pt-3 bg-light rounded-4">

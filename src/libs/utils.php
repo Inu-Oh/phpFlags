@@ -300,16 +300,21 @@ function scoreBoard( $pdo, $quizId=FALSE ): string {
                         '</span>&nbsp;&nbsp; ';
         
         if ( $_SESSION['quizMode'] == 'practice' ) {
-            $scoreBoard .= htmlspecialchars( count( $_SESSION['practiceList'] ) );
+            $cards_left = htmlspecialchars( count( $_SESSION['practiceList'] ) );
 
         } elseif ( $_SESSION['quizMode'] == 'review' ) {
-            $scoreBoard .= htmlspecialchars( count( $_SESSION['reviewList'] ) );
+            $cards_left = htmlspecialchars( count( $_SESSION['reviewList'] ) );
         }
         
-        $scoreBoard .= ' to go &nbsp; ' . 
-            '<span class="text-warning">' .
-                htmlspecialchars( $score, ENT_QUOTES, 'UTF-8' ) .
-            '</span>';
+        if ( $cards_left == 0 ) {
+            $scoreBoard .= ' last card &nbsp; ';
+        } else {
+            $scoreBoard .= $cards_left . ' to go &nbsp; ';
+        }
+
+        $scoreBoard .= '<span class="text-warning">' .
+                            htmlspecialchars( $score, ENT_QUOTES, 'UTF-8' ) .
+                        '</span>';
 
     // Text output for learning quiz mode
     } else {
@@ -395,6 +400,8 @@ function updateAnonProgress( $quizId ): void {
 function updateInfoPane(): void {
     
     $_SESSION['cardsRemaining'] = $_SESSION['questionCount'] - $_SESSION['testedCards'];
+
+    if ( ! isset( $_SESSION['testCount'] ) ) $_SESSION['testCount'] = 0;
 
     switch ( TRUE ) {
         case $_SESSION['testCount'] < 100 :

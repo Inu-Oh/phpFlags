@@ -37,6 +37,10 @@ if ( isGetRequest() ) {
 view('head'); ?>
 
 <body class="p-5">
+
+<?php require_once __DIR__ . '/src/inc/falseNav.php'; ?>
+<?php require_once __DIR__ . '/src/inc/infoPane.php'; ?>
+
 <main>
     <div id="q-card" class="container pt-3 bg-light rounded-4">
 
@@ -102,6 +106,22 @@ $(document).ready(function() {
         context.feedback = feedback;
         $('#quiz-area').replaceWith(template(context));
     }).fail( function() { alert('getJSON feedback fail'); } );
+
+    function adjustSidenav() {
+        const $falseNav = $('#falseNavbar');
+        const $infoPane = $('#infoPane');
+        if ( $(window).width() < 890 ) {
+            $falseNav.width(0);
+            $infoPane.width(0);
+        } else {
+            $falseNav.width("21%");
+            $infoPane.width("21%");
+        }
+    }
+
+    $(window).on('resize', adjustSidenav);
+
+    adjustSidenav();
 });
 </script>
 

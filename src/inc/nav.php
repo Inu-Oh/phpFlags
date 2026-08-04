@@ -76,33 +76,3 @@
 ?>
 
 </nav>
-
-<div id="infoPane" class="bg-light">
-    <div class="card card-body m-3 p-4 bg-light border-5 border-white rounded-4">
-        <div class="card-title fs-5 pb-1">
-            Cards &nbsp;<span class="card-text fs-6"><?= $_SESSION['cardsRemaining'] ?></span>
-        </div>
-        <div class="card-title fs-5 py-1">
-            Tested &nbsp;<span class="card-text fs-6"><?= $_SESSION['testedCards'] ?></span>
-        </div>
-        <div class="card-title fs-5 py-1">
-            Score&nbsp;<span class="card-text fs-6">
-                <?php if ( isset( $_SESSION['username'] ) ) {
-                    echo $_SESSION['userCorrect'] . 
-                        '</span>
-                    </div>
-                    <div class="card-title fs-5 py-1">Rate&nbsp
-                        <span class="card-text fs-6">' . 
-                            round( $_SESSION['userAccuracy'] ) . 
-                        '%</span>
-                    </div>
-                    <div class="card-title fs-5 py-1">XP&nbsp
-                        <span class="card-text fs-6">' . $_SESSION['level'];
-                } else {
-                    echo $_SESSION['score'];
-                } ?>
-            </span>
-        </div>
-    </div>
-
-</div>
