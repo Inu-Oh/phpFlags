@@ -22,11 +22,13 @@
                 echo '<form action="switchMode.php" method="post">
                     <input type="hidden" value="' . $_SESSION['csrf_token'] . '"
                         name="csrf_token">
-                    <div class="card-text">
-                        <input class="nav-submit-link" type="submit" value="Learn"
+                    <div class="card-text">';
+                if ( $_SESSION['testedCards'] < $_SESSION['questionCount'] ) {
+                    echo '<input class="nav-submit-link" type="submit" value="Learn"
                             name="learn">
-                        <label class="text-secondary info-text">Discover new content</label>
-                        <input class="nav-submit-link pt-3" type="submit" value="Review"
+                        <label class="text-secondary info-text">Discover new content</label>';
+                }
+                echo    '<input class="nav-submit-link pt-3" type="submit" value="Review"
                             name="review">
                         <label class="text-secondary info-text">
                             Refresh your memory</label>
@@ -37,11 +39,13 @@
                 echo '<form action="switchMode.php" method="post">
                     <input type="hidden" value="' . $_SESSION['csrf_token'] . '"
                         name="csrf_token">
-                    <div class="card-text">
-                        <input class="nav-submit-link" type="submit" value="Learn"
+                    <div class="card-text">';
+                if ( $_SESSION['testedCards'] < $_SESSION['questionCount'] ) {
+                    echo '<input class="nav-submit-link" type="submit" value="Learn"
                             name="learn">
-                        <label class="text-secondary info-text">Discover new content</label>
-                        <input class="nav-submit-link pt-3" type="submit" value="Practice"
+                        <label class="text-secondary info-text">Discover new content</label>';
+                }
+                echo    '<input class="nav-submit-link pt-3" type="submit" value="Practice"
                             name="practice">
                         <label class="text-secondary info-text">
                             Strengthen skills</label>

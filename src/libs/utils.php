@@ -137,7 +137,7 @@ function getPracticeQuestion(): void {
         $_SESSION['message'] = "Practice complete";
 
             // ... or to review mode if no questions to learn
-            if ( count( $_SESSION['questionCount'] ) <= 0 ) {
+            if ( $_SESSION['questionCount'] <= 0 ) {
                 header( 'Location: switchMode.php/switchMode.php?mode=review' );
                 exit();
             }
@@ -160,7 +160,7 @@ function getReviewQuestion(): void {
         unset( $_SESSION['reviewList'], $_SESSION['quizMode'] );
 
             // ... or restart review mode if no questions to learn
-            if ( count( $_SESSION['questionCount'] ) <= 0 ) {
+            if ( $_SESSION['questionCount'] <= 0 ) {
                 header( 'Location: switchMode.php/switchMode.php?mode=review' );
                 exit();
             }
