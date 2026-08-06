@@ -132,9 +132,13 @@ function getPracticeQuestion(): void {
 
     } else {
         // Switch to learn mode if no more practice questions...
-        unset( $_SESSION['practiceList'], $_SESSION['quizMode'] );
-
-        $_SESSION['message'] = "Practice complete";
+        $_SESSION['message'] = 'Practice complete &nbsp; ' . $_SESSION['modeQuizAccuracy'];
+        unset( $_SESSION['practiceList'],
+            $_SESSION['quizMode'], 
+            $_SESSION['modeQuizAccuracy'],
+            $_SESSION['modeQuizTested'],
+            $_SESSION['modeQuizCorrect']
+        );
 
             // ... or to review mode if no questions to learn
             if ( $_SESSION['questionCount'] <= 0 ) {
@@ -157,15 +161,19 @@ function getReviewQuestion(): void {
 
     } else {
         // Switch to learn mode if no more practice questions...
-        unset( $_SESSION['reviewList'], $_SESSION['quizMode'] );
+        $_SESSION['message'] = 'Review comlplete &nbsp; ' . $_SESSION['modeQuizAccuracy'];
+        unset( $_SESSION['practiceList'],
+            $_SESSION['quizMode'], 
+            $_SESSION['modeQuizAccuracy'],
+            $_SESSION['modeQuizTested'],
+            $_SESSION['modeQuizCorrect']
+        );
 
             // ... or restart review mode if no questions to learn
             if ( $_SESSION['questionCount'] <= 0 ) {
                 header( 'Location: switchMode.php/switchMode.php?mode=review' );
                 exit();
             }
-
-        $_SESSION['message'] = "Review comlplete";
 
         getQuestion();
     }
@@ -320,20 +328,20 @@ function scoreBoard( $pdo, $quizId=FALSE ): string {
                         '</span>&nbsp;&nbsp; ';
         
         if ( $_SESSION['quizMode'] == 'practice' ) {
-            $cards_left = htmlspecialchars( count( $_SESSION['practiceList'] ) );
+            $cards_left = count( $_SESSION['practiceList'] );
 
         } elseif ( $_SESSION['quizMode'] == 'review' ) {
-            $cards_left = htmlspecialchars( count( $_SESSION['reviewList'] ) );
+            $cards_left = count( $_SESSION['reviewList'] );
         }
         
         if ( $cards_left == 0 ) {
             $scoreBoard .= ' last card &nbsp; ';
         } else {
-            $scoreBoard .= $cards_left . ' to go &nbsp; ';
+            $scoreBoard .= $cards_left + 1 . ' to go &nbsp; ';
         }
 
         $scoreBoard .= '<span class="text-warning">' .
-                            htmlspecialchars( $score, ENT_QUOTES, 'UTF-8' ) .
+                            $_SESSION['modeQuizAccuracy'] .
                         '</span>';
 
     // Text output for learning quiz mode
@@ -403,6 +411,13 @@ function setQuizAndQuestion( $quizId, $questionId ) {
     $_SESSION['nextQuestion'] = intval( $questionId );
 }
 
+# Set up stats for practice and review quiz modes
+function setModeQuizStats(): void {
+    $_SESSION['modeQuizAccuracy'] = '';
+    $_SESSION['modeQuizTested'] = 0;
+    $_SESSION['modeQuizCorrect'] = 0;
+}
+
 // Update anonymous progress after each test in case user creates an account or logs in
 function updateAnonProgress( $quizId ): void {
     if ( ! isset( $_SESSION['anonProgress'] ) ) {
@@ -457,9 +472,17 @@ function updateScore( $pdo, $quizId, $percAccuracy ): void {
 
         $_SESSION['testCount']++;
         if ( $percAccuracy > 85 ) $_SESSION['userCorrect']++;
-
         $_SESSION['userAccuracy'] =
             ( $_SESSION['userCorrect'] / $_SESSION['testCount'] ) * 100;
+
+        if ( isset( $_SESSION['quizMode'] ) ) {
+            $_SESSION['modeQuizTested']++;
+            if ( $percAccuracy > 85 ) $_SESSION['modeQuizCorrect']++;
+            $_SESSION['modeQuizAccuracy'] = 
+                strval( 
+                    round( ( $_SESSION['modeQuizCorrect'] / $_SESSION['modeQuizTested'] ) * 100)
+                ) . "%";
+        }
     }
 }
 

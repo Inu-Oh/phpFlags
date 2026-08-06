@@ -24,6 +24,7 @@ if ( isPostRequest() ) {
         if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
 
         getUserPracticeList();
+        setModeQuizStats();
         $_SESSION['quizMode'] = 'practice';
 
     } elseif ( isset( $_POST['review']) || 
@@ -33,6 +34,7 @@ if ( isPostRequest() ) {
         if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
 
         getUserReviewList();
+        setModeQuizStats();
         $_SESSION['quizMode'] = 'review';
     }
 }
