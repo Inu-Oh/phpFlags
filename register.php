@@ -83,6 +83,7 @@ if ( isPostRequest() ) {
 
             // Update the user prgross in DB based on progress saved in session
             updateUserProgressFromSessionToDB($pdo);
+            unset( $_SESSION['userId'] );
 
             header( 'Location: login.php' );
             return;

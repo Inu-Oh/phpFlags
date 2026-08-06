@@ -49,6 +49,9 @@ if ( isPostRequest() ) {
                 // Update any user progress made prior to login
                 updateUserProgressFromSessionToDB($pdo);
 
+                // Remove quiz card that is in the queue before login
+                if ( isset( $_SESSION['nextQuestion'] ) ) unset( $_SESSION['nextQuestion'] );
+
                 error_log("Login success for " . $username);
                 header( 'Location: index.php' );
                 return;
