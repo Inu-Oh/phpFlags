@@ -23,19 +23,19 @@ if ( isPostRequest() ) {
         if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
         if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
 
+        $_SESSION['quizMode'] = 'practice';
         getUserPracticeList();
         setModeQuizStats();
-        $_SESSION['quizMode'] = 'practice';
-
+        
     } elseif ( isset( $_POST['review']) || 
         ( isset( $_GET['mode'] ) && $_GET['mode'] == 'review' ) ) {
 
         if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
         if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
 
+        $_SESSION['quizMode'] = 'review';
         getUserReviewList();
         setModeQuizStats();
-        $_SESSION['quizMode'] = 'review';
     }
 }
 

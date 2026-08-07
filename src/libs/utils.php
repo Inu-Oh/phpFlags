@@ -263,9 +263,15 @@ function getUserStats( $pdo, $quizId ): void {
 // Return grade based on percentage score
 function grade(): string {
     if ( ( isset( $_SESSION['testCount'] ) && $_SESSION['testCount'] > 0 ) || 
-        isset( $_SESSION['userAccuracy'] ) ) {
+        isset( $_SESSION['userAccuracy'] ) || isset( $_SESSION['modeQuizAccuracy'] ) ) {
             
-        if ( isset( $_SESSION['userAccuracy'] ) ) {
+        if ( isset( $_SESSION['modeQuizAccuracy'] ) ) {
+            if ( $_SESSION['modeQuizTested'] > 0 ) {
+                $perc = ( $_SESSION['modeQuizCorrect'] / $_SESSION['modeQuizTested'] ) * 100;
+            } else {
+                $perc = 100;
+            }
+        } elseif ( isset( $_SESSION['userAccuracy'] ) ) {
             $perc = round( $_SESSION['userAccuracy'] );
         } else {
             $perc = round( ( $_SESSION['score'] / $_SESSION['testCount'] ) * 100 );
@@ -325,7 +331,7 @@ function scoreBoard( $pdo, $quizId=FALSE ): string {
     if ( isset( $_SESSION['quizMode'] ) ) {
         $scoreBoard .=  '<span class="text-warning fw-bold">' . 
                             htmlspecialchars( ucwords( $_SESSION['quizMode'] ) ) . 
-                        '</span>&nbsp;&nbsp; ';
+                        '</span>';
         
         if ( $_SESSION['quizMode'] == 'practice' ) {
             $cards_left = count( $_SESSION['practiceList'] );
@@ -337,7 +343,8 @@ function scoreBoard( $pdo, $quizId=FALSE ): string {
         if ( $cards_left == 0 ) {
             $scoreBoard .= ' last card &nbsp; ';
         } else {
-            $scoreBoard .= $cards_left + 1 . ' to go &nbsp; ';
+            $scoreBoard .= ' card ' . $_SESSION['modeQuizLength'] - $cards_left . 
+                            ' of ' . $_SESSION['modeQuizLength'] . ' &nbsp; ' ;
         }
 
         $scoreBoard .= '<span class="text-warning">' .
@@ -413,6 +420,11 @@ function setQuizAndQuestion( $quizId, $questionId ) {
 
 # Set up stats for practice and review quiz modes
 function setModeQuizStats(): void {
+    if ( $_SESSION['quizMode'] == 'practice' ) {
+        $_SESSION['modeQuizLength'] = count( $_SESSION['practiceList'] );
+    } else {
+        $_SESSION['modeQuizLength'] = count( $_SESSION['reviewList'] );
+    }
     $_SESSION['modeQuizAccuracy'] = '';
     $_SESSION['modeQuizTested'] = 0;
     $_SESSION['modeQuizCorrect'] = 0;
