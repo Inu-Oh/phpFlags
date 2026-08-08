@@ -3,54 +3,91 @@ Simple PHP flag quiz app.
 
 >  [!CAUTION]
 >
->  This app is currently in development / Use only this code only for development
+>  This app is still in development and only suitable for testing and development
 
 A geography quiz Web app written in PHP, testing knowledge of flags, country and capital city names. The app randomly chooses between four types of quizzes, then chooses a random question from each quiz question list, just under one thousand questions in total.
 
-See below for SQL and PHP code for use to set up quiz question data on PostgreSQL.
-
-## Quiz types
+## Quiz question types
+Quiz cards are selected in random order
 - Guess country from flag
 - Guess capital from flag
 - Guess capital from country
 - Guess country from capital
 
-## Features
-All quiz data is currenty stored in the 'countries.php' array file, from which questions are accessed by the main view pages using jQuery to embed JSON data in Handlebars stript templates. The app is now writting fully in PHP. I have eliminated most JavaScript elments.
+## Quiz modes
+- Learn - trains user on new quiz cards selected in random order - anon and account users
+- Practice - strengthens user skill by focusing on weakest quiz cards - requires account
+- Review - refreshes user memory of leaned quiz cards in random order - requires account
 
-## Planned development
-### Quiz data storage
-The quiz data is now stored in database and retrieved with PDO for each question. See earlier version for a pure PHP array implementation.
-### User progress
-Choosing an SQL schema to store user learning progress on all quiz questions. Planning how the user data will be best set up together with the quiz data.
+## Features
+All quiz data is currently stored in the 'countries.php' array file, from which question and feedback data are accessed by the main view pages using jQuery to embed JSON data in Handlebars script templates. The app is now written fully in PHP, using minimal JavaScript.
+
+PostgreSQL database stores all quiz information as well as user data and user progress data for each quiz question.
+
+Left side navigation, card scoreboard, and right side info pane provide context to quiz progression through cards selected depending on quiz mode.
+
+When anonymous user logs in current session data is used to update any cards the user has tested and automatically updates to the user progress data in the database.
+
+Scroll below gallery for PostgreSQL and PHP code implementation of user, user progress, and quiz question data.
+
+### In development
+- Finalize functionality
+- Review security features
+- Write tests
 
 ## Gallery
-### Start Quiz - sample question for Guess country from capital city name
-<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/c78b8418-801a-4195-b5a0-53d4f5da5166" />
 
-### Quiz Question - Guess country from flag
+### Full Main Quiz Page
+Practice quiz mode question with logged in user - showing left navigation, quiz mode scoreboard and user right info pane
+- navigation with links to logout or switch quiz modes
+<img width="1167" height="826" alt="image" src="https://github.com/user-attachments/assets/a6b5af92-8753-4e55-84f6-198f2c4f7c11" />
+
+
+### Full Feedback Page
+Review quiz mode with logged in user - showing left and right info panes and quiz mode scoreboard
+- navigation disabled during feedback
+<img width="1167" height="826" alt="image" src="https://github.com/user-attachments/assets/1b0998d9-a530-46c5-a93d-ebcf59490b7b" />
+
+### Full Anonymous Quiz Page
+Learn quiz mode with anonymous user - showing scoreboard for perfect quiz results and similar left navigation and right info panes
+- navigation links to log in and out
+- only learn mode is available to anonymous users
+- info pane has similar information 
+<img width="1257" height="826" alt="image" src="https://github.com/user-attachments/assets/6f4aa029-1461-4047-80e0-2256efc6b702" />
+
+### Start Quiz - Guess capital city name from flag - anonymous
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/f346fd1d-a421-4c58-a5d2-15b281b9a27a" />
+
+### Quiz Question - Guess country from flag - example of perfect score - anonymous
 <img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/a3af0c73-5ec2-48a0-b080-2e1b6daf72d3" />
 
-### Quiz question - Guess capital city name from flag
-<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/5c116a90-4771-4ef0-a4a2-7ca1d503c06d" />
+### Quiz question - Guess capital city name from country - review mode
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/2c129aaf-e25b-41d1-8bbb-0243dfcbb9fa" />
 
-### Quiz question - Guess country from capital city name
-<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/4f21d0bb-4085-4bc9-8a20-cdbd67dc0809" />
+### Quiz question - Guess country from capital city name - logged in user
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/41640c87-2757-4277-bb18-04309694fc84" />
 
 ### Feedback on country name guess from flag
 <img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/adf907ab-606a-45f2-a612-7271a48077e2" />
 
-### Feedback on capital city name guess from country - showing perfect score
-<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/68a6dab0-00d2-4d1a-a683-13bf15f36e42" />
+### Feedback on capital city name guess from country
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/0544831b-1c48-43e7-b741-b726759e74a2" />
 
 ### Feedback on capital city name guess from flag - misspelling feedback
 <img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/d74849ed-b497-406d-9e6c-a5261025f21e" />
 
-### Feedback on country name guess from flag - wrong guess
-<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/69f4ec41-331c-4fff-86b2-033c96d63ec6" />
+### Feedback on country name guess from flag - wrong guess - practice mode
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/f12fddaa-07cf-4de5-afee-d70114116c08" />
 
-### Feedback on country name guess from capity city name - wrong guess
-<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/763845b8-1b76-413c-bfb9-44d47f9313f2" />
+### Feedback on country name guess from capital city name - wrong guess
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/12e4a77d-eeb7-4bb0-a0d0-0ccf0d9bab05" />
+
+### Error message shown when user enters country instead of capital
+- Similar message given when user enters capital instead of country
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/993284ff-6b40-4289-8140-d752e5ce0e8c" />
+
+### Error message shown when user does not enter a value
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/712e6180-1b5e-4407-b24a-e2c3525c4f6a" />
 
 ## Add config.php
 
