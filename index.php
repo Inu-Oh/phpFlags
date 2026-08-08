@@ -48,6 +48,7 @@ if ( isPostRequest() ) {
         $_SESSION['feedback'] = TRUE;
         $_SESSION['loaded'] = FALSE;
         if ( ! isset( $_SESSION['quizMode'] ) ) {
+            $_SESSION['testCount']++;
             $_SESSION['testedCards']++;
         }
         

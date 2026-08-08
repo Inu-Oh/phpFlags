@@ -272,9 +272,9 @@ function grade(): string {
                 $perc = 100;
             }
         } elseif ( isset( $_SESSION['userAccuracy'] ) ) {
-            $perc = round( $_SESSION['userAccuracy'] );
+            $perc = $_SESSION['userAccuracy'] ;
         } else {
-            $perc = round( ( $_SESSION['score'] / $_SESSION['testCount'] ) * 100 );
+            $perc = ( $_SESSION['score'] / $_SESSION['testCount'] ) * 100;
         }
         
         if ( $perc > 85 ) {

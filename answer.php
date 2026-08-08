@@ -1,24 +1,24 @@
 <?php
 require_once __DIR__ . '/src/config/config.php';
-header("Content-type: application/json; charset=utf-8");
+header( "Content-type: application/json; charset=utf-8" );
 require_once __DIR__ . '/src/pdo.php';
 
 // Prapare array of question data to be sent via JSON to Handlebars template
 // only if user has entered an answer and feedbck has been set to true
-if ( isset($_SESSION['feedback']) ) {
+if ( isset( $_SESSION['feedback'] ) ) {
 
     if ( $_SESSION['feedback'] === TRUE ) {
 
-        $stmt = $pdo->prepare('SELECT * FROM countries WHERE pk = :pk');
-        $stmt->execute(array(':pk' => $_SESSION['nextQuestion']));
-        $feedback = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $pdo->prepare( 'SELECT * FROM countries WHERE pk = :pk' );
+        $stmt->execute( array( ':pk' => $_SESSION['nextQuestion'] ) );
+        $feedback = $stmt->fetch( PDO::FETCH_ASSOC );
 
         // Add feedback data from session
         $feedback['correct'] = $_SESSION['correct'];
         $feedback['user_input'] = $_SESSION['userInput'];
         $feedback['answer'] = $_SESSION['answer'];
         $feedback['src'] = 'static/images/'.$feedback['code'].'.png';
-        if ( isset($_SESSION['misspelled']) && $_SESSION['misspelled'] === TRUE ) {
+        if ( isset( $_SESSION['misspelled'] ) && $_SESSION['misspelled'] === TRUE ) {
             $feedback['misspelled'] = TRUE;
         }
 
@@ -45,8 +45,14 @@ if ( isset($_SESSION['feedback']) ) {
                 break;
         }
         // Clean up session data before returning JSON
-        unset($feedback['country'],$feedback['capital'], $feedback['code'],
-            $feedback['hint'], $feedback['pk'], $_SESSION['misspelled']);
-        echo(json_encode($feedback, JSON_PRETTY_PRINT));
+        unset(
+            $feedback['country'],
+            $feedback['capital'],
+            $feedback['code'],
+            $feedback['hint'],
+            $feedback['pk'],
+            $_SESSION['misspelled']
+        );
+        echo( json_encode( $feedback, JSON_PRETTY_PRINT ) );
     }
 }
