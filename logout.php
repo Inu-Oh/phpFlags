@@ -7,5 +7,5 @@ $_SESSION = array();
 
 // Destroy the session and redirect to home page
 session_destroy();
-header('Location: index.php');
+header( 'Location: index.php' );
 ?>

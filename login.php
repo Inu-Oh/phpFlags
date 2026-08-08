@@ -3,51 +3,53 @@ require_once __DIR__ . '/src/config/config.php';
 require_once __DIR__ . '/src/pdo.php';
 require_once __DIR__ . '/src/libs/utils.php';
 
-if ( empty($_SESSION['csrf_token']) ) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if ( empty( $_SESSION['csrf_token'] ) )
+    $_SESSION['csrf_token'] = bin2hex( random_bytes(32) );
 
 if ( isPostRequest() ) {
 
     verifyCsrfOrDie();
 
     // Redirect to home page if user cancels login
-    if ( isset($_POST['cancel']) && $_POST['cancel'] == 'Cancel') {
+    if ( isset( $_POST['cancel'] ) && $_POST['cancel'] == 'Cancel') {
 
         header( 'Location: index.php' );
         return;
     }
 
-    if ( isset($_POST['username']) && isset($_POST['password'])) {
+    if ( isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
 
         // Logout current user if any
-        unset($_SESSION['username'], $_SESSION['userId']); 
+        unset( $_SESSION['username'], $_SESSION['userId'] ); 
         
         // Show error flash message if name or password are not entered
-        if ( strlen($_POST['username']) < 1 || strlen($_POST['password']) < 1 ) {
+        if ( strlen( $_POST['username'] ) < 1 || strlen( $_POST['password'] ) < 1 ) {
 
-            $_SESSION['error'] = '<p style="color:red">User name and password are required</p>';
+            $_SESSION['error'] = '<p style="color:red">
+                User name and password are required</p>';
             header( 'Location: login.php' );
             return;
         } 
 
         // Lookup username
-        $username = htmlentities($_POST['username']);
+        $username = htmlentities( $_POST['username'] );
         $sql = "SELECT user_id, pw_hash FROM users WHERE username = :un";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(array(':un' => $username));
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $pdo->prepare( $sql ) ;
+        $stmt->execute( array( ':un' => $username ) );
+        $row = $stmt->fetch( PDO::FETCH_ASSOC );
 
-        if ( ! empty($row) ) {
+        if ( ! empty( $row ) ) {
 
             // Validadate user password
-            $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
-            if ( password_verify($password, (string)$row['pw_hash'] ) ) {
+            $password = htmlspecialchars( $_POST['password'], ENT_QUOTES, 'UTF-8' );
+            if ( password_verify( $password, (string)$row['pw_hash'] ) ) {
 
                 $_SESSION['username'] = $username;
                 $_SESSION['userId'] = $row['user_id'];
                 $_SESSION['success'] = '<p style="color:green">Logged in</p>';
 
                 // Update any user progress made prior to login
-                updateUserProgressFromSessionToDB($pdo);
+                updateUserProgressFromSessionToDB( $pdo );
 
                 // Remove quiz card that is in the queue before login
                 if ( isset( $_SESSION['nextQuestion'] ) ) unset( $_SESSION['nextQuestion'] );
@@ -59,7 +61,7 @@ if ( isPostRequest() ) {
                 } else {
                 // Show error flash message if password is incorrect
                 $_SESSION['error'] = '<p style="color:red">Incorrect password</p>';
-                error_log("Login fail for " . $username);
+                error_log( "Login fail for " . $username );
                 header( 'Location: login.php' );
                 return;
             }
@@ -73,24 +75,24 @@ if ( isPostRequest() ) {
     }
 }
 
-if ( isGetRequest() && isset($_SESSION['username']) ) {
+if ( isGetRequest() && isset( $_SESSION['username'] ) ) {
     header( 'Location: index.php' );
     return;
 }
 
-view('head', ['title' => 'Login']);
+view( 'head', ['title' => 'Login'] );
 ?>
 
 <body class="p-5">
 <main>
     <div id="q-card" class="container p-3 bg-light rounded-4">
         <h1 class="m-3"> <?php            
-            if ( isset($_SESSION['error']) ) {
-                echo '<span class="text-danger">'.$_SESSION['error'].'</span>';
-                unset($_SESSION['error']);
-            } else if ( isset($_SESSION['bug']) ) {
-                echo '<span class="text-danger">'.$_SESSION['bug'].'</span>';
-                unset($_SESSION['bug']);
+            if ( isset( $_SESSION['error'] ) ) {
+                echo '<span class="text-danger">' . $_SESSION['error'] . '</span>';
+                unset( $_SESSION['error'] );
+            } else if ( isset( $_SESSION['bug'] ) ) {
+                echo '<span class="text-danger">' . $_SESSION['bug'] . '</span>';
+                unset( $_SESSION['bug'] );
             } else {
                 echo 'Please Log In';
             }

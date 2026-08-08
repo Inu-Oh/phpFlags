@@ -3,27 +3,28 @@ require_once __DIR__ . '/src/config/config.php';
 require_once __DIR__ . '/src/pdo.php';
 require_once __DIR__ . '/src/libs/utils.php';
 
-if ( empty($_SESSION['csrf_token']) ) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if ( empty( $_SESSION['csrf_token'] ) ) 
+    $_SESSION['csrf_token'] = bin2hex( random_bytes(32) );
 
 if ( isPostRequest() ) {
     
     verifyCsrfOrDie();
 
     // Check that all fields are posted
-    if ( isset($_POST['username']) && isset($_POST['email']) 
-        && isset($_POST['password']) && isset($_POST['password2']) ) {
+    if ( isset( $_POST['username'] ) && isset( $_POST['email'] ) 
+        && isset( $_POST['password'] ) && isset( $_POST['password2'] ) ) {
         
         // Validate email
-        $email = htmlspecialchars($_POST['email']);
+        $email = htmlspecialchars( $_POST['email'] );
         if ( ! filter_var( $email, FILTER_VALIDATE_EMAIL )
-            || strlen($email) > 128 ) {
+            || strlen( $email ) > 128 ) {
             $_SESSION['error'] = "Invalid email address";
             header( 'Location: register.php' );
             return;
         }
         // Make sure email is unique
         $stmt = $pdo->prepare('SELECT email FROM users WHERE email = :em');
-        $stmt->execute(array(':em' => $email ));
+        $stmt->execute( array( ':em' => $email ) );
         if ( $stmt->fetchColumn() ) {
             $_SESSION['error'] = "That email is already taken";
             header( 'Location: register.php' );
@@ -31,15 +32,15 @@ if ( isPostRequest() ) {
         }
 
         // Validate username
-        $username = htmlspecialchars($_POST['username']);
+        $username = htmlspecialchars( $_POST['username'] );
         if ( strlen($username) > 32 ) {
             $_SESSION['error'] = "Choose a shorter username";
             header( 'Location: register.php' );
             return;
         }
         // Make sure username is unique
-        $stmt = $pdo->prepare('SELECT username FROM users WHERE username = :un');
-        $stmt->execute(array(':un' => $username));
+        $stmt = $pdo->prepare( 'SELECT username FROM users WHERE username = :un' );
+        $stmt->execute( array( ':un' => $username ) );
         if ( $stmt->fetchColumn() ) {
             $_SESSION['error'] = "That username is already taken";
             header( 'Location: register.php' );
@@ -47,42 +48,42 @@ if ( isPostRequest() ) {
         }
 
         // Validate password. Check for match.
-        if ( htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8') ==
-            htmlspecialchars($_POST['password2'], ENT_QUOTES, 'UTF-8') ) {
+        if ( htmlspecialchars( $_POST['password'], ENT_QUOTES, 'UTF-8' ) ==
+            htmlspecialchars( $_POST['password2'], ENT_QUOTES, 'UTF-8' ) ) {
             
             // Hash the password before saving
-            $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
+            $password = htmlspecialchars( $_POST['password'], ENT_QUOTES, 'UTF-8' );
             $options = [ 'cost' => 12 ];
-            $pw_hash = password_hash($password, PASSWORD_BCRYPT, $options); 
+            $pw_hash = password_hash( $password, PASSWORD_BCRYPT, $options ); 
 
             // Save new user data and hash to database
             $sql = 'INSERT INTO users (username, email, pw_hash) VALUES(:un, :em, :pw)';
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute(array(
+            $stmt = $pdo->prepare( $sql );
+            $stmt->execute( array(
                 ':un' => $username,
                 ':em' => $email,
                 ':pw' => $pw_hash,
-            ));
+            ) );
             $_SESSION['userId'] = $pdo->lastInsertId();
 
             // Reset all quiz lists. Initiate user's progress for each quiz question.
-            setQuestions($pdo);
+            setQuestions( $pdo );
             $quizzes = quizArray();
-            foreach ($quizzes as $quizName => $quizId) { 
-                foreach ($_SESSION[$quizName] as $countryId) {
+            foreach ( $quizzes as $quizName => $quizId ) { 
+                foreach ( $_SESSION[$quizName] as $countryId ) {
                     $sql = 'INSERT INTO progress (user_id, country_id, quiz_id)
                                 VALUES (:ui, :ci, :qi)';
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute(array(
+                    $stmt = $pdo->prepare( $sql );
+                    $stmt->execute( array(
                         ':ui' => $_SESSION['userId'],
                         ':ci' => $countryId,
                         ':qi' => $quizId
-                    ));
+                    ) );
                 }
             }
 
             // Update the user prgross in DB based on progress saved in session
-            updateUserProgressFromSessionToDB($pdo);
+            updateUserProgressFromSessionToDB( $pdo );
             unset( $_SESSION['userId'] );
 
             header( 'Location: login.php' );
@@ -97,24 +98,24 @@ if ( isPostRequest() ) {
     }
 }
 
-if ( isGetRequest() && isset($_SESSION['username']) ) {
+if ( isGetRequest() && isset( $_SESSION['username'] ) ) {
     header( 'Location: index.php' );
     return;
 }
 
-view('head', ['title' => 'Register']);
+view( 'head', ['title' => 'Register'] );
 
 ?>
 <body class="p-5">
 <main>
     <div id="q-card" class="container p-3 bg-light rounded-4">
         <h1 class="m-3"> <?php            
-            if ( isset($_SESSION['error']) ) {
-                echo '<span class="text-danger">'.$_SESSION['error'].'</span>';
-                unset($_SESSION['error']);
+            if ( isset( $_SESSION['error'] ) ) {
+                echo '<span class="text-danger">' . $_SESSION['error'] . '</span>';
+                unset( $_SESSION['error'] );
             } else if ( isset($_SESSION['bug']) ) {
-                echo '<span class="text-danger">'.$_SESSION['bug'].'</span>';
-                unset($_SESSION['bug']);
+                echo '<span class="text-danger">' . $_SESSION['bug'] . '</span>';
+                unset( $_SESSION['bug'] );
             } else {
                 echo 'Sign Up';
             }
@@ -152,7 +153,7 @@ function doValidate() {
     try {
         user = document.getElementById('username').value;
         pw = document.getElementById('password').value;
-        console.log("Validating addr="+user+" pw=");
+        console.log("Validating addr=" + user + " pw=");
         if (user == null || user == "" || pw == null || pw == "") {
             alert("Both fields must be filled out");
             return false;
