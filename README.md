@@ -55,11 +55,11 @@ Learn quiz mode with anonymous user - showing scoreboard for perfect quiz result
 - info pane has similar information 
 <img width="1257" height="826" alt="image" src="https://github.com/user-attachments/assets/6f4aa029-1461-4047-80e0-2256efc6b702" />
 
-### Start Quiz - Guess capital city name from flag - anonymous
+### Start Quiz - Guess country name from flag - anonymous
 <img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/f346fd1d-a421-4c58-a5d2-15b281b9a27a" />
 
-### Quiz Question - Guess country from flag - example of perfect score - anonymous
-<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/a3af0c73-5ec2-48a0-b080-2e1b6daf72d3" />
+### Quiz Question - Guess capital city from flag - example of perfect score - anonymous
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/c410af8c-3a47-4c70-b283-9464bf393473" />
 
 ### Quiz question - Guess capital city name from country - review mode
 <img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/2c129aaf-e25b-41d1-8bbb-0243dfcbb9fa" />
