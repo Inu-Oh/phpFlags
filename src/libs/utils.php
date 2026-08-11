@@ -131,6 +131,9 @@ function getPracticeQuestion(): void {
         setQuizAndQuestion( $quizId, $questionId ) ;
 
     } else {
+        // TODO - redirect to quizResult page - reconfigure below functionalit to be performed
+        // with the new page quizResult.php
+
         // Switch to learn mode if no more practice questions...
         $_SESSION['message'] = 'Practice complete &nbsp; ' . $_SESSION['modeQuizAccuracy'];
         unset( $_SESSION['practiceList'],
@@ -145,7 +148,7 @@ function getPracticeQuestion(): void {
                 header( 'Location: switchMode.php/switchMode.php?mode=review' );
                 exit();
             }
-
+        
         getQuestion();
     }
 }
