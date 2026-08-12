@@ -110,6 +110,11 @@ view('head'); ?>
     </div>
 </main>
 
+<?php
+    if ( isset( $_SESSION['modeQuizSummary'] ) ) 
+        require_once __DIR__ . '/src/inc/quizResult.php';
+?>
+
 <script id="quiz-template" type="text/x-handlebars-template">
 <div class="px-3">
 

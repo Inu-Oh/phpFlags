@@ -132,57 +132,17 @@ function getPracticeQuestion(): void {
 
     } else {
         // TODO - create a modal that will show results of quiz and user can close
-        // openQuizResultModal(); // Probably bette to call the function after
-        $_SESSION['modeQuizSummary'] = 'practice';
-
         // Switch to learn mode if no more practice questions...
-        $_SESSION['message'] = 'Practice complete &nbsp; ' . $_SESSION['modeQuizAccuracy'];
-        unset( $_SESSION['practiceList'],
-            $_SESSION['quizMode'], 
-            $_SESSION['modeQuizAccuracy'],
-            $_SESSION['modeQuizTested'],
-            $_SESSION['modeQuizCorrect']
-        );
+        $_SESSION['modeQuizSummary'] = TRUE;
+        // TODO - delete the following after testing new result modal
+        // $_SESSION['message'] = 'Practice complete &nbsp; ' . $_SESSION['modeQuizAccuracy'];
 
-            // ... or to review mode if no questions to learn
-            if ( $_SESSION['questionCount'] <= 0 ) {
-                header( 'Location: switchMode.php/switchMode.php?mode=review' );
-                exit();
-            }
-        
-        getQuestion();
+        // ... or to review mode if no questions to learn
+        if ( $_SESSION['questionCount'] <= 0 ) {
+            header( 'Location: switchMode.php/switchMode.php?mode=review' );
+            exit();
+        }
     }
-}
-
-function openQuizResultModal() {
-    // TODO - Funcion will be triggered in index GET section if $_SESSION['modeQuizSummary'] is set
-    echo '<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">
-                        Modal title
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>';
-
-    echo '<script type="text/javascript">
-    $(document).ready(function(){
-        $("#checkModal").modal("show");
-    });
-    </script>';
 }
 
 // Get question for review quiz mode
@@ -196,25 +156,16 @@ function getReviewQuestion(): void {
 
     } else {
         // TODO - create a modal that will show results of quiz and user can close
-        // openQuizResultModal();
-        $_SESSION['modeQuizSummary'] = 'review';
-
         // Switch to learn mode if no more practice questions...
-        $_SESSION['message'] = 'Review comlplete &nbsp; ' . $_SESSION['modeQuizAccuracy'];
-        unset( $_SESSION['practiceList'],
-            $_SESSION['quizMode'], 
-            $_SESSION['modeQuizAccuracy'],
-            $_SESSION['modeQuizTested'],
-            $_SESSION['modeQuizCorrect']
-        );
+        $_SESSION['modeQuizSummary'] = TRUE;
+        // TODO - delete the following after testing new result modal
+        // $_SESSION['message'] = 'Review comlplete &nbsp; ' . $_SESSION['modeQuizAccuracy'];
             
-            // ... or restart review mode if no questions to learn
-            if ( $_SESSION['questionCount'] <= 0 ) {
-                header( 'Location: switchMode.php/switchMode.php?mode=review' );
-                exit();
-            }
-
-        getQuestion();
+        // ... or restart review mode if no questions to learn
+        if ( $_SESSION['questionCount'] <= 0 ) {
+            header( 'Location: switchMode.php/switchMode.php?mode=review' );
+            exit();
+        }
     }
 }
 
