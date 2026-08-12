@@ -131,8 +131,9 @@ function getPracticeQuestion(): void {
         setQuizAndQuestion( $quizId, $questionId ) ;
 
     } else {
-        // TODO - redirect to quizResult page - reconfigure below functionalit to be performed
-        // with the new page quizResult.php
+        // TODO - create a modal that will show results of quiz and user can close
+        // openQuizResultModal(); // Probably bette to call the function after
+        $_SESSION['modeQuizSummary'] = 'practice';
 
         // Switch to learn mode if no more practice questions...
         $_SESSION['message'] = 'Practice complete &nbsp; ' . $_SESSION['modeQuizAccuracy'];
@@ -153,6 +154,37 @@ function getPracticeQuestion(): void {
     }
 }
 
+function openQuizResultModal() {
+    // TODO - Funcion will be triggered in index GET section if $_SESSION['modeQuizSummary'] is set
+    echo '<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        Modal title
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>';
+
+    echo '<script type="text/javascript">
+    $(document).ready(function(){
+        $("#checkModal").modal("show");
+    });
+    </script>';
+}
+
 // Get question for review quiz mode
 function getReviewQuestion(): void {
 
@@ -163,6 +195,10 @@ function getReviewQuestion(): void {
         setQuizAndQuestion( $quizId, $questionId );
 
     } else {
+        // TODO - create a modal that will show results of quiz and user can close
+        // openQuizResultModal();
+        $_SESSION['modeQuizSummary'] = 'review';
+
         // Switch to learn mode if no more practice questions...
         $_SESSION['message'] = 'Review comlplete &nbsp; ' . $_SESSION['modeQuizAccuracy'];
         unset( $_SESSION['practiceList'],
@@ -171,7 +207,7 @@ function getReviewQuestion(): void {
             $_SESSION['modeQuizTested'],
             $_SESSION['modeQuizCorrect']
         );
-
+            
             // ... or restart review mode if no questions to learn
             if ( $_SESSION['questionCount'] <= 0 ) {
                 header( 'Location: switchMode.php/switchMode.php?mode=review' );
@@ -258,15 +294,15 @@ function getUserStats( $pdo, $quizId ): void {
     // Store calculated performance data in session
     $_SESSION['testedCards'] = $testedCards;
     $_SESSION['testCount'] = $testCount;
-    $_SESSION['userCorrect'] = $correct;
+    $_SESSION['correctCount'] = $correct;
     $_SESSION['questionCount'] = count( $_SESSION['userProgress'] );
-    $_SESSION['userAccuracy'] = $accuracy;
+    $_SESSION['accuracy'] = $accuracy;
 }
 
 // Return grade based on percentage score
 function grade(): string {
     if ( ( isset( $_SESSION['testCount'] ) && $_SESSION['testCount'] > 0 ) || 
-        isset( $_SESSION['userAccuracy'] ) || isset( $_SESSION['modeQuizAccuracy'] ) ) {
+        isset( $_SESSION['accuracy'] ) || isset( $_SESSION['modeQuizAccuracy'] ) ) {
             
         if ( isset( $_SESSION['modeQuizAccuracy'] ) ) {
             if ( $_SESSION['modeQuizTested'] > 0 ) {
@@ -274,8 +310,8 @@ function grade(): string {
             } else {
                 $perc = 100;
             }
-        } elseif ( isset( $_SESSION['userAccuracy'] ) ) {
-            $perc = $_SESSION['userAccuracy'] ;
+        } elseif ( isset( $_SESSION['accuracy'] ) ) {
+            $perc = $_SESSION['accuracy'] ;
         } else {
             $perc = ( $_SESSION['score'] / $_SESSION['testCount'] ) * 100;
         }
@@ -314,11 +350,11 @@ function scoreBoard( $pdo, $quizId=FALSE ): string {
 
     // Set up data to use in scoreboard depending on user or anonymous data
     if ( isset( $_SESSION['username'] ) ) {
-        if ( ! isset( $_SESSION['userAccuracy'] ) ) {
+        if ( ! isset( $_SESSION['accuracy'] ) ) {
             getUserStats( $pdo, $quizId );
         }
         
-        $score = round( $_SESSION['userAccuracy'] ) . '%';
+        $score = round( $_SESSION['accuracy'] ) . '%';
         $conjunction = ' on ';
     } else {
         $score = $_SESSION['score'];
@@ -478,17 +514,17 @@ function updateScore( $pdo, $quizId, $percAccuracy ): void {
     if ( isset($_SESSION['username'])) {
 
         if ( ! isset( $_SESSION['testCount'] ) ||
-            ! isset( $_SESSION['userAccuracy'] ) ||
+            ! isset( $_SESSION['accuracy'] ) ||
             ! isset( $_SESSION['questionCount'] ) ||
-            ! isset( $_SESSION['userCorrect'] ) ) {
+            ! isset( $_SESSION['correctCount'] ) ) {
 
             getUserStats($pdo, $quizId);
         }
 
         $_SESSION['testCount']++;
-        if ( $percAccuracy > 85 ) $_SESSION['userCorrect']++;
-        $_SESSION['userAccuracy'] =
-            ( $_SESSION['userCorrect'] / $_SESSION['testCount'] ) * 100;
+        if ( $percAccuracy > 85 ) $_SESSION['correctCount']++;
+        $_SESSION['accuracy'] =
+            ( $_SESSION['correctCount'] / $_SESSION['testCount'] ) * 100;
 
         if ( isset( $_SESSION['quizMode'] ) ) {
             $_SESSION['modeQuizTested']++;

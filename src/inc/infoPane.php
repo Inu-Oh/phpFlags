@@ -14,7 +14,7 @@
                 
             <?php if ( isset( $_SESSION['username'] ) ) {
                 echo number_format(
-                    $_SESSION['userCorrect'],
+                    $_SESSION['correctCount'],
                     $decimals = 0,
                     $decimal_separator = "",
                     $thousands_separator = ","
@@ -23,7 +23,7 @@
                 </div>
                 <div class="card-title fs-5 py-1">Rate&nbsp
                     <span class="card-text fs-6">' . 
-                        round( $_SESSION['userAccuracy'] ) . '%';
+                        round( $_SESSION['accuracy'] ) . '%';
             } else {
                 echo number_format(
                     $_SESSION['score'],
