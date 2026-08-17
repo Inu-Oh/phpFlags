@@ -58,8 +58,8 @@ if ( isPostRequest() ) {
     }
 }
 
-if ( isGetRequest() ) { # TODO - remove 
-    $_SESSION['modeQuizSummary'] = true;
+if ( isGetRequest() ) { 
+    # TODO - remove $_SESSION['modeQuizSummary'] = true;
     if ( ! isset($_SESSION['quizIsSet']) ) {
 
         setQuestions($pdo);
