@@ -60,17 +60,17 @@ if ( isPostRequest() ) {
 
 if ( isGetRequest() ) { 
     # TODO - remove $_SESSION['modeQuizSummary'] = true;
-    if ( ! isset($_SESSION['quizIsSet']) ) {
+    if ( ! isset( $_SESSION['quizIsSet'] ) ) {
 
-        setQuestions($pdo);
+        setQuestions( $pdo );
         // Start new score session
         $_SESSION['score'] = 0;
         $_SESSION['testedCards'] = 0;
-        getQuestion();
+        getQuestion( $pdo );
     }
 
     // Get question data if it is not set
-    if ( ! isset($_SESSION['nextQuestion']) ) getQuestion();
+    if ( ! isset( $_SESSION['nextQuestion'] ) ) getQuestion( $pdo );
 
     // Prevent user hitting back arrow to move from feedback back to quiz question
     if ( $_SESSION['loaded'] == FALSE ) {

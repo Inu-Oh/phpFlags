@@ -64,12 +64,11 @@ function cleanUpUserInputForOutput(): void {
 // Get question for learn quiz mode
 function getLearnQuestion(): void {
 
-    // TODO - test this - Autoredirect to review mode if all cards are learned
     if ( $_SESSION['questionCount'] <= 0 ) {
 
-            header( 'Location: switchMode.php/switchMode.php?mode=review' );
-            exit();
-        }
+        header( 'Location: switchMode.php?mode=review' );
+        exit();
+    }
 
     // Make an array of all quizzes to choose from
     $quizzes = array();
@@ -96,15 +95,21 @@ function getLearnQuestion(): void {
             $_SESSION['nextQuestion'] = array_pop( $_SESSION['capitalCountry'] );
             break;
     }
+
+    // TODO - after testing remove this last line
     if ( ! isset( $_SESSION['nextQuestion'] ) ) getLearnQuestion();  
 }
 
 // Get the next quiz question and save it to session
-function getQuestion(): void {
+function getQuestion( $pdo ): void {
 
-    if ( ! isset( $_SESSION['quizMode'] ) ) {
+    if ( ! isset( $_SESSION['username'] ) ) {
 
         getLearnQuestion();
+
+    } elseif ( ! isset( $_SESSION['quizMode'] )) {
+
+        getUserLearnQuestion( $pdo );
 
     } elseif ( $_SESSION['quizMode'] == 'practice' ) {
     
@@ -131,15 +136,12 @@ function getPracticeQuestion(): void {
         setQuizAndQuestion( $quizId, $questionId ) ;
 
     } else {
-        // TODO - create a modal that will show results of quiz and user can close
         // Switch to learn mode if no more practice questions...
         $_SESSION['modeQuizSummary'] = TRUE;
-        // TODO - delete the following after testing new result modal
-        // $_SESSION['message'] = 'Practice complete &nbsp; ' . $_SESSION['modeQuizAccuracy'];
 
         // ... or to review mode if no questions to learn
         if ( $_SESSION['questionCount'] <= 0 ) {
-            header( 'Location: switchMode.php/switchMode.php?mode=review' );
+            header( 'Location: switchMode.php?mode=review' );
             exit();
         }
     }
@@ -155,17 +157,58 @@ function getReviewQuestion(): void {
         setQuizAndQuestion( $quizId, $questionId );
 
     } else {
-        // TODO - create a modal that will show results of quiz and user can close
         // Switch to learn mode if no more practice questions...
         $_SESSION['modeQuizSummary'] = TRUE;
-        // TODO - delete the following after testing new result modal
-        // $_SESSION['message'] = 'Review comlplete &nbsp; ' . $_SESSION['modeQuizAccuracy'];
-            
+                  
         // ... or restart review mode if no questions to learn
         if ( $_SESSION['questionCount'] <= 0 ) {
-            header( 'Location: switchMode.php/switchMode.php?mode=review' );
+            header( 'Location: switchMode.php?mode=review' );
             exit();
         }
+    }
+}
+
+// Return list of user's unlearned questions shuffeled randomly
+function getUserLearnList(): void {
+    $_SESSION['userLearnList'] = array();
+
+    foreach ( $_SESSION['userProgress'] as $key => $questionProgress ) {
+
+        list( $views, $_ ) = $questionProgress;
+
+        if ( $views <= 0 ) {
+
+            $quizId = intval( round( $key / 10_000 ) );
+            $questionId = $key % 10_000;
+            $_SESSION['userLearnList'][] = array( $quizId, $questionId );
+        }
+    }
+
+    shuffle( $_SESSION['userLearnList'] );
+}
+
+// Get logged in user's next learn question
+function getUserLearnQuestion( $pdo ): void {
+    
+    // Create a user learn quiz list if it's not in session
+    if ( ! isset( $_SESSION['userLearnList'] ) ) {
+        unset( $_SESSION['userProgress'] );
+        updateUserProgressInSession( $pdo, NULL ); // The second param is not needed
+        getUserLearnList();
+    }
+
+    // Get next question data from queue
+    if ( count( $_SESSION['userLearnList'] ) > 0 ) {
+
+        $nextQuestion = array_shift( $_SESSION['userLearnList'] );
+        list( $quizId, $questionId ) = $nextQuestion;
+        setQuizAndQuestion( $quizId, $questionId );
+
+    // Switch to review mode if user has learned all questions
+    } else {
+        unset( $_SESSION['userLearnList'] );
+        header( 'Location: switchMode.php?mode=review' );
+        exit();
     }
 }
 
@@ -203,7 +246,7 @@ function getUserPracticeList(): void {
 }
 
 // Return random list of questions from user's learned question set
-function getUserReviewList() {
+function getUserReviewList(): void {
 
     // Make a list of all previously tested questions from user progress
     $_SESSION['reviewList'] = array();

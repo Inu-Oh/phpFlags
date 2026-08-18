@@ -28,8 +28,7 @@ if ( isPostRequest() ) {
         getUserPracticeList();
         setModeQuizStats();
         
-    } elseif ( isset( $_POST['review']) || 
-        ( isset( $_GET['mode'] ) && $_GET['mode'] == 'review' ) ) {
+    } elseif ( isset( $_POST['review']) ) {
 
         if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
         if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
@@ -38,6 +37,16 @@ if ( isPostRequest() ) {
         getUserReviewList();
         setModeQuizStats();
     }
+}
+
+if ( isGetRequest() && ( isset( $_GET['mode'] ) && $_GET['mode'] == 'review' ) ) {
+
+    if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
+    if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
+
+    $_SESSION['quizMode'] = 'review';
+    getUserReviewList();
+    setModeQuizStats();
 }
 
 header( 'Location: index.php' );

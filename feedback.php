@@ -12,7 +12,7 @@ if ( isPostRequest() ) {
     // Get data for next quiz question when user clicks 'Next'
     if ( isset($_POST['next']) || ! isset($_SESSION['nextQuestion']) ) {
         
-        getQuestion();
+        getQuestion( $pdo );
         header( 'Location: index.php' );
         return;
     }
