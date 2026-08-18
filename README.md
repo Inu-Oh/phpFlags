@@ -173,7 +173,7 @@ if ($handle) {
         $stmt->execute(array(':pk' => $pk));
         if ( $stmt->fetchColumn() ) {
             $stmt = $pdo->prepare('UPDATE Countries
-                SET country=:ct, capital=:cp, code=:cc, hint=:ht) 
+                SET country=:ct, capital=:cp, code=:cc, hint=:ht
                 WHERE pk=:pk');
             $stmt->execute($bound);
         } else {
@@ -209,7 +209,7 @@ Create a table to store user progress on each quiz question.
 CREATE TABLE progress (
 	user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
 	country_id SMALLINT REFERENCES countries(pk) ON DELETE CASCADE,
-	quiz_id SMALLINT REFERENCES countries(pk) ON DELETE CASCADE,
+	quiz_id SMALLINT,
 	test_count SMALLINT DEFAULT 0,
 	correct_count SMALLINT DEFAULT 0,
 	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

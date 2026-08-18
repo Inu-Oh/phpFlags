@@ -276,7 +276,7 @@ function getUserStats( $pdo, $quizId ): void {
         $_SESSION['questionCount'] = count( $_SESSION['userProgress'] );
 
     $sql = 'SELECT COUNT(test_count) AS total_questions_learned,
-                SUM(test_count) AS number_of_times_tested,
+                SUM(test_count) AS total_times_tested,
                 SUM(correct_count) AS total_correct_answers
                 FROM progress WHERE user_id=:ui AND test_count > 0';
     $stmt = $pdo->prepare( $sql );
@@ -289,7 +289,7 @@ function getUserStats( $pdo, $quizId ): void {
         exit;
     } else {
         $_SESSION['testedCards'] = $row['total_questions_learned'];
-        $_SESSION['testCount'] = $row['number_of_times_tested'];
+        $_SESSION['testCount'] = $row['total_times_tested'];
         $_SESSION['correctCount'] = $row['total_correct_answers'];
         $_SESSION['accuracy'] = 
             ( $_SESSION['testCount'] > 0 ) ? 
