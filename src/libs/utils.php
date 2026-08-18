@@ -216,7 +216,7 @@ function getUserLearnQuestion( $pdo ): void {
 function getUserPracticeList(): void {
 
     // Create an array of practice questions with value grading each question
-    $_SESSION['practiceList'] = array();
+    $practiceList = array();
 
     foreach ( $_SESSION['userProgress'] as $key => $questionProgress ) {
 
@@ -230,7 +230,7 @@ function getUserPracticeList(): void {
 
                 $quizId = intval( round( $key / 10_000 ) );
                 $questionId = $key % 10_000;
-                $_SESSION['practiceList'][] = array(
+                $practiceList[] = array(
                     'quizId' => $quizId,
                     'questionId' => $questionId,
                     'accuracy' => $questionAccuracy
@@ -240,17 +240,25 @@ function getUserPracticeList(): void {
     }
     
     # Order the array from lowest to highest accuracy score per question
-    usort( $_SESSION['practiceList'], function( $a, $b ) {
+    usort( $practiceList, function( $a, $b ) {
         return $a['accuracy'] <=> $b['accuracy'];
     });
+
+    # Truncate if too long and save to session
+    if ( count( $practiceList ) > 30 ) {
+        $_SESSION['practiceList'] = array_slice( $practiceList, 0, 30 );
+    } else {
+        $_SESSION['practiceList'] = $practiceList;
+    }
 }
 
+// TODO - make this function more efficient - don't make full list then truncate
 // Return random list of questions from user's learned question set
 function getUserReviewList(): void {
 
-    // Make a list of all previously tested questions from user progress
-    $_SESSION['reviewList'] = array();
-
+    // Make a list of random 30 previously tested questions from user progress
+    $reviewList = array();
+    
     foreach ( ( $_SESSION['userProgress'] ) as $key => $questionProgress ) {
 
         list( $views, $_ ) = $questionProgress;
@@ -259,12 +267,17 @@ function getUserReviewList(): void {
 
             $quizId = intval( round( $key / 10_000 ) );
             $questionId = $key % 10_000;
-            $_SESSION['reviewList'][] = array( $quizId, $questionId );
+            $reviewList[] = array( $quizId, $questionId );
         }
     }
 
-    // Order the list randomly
-    shuffle( $_SESSION['reviewList'] );
+    # Truncate if necessary and save to session
+    shuffle( $reviewList );
+    if ( count( $reviewList ) > 30 ) {
+        $_SESSION['reviewList'] = array_slice( $reviewList, 0, 30 );
+    } else {
+        $_SESSION['reviewList'] = $reviewList;
+    }
 }
 
 // Retreives all user stats from database for use in scorebard and info pane
