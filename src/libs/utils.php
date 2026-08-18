@@ -267,33 +267,37 @@ function getUserReviewList(): void {
     shuffle( $_SESSION['reviewList'] );
 }
 
-
+// Retreives all user stats from database for use in scorebard and info pane
 function getUserStats( $pdo, $quizId ): void {
 
     if ( ! isset($_SESSION['userProgress']) ) updateUserProgressInSession( $pdo, $quizId );
 
-    # Calculate user's performance on all questions overall
-    $total = $testCount = $testedCards = $correct = 0;
-    foreach ( $_SESSION['userProgress'] as $questionProgress ) {
+    if ( ! isset( $_SESSION['questionCount'] ) ) 
+        $_SESSION['questionCount'] = count( $_SESSION['userProgress'] );
 
-        if ( $questionProgress[0] > 0 ) {
-            $testCount += $questionProgress[0];
-            $testedCards ++ ;
-            $correct += $questionProgress[1];
-        }
+    $sql = 'SELECT COUNT(test_count) AS total_questions_learned,
+                SUM(test_count) AS number_of_times_tested,
+                SUM(correct_count) AS total_correct_answers
+                FROM progress WHERE user_id=:ui AND test_count > 0';
+    $stmt = $pdo->prepare( $sql );
+    $stmt->execute( array( ':ui' => $_SESSION['userId'] ) );
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ( $row === FALSE ) {
+        $_SESSION['message'] = 'Bad value for user_id';
+        header( 'Location: index.php' );
+        exit;
+    } else {
+        $_SESSION['testedCards'] = $row['total_questions_learned'];
+        $_SESSION['testCount'] = $row['number_of_times_tested'];
+        $_SESSION['correctCount'] = $row['total_correct_answers'];
+        $_SESSION['accuracy'] = 
+            ( $_SESSION['testCount'] > 0 ) ? 
+            ( $_SESSION['correctCount'] / $_SESSION['testCount'] ) * 100 : 0;
     }
-
-    $accuracy = ( $testCount > 0 ) ? ( $correct / $testCount ) * 100 : 0;
-    
-    // Store calculated performance data in session
-    $_SESSION['testedCards'] = $testedCards;
-    $_SESSION['testCount'] = $testCount;
-    $_SESSION['correctCount'] = $correct;
-    $_SESSION['questionCount'] = count( $_SESSION['userProgress'] );
-    $_SESSION['accuracy'] = $accuracy;
 }
 
-// Return grade based on percentage score
+// Return grade emoji based on percentage score
 function grade(): string {
     if ( ( isset( $_SESSION['testCount'] ) && $_SESSION['testCount'] > 0 ) || 
         isset( $_SESSION['accuracy'] ) || isset( $_SESSION['modeQuizAccuracy'] ) ) {
@@ -514,11 +518,6 @@ function updateScore( $pdo, $quizId, $percAccuracy ): void {
 
             getUserStats($pdo, $quizId);
         }
-
-        $_SESSION['testCount']++;
-        if ( $percAccuracy > 85 ) $_SESSION['correctCount']++;
-        $_SESSION['accuracy'] =
-            ( $_SESSION['correctCount'] / $_SESSION['testCount'] ) * 100;
 
         if ( isset( $_SESSION['quizMode'] ) ) {
             $_SESSION['modeQuizTested']++;
