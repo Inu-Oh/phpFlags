@@ -144,6 +144,8 @@ function getPracticeQuestion(): void {
             header( 'Location: switchMode.php?mode=review' );
             exit();
         }
+        $_SESSION['mode'] = $_SESSION['quizMode'];
+        unset($_SESSION['quizMode']);
     }
 }
 
@@ -165,6 +167,8 @@ function getReviewQuestion(): void {
             header( 'Location: switchMode.php?mode=review' );
             exit();
         }
+        $_SESSION['mode'] = $_SESSION['quizMode'];
+        unset($_SESSION['quizMode']);
     }
 }
 
@@ -271,7 +275,7 @@ function getUserReviewList(): void {
         }
     }
 
-    # Truncate if necessary and save to session
+    # Truncate if too long and save to session
     shuffle( $reviewList );
     if ( count( $reviewList ) > 30 ) {
         $_SESSION['reviewList'] = array_slice( $reviewList, 0, 30 );

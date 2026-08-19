@@ -1,6 +1,6 @@
 <?php
 
-$quizMode = $_SESSION['quizMode'];
+$quizMode = $_SESSION['mode'];
 $quizAccuracy = $_SESSION['modeQuizAccuracy'];
 $quizLength = $_SESSION['modeQuizLength'];
 $correctCount = $_SESSION['modeQuizCorrect'];
@@ -18,7 +18,7 @@ switch ( $quizMode ) {
 }
 
 unset(
-    $_SESSION['quizMode'], 
+    $_SESSION['mode'], 
     $_SESSION['modeQuizAccuracy'],
     $_SESSION['modeQuizTested'],
     $_SESSION['modeQuizCorrect'],
@@ -44,7 +44,7 @@ $congrats = array(
     "Congrats! Your hard work today will open doors for tomorrow."
 );
 
-getQuestion();
+getQuestion( $pdo );
 ?>
 
 <div id="quizResultModal" class="modal fade" id="quizResultModal" tabindex="-1" 
@@ -63,21 +63,21 @@ getQuestion();
                 
                 <div class="modal-section fs-5 mb-4 p-4 rounded-3 row">
                     <div class="col-3 text-end pe-1">
+                        <p class="fs-3"><?= $quizAccuracy ?></p>
                         <p><?= $quizLength ?></p>
                         <p><?= $correctCount ?></p>
-                        <p><?= $quizAccuracy ?></p>
                     </div>
                     <div class="col-9 ps-1">
+                        <p class="fs-3">accuracy rate</p>
                         <p>qustions tested</p>
                         <p>answered correctly</p>
-                        <p>accuracy rate</p>
                     </div>
                 </div>
             
             </div>
             
             <div class="modal-footer border-0 p-3">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">
+                <button id="closModalBtn" type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">
                     Close
                 </button>
             </div>
@@ -88,6 +88,12 @@ getQuestion();
 
 <script type="text/javascript">
     $(document).ready(function(){
-        $("#quizResultModal").modal("show");
+        $('#quizResultModal').modal('show');
+    });
+
+    $(document).keydown(function(e) {
+        if(e.keyCode==13){
+                $('.modal').modal('hide');
+        }
     });
 </script>
