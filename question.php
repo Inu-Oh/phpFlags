@@ -12,7 +12,7 @@ $question = $stmt->fetch( PDO::FETCH_ASSOC );
 switch ( $_SESSION['currentQuiz'] ) {
 
     case 'flagCountry':
-        $question['src'] = 'static/images/'.$question['code'].'.png';
+        $question['src'] = 'static/images/' . $question['code'] . '.png';
         $question['text'] = 'Name the country of this flag';
         $question['placeholder'] = 'Country name ...';
         $_SESSION['answer'] = $question['country'];

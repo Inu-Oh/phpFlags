@@ -104,7 +104,6 @@ if ( isGetRequest() && isset( $_SESSION['username'] ) ) {
 }
 
 view( 'head', ['title' => 'Register'] );
-
 ?>
 <body class="p-5">
 <main>

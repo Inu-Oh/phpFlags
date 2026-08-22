@@ -17,7 +17,7 @@ if ( isset( $_SESSION['feedback'] ) ) {
         $feedback['correct'] = $_SESSION['correct'];
         $feedback['user_input'] = $_SESSION['userInput'];
         $feedback['answer'] = $_SESSION['answer'];
-        $feedback['src'] = 'static/images/'.$feedback['code'].'.png';
+        $feedback['src'] = 'static/images/' . $feedback['code'] . '.png';
         if ( isset( $_SESSION['misspelled'] ) && $_SESSION['misspelled'] === TRUE ) {
             $feedback['misspelled'] = TRUE;
         }

@@ -3,7 +3,8 @@ require_once __DIR__ . '/src/config/config.php';
 require_once __DIR__ . '/src/pdo.php';
 require_once __DIR__ . '/src/libs/utils.php';
 
-if ( empty($_SESSION['csrf_token']) ) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if ( empty( $_SESSION['csrf_token'] ) )
+    $_SESSION['csrf_token'] = bin2hex( random_bytes( 32 ) );
 
 if ( isPostRequest() ) {
 

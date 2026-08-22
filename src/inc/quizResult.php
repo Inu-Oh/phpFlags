@@ -32,11 +32,11 @@ $congrats = array(
     "You did it! Your commitment to excellence is commendable.",
     "Bravo! Your hard work has led to this fantastic achievement.",
     "Fantastic job! Your perseverance has really shone through.",
-    "Congrats on finishing this project! Your attention to detail made all the difference.",
-    "Well done on completing this task! Your determination is truly admirable.",
+    "Congrats on finishing this quiz! Your attention to detail made all the difference.",
+    "Well done on completing this quiz! Your determination is truly admirable.",
     "Kudos for your successful completion! Your skills and hard work are evident.",
-    "Great work on this task! Your ability to stay focused is impressive.",
-    "Hats off to you for completing this! Your dedication is inspiring.",
+    "Great work on this quiz! Your ability to stay focused is impressive.",
+    "Hats off to you for completing this quiz! Your dedication is inspiring.",
     "Congrats! This achievement is just the beginning of your success.",
     "Well done! I can't wait to see where your hard work takes you next.",
     "Fantastic job! This accomplishment sets the stage for even greater things ahead.",
@@ -55,7 +55,7 @@ getQuestion( $pdo );
             <div class="modal-body p-4 m-4">
 
                 <div class="modal-section mb-4 p-4 rounded-3 row" >
-                    <h1 class="modal-title fs-2" id="quizResultModalLabel">
+                    <h1 class="modal-title" id="quizResultModalLabel">
                         <?= ucfirst( $quizMode ) ?> Quiz Results 
                     </h1>
                     <p><?php $i = array_rand( $congrats ); echo $congrats[$i] ?></p>
@@ -88,7 +88,7 @@ getQuestion( $pdo );
 
 <script type="text/javascript">
     $(document).ready(function(){
-        $('#quizResultModal').modal('show');
+        $('.modal').modal('show');
     });
 
     $(document).keydown(function(e) {
