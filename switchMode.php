@@ -9,34 +9,38 @@ if ( isPostRequest() ) {
 
     verifyCsrfOrDie();
 
-    // Wipe previous quiz mode from session and write quiz list for newsly selected mode
-    if ( isset( $_SESSION['currentQuiz'] ) ) unset( $_SESSION['currentQuiz'] );
-    if ( isset( $_SESSION['nextQuestion'] ) ) unset( $_SESSION['nextQuestion'] );
+    ### TODO - add code to redirect and delete below once changes tested
+    header( 'Location: index.php' );
+    return;
 
-    if ( isset( $_POST['learn'] ) ) {
+    // // Wipe previous quiz mode from session and write quiz list for newsly selected mode
+    // if ( isset( $_SESSION['currentQuiz'] ) ) unset( $_SESSION['currentQuiz'] );
+    // if ( isset( $_SESSION['nextQuestion'] ) ) unset( $_SESSION['nextQuestion'] );
 
-        if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
-        if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
-        if ( isset( $_SESSION['quizMode'] ) ) unset( $_SESSION['quizMode'] );
+    // if ( isset( $_POST['learn'] ) ) {
 
-    } elseif ( isset( $_POST['practice'] ) ) {
+    //     if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
+    //     if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
+    //     if ( isset( $_SESSION['quizMode'] ) ) unset( $_SESSION['quizMode'] );
 
-        if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
-        if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
+    // } elseif ( isset( $_POST['practice'] ) ) {
 
-        $_SESSION['quizMode'] = 'practice';
-        getUserPracticeList();
-        setModeQuizStats();
+    //     if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
+    //     if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
+
+    //     $_SESSION['quizMode'] = 'practice';
+    //     getUserPracticeList();
+    //     setModeQuizStats();
         
-    } elseif ( isset( $_POST['review']) ) {
+    // } elseif ( isset( $_POST['review']) ) {
 
-        if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
-        if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
+    //     if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
+    //     if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
 
-        $_SESSION['quizMode'] = 'review';
-        getUserReviewList();
-        setModeQuizStats();
-    }
+    //     $_SESSION['quizMode'] = 'review';
+    //     getUserReviewList();
+    //     setModeQuizStats();
+    // }
 }
 
 if ( isGetRequest() && isset( $_GET['mode'] ) ) {
