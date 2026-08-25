@@ -43,7 +43,8 @@ view('head'); ?>
 <?php require_once __DIR__ . '/src/inc/infoPane.php'; ?>
 
 <main>
-    <div id="q-card" class="container pt-3 bg-light rounded-4">
+    <div id="q-card"
+        class="container pt-3 bg-light border border-5 border-white rounded-4">
 
         <?= scoreBoard($pdo, $_SESSION['currentQuiz']); ?>
 

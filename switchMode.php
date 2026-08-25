@@ -39,14 +39,35 @@ if ( isPostRequest() ) {
     }
 }
 
-if ( isGetRequest() && ( isset( $_GET['mode'] ) && $_GET['mode'] == 'review' ) ) {
+if ( isGetRequest() && isset( $_GET['mode'] ) ) {
 
-    if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
-    if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
+    // Wipe previous quiz mode from session and write quiz list for newsly selected mode
+    if ( isset( $_SESSION['currentQuiz'] ) ) unset( $_SESSION['currentQuiz'] );
+    if ( isset( $_SESSION['nextQuestion'] ) ) unset( $_SESSION['nextQuestion'] );
 
-    $_SESSION['quizMode'] = 'review';
-    getUserReviewList();
-    setModeQuizStats();
+    if ( $_GET['mode'] == 'learn' ) {
+
+        if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
+        if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
+        if ( isset( $_SESSION['quizMode'] ) ) unset( $_SESSION['quizMode'] );
+
+    } elseif ( $_GET['mode'] == 'practice' ) {
+
+        if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
+        if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
+
+        $_SESSION['quizMode'] = 'practice';
+        getUserPracticeList();
+        setModeQuizStats();
+
+    } elseif ( $_GET['mode'] == 'review' ) {
+        if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
+        if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
+
+        $_SESSION['quizMode'] = 'review';
+        getUserReviewList();
+        setModeQuizStats();
+    }
 }
 
 header( 'Location: index.php' );

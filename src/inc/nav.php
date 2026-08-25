@@ -8,75 +8,83 @@
                     . $_SESSION['username'] . 
                 '</div>
             <div class="card-text pt-2">
-                <a href="logout.php">Logout</a>
+                
+                <a href="logout.php">
+                    <i class="fa-solid fa-right-from-bracket"></i>&nbsp; Logout
+                </a>
             </div>
         </div>
-        <div id="formCard" 
-            class="card card-body m-3 bg-light border-5 border-white rounded-4">';
+        <div class="card card-body m-3 bg-light border-5 border-white rounded-4">';
 
-        echo '<div id="modesTitle" class="card-title fw-bold">Quiz modes</div>';
+        echo '<div id="modesTitle" class="card-title fw-bold">Quiz modes</div>
+            <div class="card-text">';
 
         if ( isset( $_SESSION['quizMode'] ) ) {
 
             if ( $_SESSION['quizMode'] == 'practice' ) {
-                echo '<form action="switchMode.php" method="post">
-                    <input type="hidden" value="' . $_SESSION['csrf_token'] . '"
-                        name="csrf_token">
-                    <div class="card-text">';
                 if ( $_SESSION['testedCards'] < $_SESSION['questionCount'] ) {
-                    echo '<input class="nav-submit-link" type="submit" value="Learn"
-                            name="learn">
-                        <label class="text-secondary info-text">Discover new content</label>';
+                    echo '<a class="m-1" href="switchMode.php?mode=learn">
+                            <i class="fa-solid fa-graduation-cap"></i>&nbsp; Learn
+                        </a>
+                        <label class="text-secondary info-text m-1 pb-2">
+                            Discover new content</label>';
                 }
-                echo    '<input class="nav-submit-link pt-3" type="submit" value="Review"
-                            name="review">
-                        <label class="text-secondary info-text">
-                            Refresh your memory</label>
-                    </div>
-                </form>';
+                echo '<a class="m-1" href="switchMode.php?mode=review">
+                        <i class="fa-solid fa-dumbbell"></i>&nbsp; Review
+                    </a>
+                    <label class="text-secondary info-text m-1 pb-2">
+                        Refresh your memory</label>';
 
             } elseif ( $_SESSION['quizMode'] == 'review' ) { 
-                echo '<form action="switchMode.php" method="post">
-                    <input type="hidden" value="' . $_SESSION['csrf_token'] . '"
-                        name="csrf_token">
-                    <div class="card-text">';
                 if ( $_SESSION['testedCards'] < $_SESSION['questionCount'] ) {
-                    echo '<input class="nav-submit-link" type="submit" value="Learn"
-                            name="learn">
-                        <label class="text-secondary info-text">Discover new content</label>';
+                    echo '<a class="m-1" href="switchMode.php?mode=learn">
+                            <i class="fa-solid fa-graduation-cap"></i>&nbsp; Learn
+                        </a>
+                        <label class="text-secondary info-text m-1 pb-2">
+                            Discover new content</label>';
                 }
-                echo    '<input class="nav-submit-link pt-3" type="submit" value="Practice"
-                            name="practice">
-                        <label class="text-secondary info-text">
-                            Strengthen skills</label>
-                    </div>
-                </form>';
+                echo '<a class="m-1" href="switchMode.php?mode=practice">
+                        <i class="fa-solid fa-weight-hanging"></i>&nbsp; Practice
+                    </a>
+                    <label class="text-secondary info-text m-1 pb-2">
+                        Strengthen skills</label>';
             }
         } else {
-            echo '<form action="switchMode.php" method="post">
-                <input type="hidden" value="' . $_SESSION['csrf_token'] . '"
-                    name="csrf_token">
-                <div class="card-text">
-                    <input class="nav-submit-link" type="submit" value="Practice"
-                        name="practice">
-                    <label class="text-secondary info-text">
-                        Strengthen skills</label>
-                    <input class="nav-submit-link pt-3" type="submit" value="Review"
-                        name="review">
-                    <label class="text-secondary info-text">
-                        Refresh your memory</label>
-                </div>
-            </form>
-        </div>';
+            echo '<a class="m-1" href="switchMode.php?mode=practice">
+                    <i class="fa-solid fa-weight-hanging"></i>&nbsp; Practice
+                </a>
+                <label class="text-secondary info-text m-1 pb-2">
+                    Strengthen skills</label>
+                <a class="m-1" href="switchMode.php?mode=review">
+                    <i class="fa-solid fa-dumbbell"></i>&nbsp; Review
+                </a>
+                <label class="text-secondary info-text m-1 pb-2">
+                    Refresh your memory</label>';
         }
     } else {
         echo '<div class="card card-body m-3 bg-light border-5 border-white rounded-4">
             <div class="card-text">
-                <a class="m-1 pt-2" href="login.php">Login</a>
-                <a class="m-1 pt-2" href="register.php">Register</a>
-            </div>
-        </div>';
+                <a class="m-1 pt-2" href="login.php">
+                    <i class="fa-solid fa-right-to-bracket"></i>&nbsp; Login
+                </a>
+                <a class="m-1 pt-2" href="register.php">
+                    <i class="fa-regular fa-id-card"></i>&nbsp; Register
+                </a>';
     }
+    if ( str_ends_with( $_SERVER['REQUEST_URI'], 'glossary.php' ) ) {
+        echo '<a class="m-1 pb-2" href="index.php">
+                <i class="fa-solid fa-person-walking-arrow-loop-left"></i> Quiz
+            </a>';
+    } elseif ( str_ends_with( $_SERVER['REQUEST_URI'], 'index.php' ) ) {
+        echo '<a class="m-1" href="glossary.php">
+                <i class="fa-solid fa-book-open-reader"></i>&nbsp; Glossary
+            </a>
+            <label class="text-secondary info-text m-1 pb-2">
+                Review, search, learn</label>';
+    }
+    echo    '</div>
+        </div>
+    </div>';
 ?>
 
 </nav>

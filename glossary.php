@@ -20,35 +20,33 @@ if ( isGetRequest() ) {
             'capital' => $row['capital'],
             'src' => 'static/images/' . $row['code'] . '.png'
         );
-        $countries[$row['pk']]['homonym'] = isset( $row['hint'] ) ? TRUE : FALSE;
+        $countries[$row['pk']]['hint'] = 
+            isset( $row['hint'] ) ? substr($row['hint'], 2) : '';
     }
 
     # TODO - move this table to utilties
-    $countryList = '<table id="glossary" class="table table-striped table-hover float-end">
-        <thead>
+    $countryList = '<table id="glossary"
+            class="table table-light table-striped table-hover float-end">
+        <thead class="sticky-top">
             <tr>
                 <th scope="col" class="th-sm">Flag</th>
                 <th scope="col">Country</th>
                 <th scope="col">Capital</th>
-                <th scope="col">Homonym</th>
+                <th scope="col">Hint</th>
             </tr>
         </thead>
         <tbody>';
     
     foreach ($countries as $pk => $country) {
 
-        $homonym = ( $country['homonym'] ) ? '<i class="fa-solid fa-check"></i>' : '';
         $countryList .= '
             <tr>
-                <td class="flag-cell">
-                    <img src="' . $country['src'] . '" 
-                        class="flag-cell text-center align-middle">
+                <td class="flag-cell text-center align-middle">
+                    <img src="' . $country['src'] . '" class="flag-cell">
                 </td>
                 <td>' . $country['country'] . '</td>
                 <td>' . $country['capital'] . '</td>
-                <td class="text-center align-middle text-danger fw-bold">'
-                    . $homonym . 
-                '</td>
+                <td class="text-secondary">' . $country['hint'] . '</td>
             </tr>';
     }
 
@@ -56,13 +54,15 @@ if ( isGetRequest() ) {
         </table>';
 }
 
-view( 'head', ['title' => 'Login'] ); ?>
+view( 'head', ['title' => 'Glossary'] ); ?>
 
-<body class="p-5">
+<body class="p-3 bg-light">
 
 <?php require_once __DIR__ . '/src/inc/nav.php'; ?>
 
-<?= $countryList ?>
+<div class="p-3">
+    <?= $countryList ?>
+</div>
 
 <script>
 $(document).ready(function() {
@@ -73,10 +73,10 @@ $(document).ready(function() {
         const $table = $('#glossary');
         if ( $(window).width() < 890 ) {
             $sidenav.width(0);
-            $table.width('90%');
+            $table.width('100%');
         } else {
             $sidenav.width("21%");
-            $table.width("73%");
+            $table.width("79.5%");
         }
     }
 

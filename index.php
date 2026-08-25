@@ -88,13 +88,14 @@ if ( isGetRequest() ) {
 
 view('head'); ?>
 
-<body class="p-5">
+<body class="p-5 bg-light">
 
 <?php require_once __DIR__ . '/src/inc/nav.php'; ?>
 <?php require_once __DIR__ . '/src/inc/infoPane.php'; ?>
 
 <main>
-    <div id="q-card" class="container pt-3 bg-light rounded-4">
+    <div id="q-card"
+        class="container pt-3 bg-light border border-5 border-white rounded-4">
 
         <?php if ( isset( $_SESSION['message'] ) ) {
             echo( '<div class="text-center p-3">
@@ -102,7 +103,7 @@ view('head'); ?>
                 . $_SESSION['message'] . '</h3></div>' );
             unset( $_SESSION['message'] );
         } else { 
-            echo  $scoreBoard; 
+            echo $scoreBoard; 
         } ?>
 
         <div id="quiz-area"></div>
