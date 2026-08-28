@@ -10,7 +10,7 @@ if ( isPostRequest() ) {
 
     verifyCsrfOrDie();
 
-    if ( isset($_POST['check']) ) {
+    if ( isset( $_POST['check'] ) ) {
 
         // Check the user answer and spelling accuracy
         if ( isset( $_POST['answer'] ) && strlen( $_POST['answer'] ) > 1 ) {

@@ -5,6 +5,40 @@ define("FLAG_CAPITAL", 2);
 define("COUNTRY_CAPITAL", 3);
 define("CAPITAL_COUNTRY", 4);
 
+// Add user performance data to Glossary list of countries
+function addGradesToGlossary( $pdo, $countries ): array {
+
+    $sql = 'SELECT country_id, test_count, correct_count 
+                FROM progress WHERE user_id=:ui';
+    $stmt = $pdo->prepare( $sql );
+    $stmt->execute( array( ':ui' => $_SESSION['userId'] ) );
+    $rows = $stmt->fetchAll( PDO::FETCH_ASSOC );
+
+    foreach ( $rows as $row ) {
+        $pk = $row['country_id'];
+        if ( array_key_exists( $pk, $countries ) ) {
+            $countries[$pk]['test_count'] =
+                ( isset( $countries[$pk]['test_count'] ) ) ? 
+                $countries[$pk]['test_count'] + $row['test_count'] :
+                $row['test_count'];
+            $countries[$pk]['correct_count'] =
+                ( isset( $countries[$pk]['correct_count'] ) ) ? 
+                $countries[$pk]['correct_count'] + $row['correct_count'] :
+                $row['correct_count'];
+        }
+    }
+
+    foreach ( $countries as $pk => $country ) {
+        $countries[$pk]['grade'] = ( $country['test_count'] > 0 ) ?
+            strval( 
+                round( ( $country['correct_count'] / $country['test_count'] ) * 100 )
+                ) . '%' : 
+            'TBD';
+    }
+
+    return $countries;
+}
+
 // Check answer accuracy and store result in session
 function checkAnswerAccuracy( $percAccuracy ): void {
     if ( $percAccuracy > 85 ) {
@@ -59,6 +93,28 @@ function cleanUpUserInputForOutput(): void {
     if ( str_contains( $_SESSION['userInput'], '&#045;' ) ) {
         $_SESSION['userInput'] = str_replace( '&#045;', "-", $_SESSION['userInput'] );
     }
+}
+
+// Get country data for Glossary table
+function getGlossaryData( $pdo ): array {
+
+    $countries = array();
+
+    $stmt = $pdo->query( 'SELECT * FROM countries' );
+    $rows = $stmt->fetchAll();
+
+    foreach ( $rows as $row ) {
+
+        $countries[$row['pk']] = array( 
+            'country' => $row['country'],
+            'capital' => $row['capital'],
+            'src' => 'static/images/' . $row['code'] . '.png'
+        );
+        $countries[$row['pk']]['hint'] = 
+            isset( $row['hint'] ) ? substr( $row['hint'], 2 ) : '';
+    }
+
+    return $countries;
 }
 
 // Get question for learn quiz mode
@@ -360,6 +416,145 @@ function isPostRequest(): bool {
     return strtoupper( $_SERVER['REQUEST_METHOD'] ) === 'POST';
 }
 
+
+function makeGlossaryTable( $countries, $search ): string {
+    $countryList = '<table id="glossary"
+        class="table table-light table-striped table-hover float-end">
+    <thead class="sticky-top">
+        <tr>
+            <th scope="col" class="th-sm">Flag</th>
+            <th scope="col">
+                Country
+                <form class="sort-form float-end pe-4 my-1" method="get" action="glossary.php">
+                    <input type="hidden" name="search" value="' . $search . '">
+                    <button class="sort-btn-top mb-2" type="submit" name="sort" value="asc_country">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </button>
+                    <button class="sort-btn-bottom" type="submit" name="sort" value="desc_country">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </form>
+            </th>
+            <th scope="col">
+                Capital
+                <form class="sort-form float-end pe-4 my-1" method="get" action="glossary.php">
+                    <input type="hidden" name="search" value="' . $search . '">
+                    <button class="sort-btn-top mb-2" type="submit" name="sort" value="asc_capital">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </button>
+                    <button class="sort-btn-bottom" type="submit" name="sort" value="desc_capital">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </form>
+            </th>
+            <th scope="col">
+                Hint
+                <form class="sort-form float-end pe-4 my-1" method="get" action="glossary.php">
+                    <input type="hidden" name="search" value="' . $search . '">
+                    <button class="sort-btn-top mb-2" type="submit" name="sort" value="asc_hint">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </button>
+                    <button class="sort-btn-bottom" type="submit" name="sort" value="desc_hint">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </form>
+            </th>
+        </tr>
+    </thead>
+    <tbody>';
+    foreach ($countries as $pk => $country) {
+        $countryList .= '
+            <tr>
+                <td class="flag-cell text-center align-middle">
+                    <img src="' . $country['src'] . '" class="flag-cell">
+                </td>
+                <td>' . $country['country'] . '</td>
+                <td>' . $country['capital'] . '</td>
+                <td class="text-secondary">' . $country['hint'] . '</td>
+            </tr>';
+    }
+    $countryList .= '</tbody>
+        </table>';
+
+    return $countryList;
+}
+
+
+function makeUserGlossaryTable( $countries, $search ): string {
+    $countryList = '<table id="glossary"
+        class="table table-light table-striped table-hover float-end">
+    <thead class="sticky-top">
+        <tr>
+            <th scope="col" class="th-sm">Flag</th>
+            <th scope="col">
+                Country
+                <form class="sort-form float-end pe-4 my-1" method="get" action="glossary.php">
+                    <input type="hidden" name="search" value="' . $search . '">
+                    <button class="sort-btn-top mb-2" type="submit" name="sort" value="asc_country">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </button>
+                    <button class="sort-btn-bottom" type="submit" name="sort" value="desc_country">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </form>
+            </th>
+            <th scope="col">
+                Capital
+                <form class="sort-form float-end pe-4 my-1" method="get" action="glossary.php">
+                    <input type="hidden" name="search" value="' . $search . '">
+                    <button class="sort-btn-top mb-2" type="submit" name="sort" value="asc_capital">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </button>
+                    <button class="sort-btn-bottom" type="submit" name="sort" value="desc_capital">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </form>
+            </th>
+            <th scope="col">
+                Hint
+                <form class="sort-form float-end pe-4 my-1" method="get" action="glossary.php">
+                    <input type="hidden" name="search" value="' . $search . '">
+                    <button class="sort-btn-top mb-2" type="submit" name="sort" value="asc_hint">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </button>
+                    <button class="sort-btn-bottom" type="submit" name="sort" value="desc_hint">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </form>
+            </th>
+            <th scope="col">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <form class="sort-form float-end pe-4 my-1" method="get" action="glossary.php">
+                    <input type="hidden" name="search" value="' . $search . '">
+                    <button class="sort-btn-top mb-2" type="submit" name="sort" value="asc_grade">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </button>
+                    <button class="sort-btn-bottom" type="submit" name="sort" value="desc_grade">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </form>
+            </th>
+        </tr>
+    </thead>
+    <tbody>';
+    foreach ($countries as $pk => $country) {
+        $countryList .= '
+            <tr>
+                <td class="flag-cell text-center align-middle">
+                    <img src="' . $country['src'] . '" class="flag-cell">
+                </td>
+                <td>' . $country['country'] . '</td>
+                <td>' . $country['capital'] . '</td>
+                <td class="text-secondary">' . $country['hint'] . '</td>
+                <td> &nbsp;' . $country['grade'] . '&nbsp; </td>
+            </tr>';
+    }
+    $countryList .= '</tbody>
+        </table>';
+
+    return $countryList;
+}
+
 // Creates HTML for scoreboard
 function scoreBoard( $pdo, $quizId=FALSE ): string {
 
@@ -482,6 +677,60 @@ function setModeQuizStats(): void {
     $_SESSION['modeQuizAccuracy'] = '';
     $_SESSION['modeQuizTested'] = 0;
     $_SESSION['modeQuizCorrect'] = 0;
+}
+
+# TODO - figure out a way to refactor the duplication from this function
+# and fix grade sort for values that don't translate to integers
+function sortGlossary( $direction, $col, $countries ): array {
+    if ( $col == 'country' ) {
+        if ( $direction == 'asc' ) {
+            usort( $countries, function( $a, $b) {
+                return strcmp( strtolower( $a['country'] ), strtolower( $b['country'] ) );
+            } );
+        } else {
+            usort( $countries, function( $a, $b ) {
+                return strcmp( strtolower( $b['country'] ), strtolower( $a['country'] ) );
+            } );
+        }        
+    } elseif ( $col == 'capital' ) {
+        if ( $col == 'capital' ) {
+            if ( $direction == 'asc' ) {
+                usort( $countries, function( $a, $b) {
+                    return strcmp( strtolower( $a['capital'] ), strtolower( $b['capital'] ) );
+                } );
+            } else {
+                usort( $countries, function( $a, $b ) {
+                    return strcmp( strtolower( $b['capital'] ), strtolower( $a['capital'] ) );
+                } );
+            }        
+        }
+    } elseif ( $col == 'hint' ) {
+        if ( $col == 'hint' ) {
+            if ( $direction == 'asc' ) {
+                usort( $countries, function( $a, $b) {
+                    return strcmp( strtolower( $a['hint'] ), strtolower( $b['hint'] ) );
+                } );
+            } else {
+                usort( $countries, function( $a, $b ) {
+                    return strcmp( strtolower( $b['hint'] ), strtolower( $a['hint'] ) );
+                } );
+            }        
+        }
+    } elseif ( $col == 'grade' ) { # TODO - incomplete - needs to sort TBD grades from tested grades
+        if ( $col == 'grade' ) {
+            if ( $direction == 'asc' ) {
+                usort( $countries, function( $a, $b) {
+                    return intval( rtrim( $a['grade'], '%' ) ) <=> intval( rtrim( $b['grade'], '%' ) );
+                } );
+            } else {
+                usort( $countries, function( $a, $b ) {
+                    return intval( rtrim( $b['grade'], '%' ) ) <=> intval( rtrim( $a['grade'], '%' ) );
+                } );
+            }        
+        }
+    }
+
+    return $countries;
 }
 
 // Update anonymous progress after each test in case user creates an account or logs in

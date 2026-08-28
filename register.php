@@ -105,9 +105,10 @@ if ( isGetRequest() && isset( $_SESSION['username'] ) ) {
 
 view( 'head', ['title' => 'Register'] );
 ?>
-<body class="p-5">
+<body class="p-5 bg-light">
 <main>
-    <div id="q-card" class="container p-3 bg-light rounded-4">
+    <div id="q-card"
+        class="container p-3 bg-light border border-5 border-white rounded-4">
         <h1 class="m-3"> <?php            
             if ( isset( $_SESSION['error'] ) ) {
                 echo '<span class="text-danger">' . $_SESSION['error'] . '</span>';

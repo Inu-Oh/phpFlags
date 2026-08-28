@@ -62,10 +62,10 @@
     } else {
         echo '<div class="card card-body m-3 bg-light border-5 border-white rounded-4">
             <div class="card-text">
-                <a class="m-1 pt-2" href="login.php">
+                <a class="py-3" href="login.php">
                     <i class="fa-solid fa-right-to-bracket"></i>&nbsp; Login
                 </a>
-                <a class="m-1 pt-2" href="register.php">
+                <a class="pb-3" href="register.php">
                     <i class="fa-regular fa-id-card"></i>&nbsp; Register
                 </a>';
     }

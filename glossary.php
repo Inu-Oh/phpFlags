@@ -7,23 +7,11 @@ if ( empty( $_SESSION['csrf_token'] ) )
     $_SESSION['csrf_token'] = bin2hex( random_bytes( 32 ) );
 
 if ( isGetRequest() ) {
-    $countries = array();
 
-    $stmt = $pdo->query( 'SELECT * FROM countries' );
-    $rows = $stmt->fetchAll();
-
-    foreach ( $rows as $row ) {
-
-        $countries[$row['pk']] = array( 
-            'country' => $row['country'],
-            'capital' => $row['capital'],
-            'src' => 'static/images/' . $row['code'] . '.png'
-        );
-        $countries[$row['pk']]['hint'] = 
-            isset( $row['hint'] ) ? substr($row['hint'], 2) : '';
-    }
+    $countries = getGlossaryData( $pdo );
 
     if ( isset( $_GET['search'] ) && strlen( $_GET['search'] ) > 0 ) {
+
         $search = strtolower( $_GET['search'] );
         foreach ( $countries as $key => $country ) {
             if ( ! str_contains( strtolower( $country['country'] ), $search ) &&
@@ -32,37 +20,22 @@ if ( isGetRequest() ) {
             }
         }
     } else {
-        $search = FALSE;
+        $search = NULL;
     }
 
-    ### TODO - move this table to utilties
-    $countryList = '<table id="glossary"
-            class="table table-light table-striped table-hover float-end">
-        <thead class="sticky-top">
-            <tr>
-                <th scope="col" class="th-sm">Flag</th>
-                <th scope="col">Country</th>
-                <th scope="col">Capital</th>
-                <th scope="col">Hint</th>
-            </tr>
-        </thead>
-        <tbody>';
+    if ( isset( $_SESSION['username'] ) ) 
+        $countries = addGradesToGlossary( $pdo, $countries );
 
-    foreach ($countries as $pk => $country) {
-
-        $countryList .= '
-            <tr>
-                <td class="flag-cell text-center align-middle">
-                    <img src="' . $country['src'] . '" class="flag-cell">
-                </td>
-                <td>' . $country['country'] . '</td>
-                <td>' . $country['capital'] . '</td>
-                <td class="text-secondary">' . $country['hint'] . '</td>
-            </tr>';
+    if ( isset( $_GET['sort'] ) ) {
+        list( $direction, $col ) = explode( '_', $_GET['sort'] );
+        $countries = sortGlossary( $direction, $col, $countries );
     }
-
-    $countryList .= '</tbody>
-        </table>';
+    
+    if ( isset( $_SESSION['username'] ) ) {
+        $countryList = makeUserGlossaryTable( $countries, $search );
+    } else {
+        $countryList = makeGlossaryTable( $countries, $search );
+    }
 }
 
 view( 'head', ['title' => 'Glossary'] ); ?>
@@ -75,12 +48,13 @@ view( 'head', ['title' => 'Glossary'] ); ?>
     <div>
         <form class="input-group float-end p-3 me-2 w-50" 
             method="get" action="glossary.php">
+            <input type="hidden" name="sort" value="<?= $sort ?>">
             <input id="search" class="form-control" type="text" name="search"
-                placeholder="Search country or capital">
-            <button type="submit" class="btn btn-success muted-link-style fw-bold">
+                placeholder="Search country or capital" autofocus value="<?= $search ?>">
+            <button type="submit" class="btn search-btn">
                 <i class="fa fa-search"></i>
             </button>
-            <a href="glossary.php" class="btn btn-warning link-style pt-2 fw-bold">
+            <a href="glossary.php" class="btn search-btn">
                 <i class="fa fa-undo"></i>
             </a>
         </form>
