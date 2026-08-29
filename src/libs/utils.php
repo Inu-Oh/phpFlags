@@ -30,10 +30,7 @@ function addGradesToGlossary( $pdo, $countries ): array {
 
     foreach ( $countries as $pk => $country ) {
         $countries[$pk]['grade'] = ( $country['test_count'] > 0 ) ?
-            strval( 
-                round( ( $country['correct_count'] / $country['test_count'] ) * 100 )
-                ) . '%' : 
-            'TBD';
+                round( ( $country['correct_count'] / $country['test_count'] ) * 100 ) : 'TBD';
     }
 
     return $countries;
@@ -522,8 +519,8 @@ function makeUserGlossaryTable( $countries, $search ): string {
                     </button>
                 </form>
             </th>
-            <th scope="col">
-                <i class="fa-solid fa-graduation-cap"></i>
+            <th scope="col"">
+                Grade
                 <form class="sort-form float-end pe-4 my-1" method="get" action="glossary.php">
                     <input type="hidden" name="search" value="' . $search . '">
                     <button class="sort-btn-top mb-2" type="submit" name="sort" value="asc_grade">
@@ -546,7 +543,10 @@ function makeUserGlossaryTable( $countries, $search ): string {
                 <td>' . $country['country'] . '</td>
                 <td>' . $country['capital'] . '</td>
                 <td class="text-secondary">' . $country['hint'] . '</td>
-                <td> &nbsp;' . $country['grade'] . '&nbsp; </td>
+                <td class="pe-5">'
+                    . $country['grade'];
+        if ( is_numeric( $country['grade'] ) ) $countryList .= '%';
+        $countryList .= '</td>
             </tr>';
     }
     $countryList .= '</tbody>
@@ -720,11 +720,19 @@ function sortGlossary( $direction, $col, $countries ): array {
         if ( $col == 'grade' ) {
             if ( $direction == 'asc' ) {
                 usort( $countries, function( $a, $b) {
-                    return intval( rtrim( $a['grade'], '%' ) ) <=> intval( rtrim( $b['grade'], '%' ) );
+                    if ( is_string( $a['grade'] ) && is_string( $b['grade'] ) )
+                        return strcmp( $a['grade'], $b['grade'] );
+                    elseif ( is_string( $a['grade'] ) ) return -1; // Strings come first
+                    elseif ( is_string( $b['grade'] ) ) return 1; // Strings come first
+                    else return $a['grade'] <=> $b['grade'];
                 } );
             } else {
                 usort( $countries, function( $a, $b ) {
-                    return intval( rtrim( $b['grade'], '%' ) ) <=> intval( rtrim( $a['grade'], '%' ) );
+                    if ( is_string( $a['grade'] ) && is_string( $b['grade'] ) )
+                        return strcmp( $b['grade'], $a['grade'] );
+                    elseif ( is_string( $a['grade'] ) ) return 1; // Numbers come first
+                    elseif ( is_string( $b['grade'] ) ) return -1; // Numbers come first
+                    else return $b['grade'] <=> $a['grade'];
                 } );
             }        
         }

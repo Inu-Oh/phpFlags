@@ -10,6 +10,9 @@ if ( isGetRequest() ) {
 
     $countries = getGlossaryData( $pdo );
 
+    if ( isset( $_SESSION['username'] ) )
+        $countries = addGradesToGlossary( $pdo, $countries );
+
     if ( isset( $_GET['search'] ) && strlen( $_GET['search'] ) > 0 ) {
 
         $search = strtolower( $_GET['search'] );
@@ -23,14 +26,17 @@ if ( isGetRequest() ) {
         $search = NULL;
     }
 
-    if ( isset( $_SESSION['username'] ) ) 
-        $countries = addGradesToGlossary( $pdo, $countries );
-
     if ( isset( $_GET['sort'] ) ) {
-        list( $direction, $col ) = explode( '_', $_GET['sort'] );
+        $_SESSION['sort'] = $_GET['sort'];
+        // list( $direction, $col ) = explode( '_', $sort ); resulted in errrors
+        $dir_col = explode( '_', $_SESSION['sort'] );
+        $direction = $dir_col[0];
+        $col = $dir_col[1];
         $countries = sortGlossary( $direction, $col, $countries );
+    } else {
+        $sort = FALSE;
     }
-    
+
     if ( isset( $_SESSION['username'] ) ) {
         $countryList = makeUserGlossaryTable( $countries, $search );
     } else {
@@ -46,15 +52,15 @@ view( 'head', ['title' => 'Glossary'] ); ?>
 
 <main>
     <div>
-        <form class="input-group float-end p-3 me-2 w-50" 
+        <form class="input-group float-end p-3 me-2 w-50 rounded" 
             method="get" action="glossary.php">
-            <input type="hidden" name="sort" value="<?= $sort ?>">
+            <input type="hidden" name="sort" value="<?= $_SESSION['sort'] ?>">
             <input id="search" class="form-control" type="text" name="search"
                 placeholder="Search country or capital" autofocus value="<?= $search ?>">
             <button type="submit" class="btn search-btn">
                 <i class="fa fa-search"></i>
             </button>
-            <a href="glossary.php" class="btn search-btn">
+            <a href="glossary.php" class="btn search-btn py-3">
                 <i class="fa fa-undo"></i>
             </a>
         </form>
