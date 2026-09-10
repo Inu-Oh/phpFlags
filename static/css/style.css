@@ -1,3 +1,8 @@
+:root {
+    --link-color: #126;
+    --link-hover: lightskyblue;
+}
+
 body {
     font-family: Arial, sans-serif;
 }
@@ -25,7 +30,7 @@ body {
     /* padding: 0.5rem 0.5rem 0.5rem 2rem; */
     text-decoration: none;
     font-size: 1.1rem;
-    color: #126;
+    color: var(--link-color);
     display: block;
     transition: 0.3s;
     border: none;
@@ -42,7 +47,7 @@ body {
 }
 
 .sidenav a:hover, .nav-submit-link:hover{
-    color: lightskyblue !important;
+    color: var(--link-hover) !important;
 }
 
 .sidenav .closebtn {
@@ -100,15 +105,14 @@ body {
 }
 
 .search-btn {
-    background-color: #126 !important;
+    background-color: var(--link-color) !important;
     border: 1;
     border-color: gray;
     color: white;
 }
 
 .search-btn:hover {
-    background-color: lightskyblue !important;
-    border: 1;
+    background-color: var(--link-hover) !important;
     color: black;
 }
 
@@ -118,18 +122,22 @@ body {
 }
 
 .sort-btn-top, .sort-btn-bottom {
+    color: var(--link-color) !important;
     display: block;
     height: 0.5rem;
     border: none;
     background: transparent;
+    position: absolute;
+}
+
+.sort-btn-top:hover, .sort-btn-bottom:hover {
+    color: var(--link-hover) !important;
 }
 
 .sort-btn-top {
-    position: absolute;
     bottom: 0;
 }
 
 .sort-btn-bottom {
-    position: absolute;
     top: 0;
 }

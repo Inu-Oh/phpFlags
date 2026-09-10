@@ -59,7 +59,7 @@ if ( isPostRequest() ) {
 }
 
 if ( isGetRequest() ) { 
-    # TODO - remove $_SESSION['modeQuizSummary'] = true;
+
     if ( ! isset( $_SESSION['quizIsSet'] ) ) {
 
         setQuestions( $pdo );
@@ -79,8 +79,9 @@ if ( isGetRequest() ) {
     }
 
     // Clear unneded data from session
-    if ( isset($_SESSION['answer']) ) unset($_SESSION['answer']);
-    if ( isset($_SESSION['correct']) ) unset($_SESSION['correct']);
+    if ( isset( $_SESSION['answer'] ) ) unset( $_SESSION['answer'] );
+    if ( isset( $_SESSION['correct'] ) ) unset( $_SESSION['correct'] );
+    if ( isset( $_SESSION['sort'] ) ) unset( $_SESSION['sort'] );
 
     $scoreBoard = scoreBoard( $pdo, $_SESSION['currentQuiz'] );
     updateInfoPane();
@@ -147,24 +148,21 @@ view('head'); ?>
     </div>
 
     <div id="form-div">
-
-    <form method="post" action="" class="form-group pt-5">
-        <div id="q-form" class="row">
-            <input type="hidden" name="csrf_token"
-                value="<?= $_SESSION['csrf_token'] ?>">
-            <div class="col-9">
-                <input id="answer" type="text" name="answer" class="form-control"
-                    placeholder="{{ question.placeholder }}" autofocus
-                    autocomplete="off">
+        <form method="post" action="" class="form-group pt-5">
+            <div id="q-form" class="row">
+                <input type="hidden" name="csrf_token"
+                    value="<?= $_SESSION['csrf_token'] ?>">
+                <div class="col-9">
+                    <input id="answer" type="text" name="answer" class="form-control"
+                        placeholder="{{ question.placeholder }}" autofocus
+                        autocomplete="off">
+                </div>
+                <div class="col-3">
+                    <input id="check-button" type="submit" name="check" value="Check"
+                        class="btn btn-outline-success form-control">
+                </div>
             </div>
-            <div class="col-3">
-                <input id="check-button" type="submit" 
-                    class="btn btn-outline-success form-control" 
-                    name="check" value="Check">
-            </div>
-        </div>
-    </form>
-
+        </form>
     </div>
 </div>
 </script>

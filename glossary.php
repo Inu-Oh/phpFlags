@@ -26,7 +26,7 @@ if ( isGetRequest() ) {
         $search = NULL;
     }
 
-    if ( isset( $_GET['sort'] ) ) {
+    if ( isset( $_GET['sort'] ) && strlen( $_GET['sort'] ) > 0 ) {
         $_SESSION['sort'] = $_GET['sort'];
         // list( $direction, $col ) = explode( '_', $sort ); resulted in errrors
         $dir_col = explode( '_', $_SESSION['sort'] );
@@ -34,7 +34,7 @@ if ( isGetRequest() ) {
         $col = $dir_col[1];
         $countries = sortGlossary( $direction, $col, $countries );
     } else {
-        $sort = FALSE;
+        $_SESSION['sort'] = FALSE;
     }
 
     if ( isset( $_SESSION['username'] ) ) {
@@ -55,6 +55,7 @@ view( 'head', ['title' => 'Glossary'] ); ?>
         <form class="input-group float-end p-3 me-2 w-50 rounded" 
             method="get" action="glossary.php">
             <input type="hidden" name="sort" value="<?= $_SESSION['sort'] ?>">
+            <label for=""></label>
             <input id="search" class="form-control" type="text" name="search"
                 placeholder="Search country or capital" autofocus value="<?= $search ?>">
             <button type="submit" class="btn search-btn">

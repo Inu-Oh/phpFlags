@@ -8,39 +8,8 @@ if ( empty( $_SESSION['csrf_token'] ) )
 if ( isPostRequest() ) {
 
     verifyCsrfOrDie();
-
-    ### TODO - add code to redirect and delete below once changes tested
     header( 'Location: index.php' );
     return;
-
-    // // Wipe previous quiz mode from session and write quiz list for newsly selected mode
-    // if ( isset( $_SESSION['currentQuiz'] ) ) unset( $_SESSION['currentQuiz'] );
-    // if ( isset( $_SESSION['nextQuestion'] ) ) unset( $_SESSION['nextQuestion'] );
-
-    // if ( isset( $_POST['learn'] ) ) {
-
-    //     if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
-    //     if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
-    //     if ( isset( $_SESSION['quizMode'] ) ) unset( $_SESSION['quizMode'] );
-
-    // } elseif ( isset( $_POST['practice'] ) ) {
-
-    //     if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
-    //     if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
-
-    //     $_SESSION['quizMode'] = 'practice';
-    //     getUserPracticeList();
-    //     setModeQuizStats();
-        
-    // } elseif ( isset( $_POST['review']) ) {
-
-    //     if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
-    //     if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
-
-    //     $_SESSION['quizMode'] = 'review';
-    //     getUserReviewList();
-    //     setModeQuizStats();
-    // }
 }
 
 if ( isGetRequest() && isset( $_GET['mode'] ) ) {

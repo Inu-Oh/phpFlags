@@ -793,6 +793,8 @@ function updateScore( $pdo, $quizId, $percAccuracy ): void {
             getUserStats($pdo, $quizId);
         }
 
+        if ( $_SESSION['correct'] ) $_SESSION['correctCount']++;
+        
         if ( isset( $_SESSION['quizMode'] ) ) {
             $_SESSION['modeQuizTested']++;
             if ( $percAccuracy > 85 ) $_SESSION['modeQuizCorrect']++;
@@ -825,6 +827,7 @@ function updateUserProgressInDB( $pdo, $quizId ): void {
     ) );
 }
 
+// TODO - Check Where is this still used? Does it need revision?
 // Make a session copy of logged in user progress from database to track in session
 function updateUserProgressInSession( $pdo, $quizId ): void {
     if ( ! isset($_SESSION['userProgress'] )) {
@@ -851,7 +854,7 @@ function updateUserProgressInSession( $pdo, $quizId ): void {
         $key = $quizId * 10000 + $_SESSION['nextQuestion'];
         list( $testCount, $correctCount ) = $_SESSION['userProgress'][$key];
         $testCount++;
-        if ( $_SESSION['correct'] ) $correctCount++; # TODO REview Does this duplicate update score?
+        if ( $_SESSION['correct'] ) $correctCount++; # TODO eEview Does this duplicate update score?
         $val = array( $testCount, $correctCount );
         $_SESSION['userProgress'][$key] = $val;
     }
