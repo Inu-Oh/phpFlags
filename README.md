@@ -1,10 +1,6 @@
 # phpFlags
 Simple PHP flag quiz app.
 
->  [!CAUTION]
->
->  This app is still in development and only suitable for testing and development
-
 A geography quiz Web app written in PHP, testing knowledge of flags, country and capital city names. The app randomly chooses between four types of quizzes, then chooses a random question from each quiz question list, just under one thousand questions in total.
 
 ## Quiz question types
@@ -31,7 +27,7 @@ When anonymous user logs in current session data is used to update any cards the
 Scroll below gallery for PostgreSQL and PHP code implementation of user, user progress, and quiz question data.
 
 ### In development
-- Finalize functionality
+- Final bug fixes
 - Review security features
 - Write tests
 
@@ -88,6 +84,10 @@ Learn quiz mode with anonymous user - showing scoreboard for perfect quiz result
 
 ### Error message shown when user does not enter a value
 <img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/712e6180-1b5e-4407-b24a-e2c3525c4f6a" />
+
+### Login and Sign Up pages
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/051dc348-cee7-4453-9079-5a1baf56b1a2" />
+<img width="660" height="700" alt="image" src="https://github.com/user-attachments/assets/163a1fa3-43df-4520-bece-a61f6f20e5a0" />
 
 ## Add config.php
 
