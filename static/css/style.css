@@ -14,8 +14,6 @@ body {
     top: 0;
     overflow-y: hidden; /* Disable horizontal scroll */
     padding-top: 3.5rem;
-    /* TODOD - keep the transition for new nav */
-    /* transition: 0.05s; /* 0.5 second transition effect to slide the sidenav */
 }
 
 .sidenav {    

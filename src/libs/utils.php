@@ -280,19 +280,15 @@ function getUserPracticeList(): void {
         list( $views, $correct ) = $questionProgress;
 
         if ( $views > 0 ) {
-
+            
             $questionAccuracy = $correct / $views;
-
-            if ( $questionAccuracy < 0.8 ) {
-
-                $quizId = intval( round( $key / 10_000 ) );
-                $questionId = $key % 10_000;
-                $practiceList[] = array(
-                    'quizId' => $quizId,
-                    'questionId' => $questionId,
-                    'accuracy' => $questionAccuracy
-                );
-            }
+            $quizId = intval( round( $key / 10_000 ) );
+            $questionId = $key % 10_000;
+            $practiceList[] = array(
+                'quizId' => $quizId,
+                'questionId' => $questionId,
+                'accuracy' => $questionAccuracy
+            );
         }
     }
     
