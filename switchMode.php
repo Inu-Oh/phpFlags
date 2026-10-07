@@ -17,30 +17,35 @@ if ( isGetRequest() && isset( $_GET['mode'] ) ) {
     // Wipe previous quiz mode from session and write quiz list for newsly selected mode
     if ( isset( $_SESSION['currentQuiz'] ) ) unset( $_SESSION['currentQuiz'] );
     if ( isset( $_SESSION['nextQuestion'] ) ) unset( $_SESSION['nextQuestion'] );
+    if ( isset( $_SESSION['challengeList'] ) )
+        unset( $_SESSION['challengeList'] );
+    if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
+    if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
 
-    if ( $_GET['mode'] == 'learn' ) {
+    $mode = $_GET['mode'];
+    if ( $mode == 'learn' ) {
 
-        if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
-        if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
         if ( isset( $_SESSION['quizMode'] ) ) unset( $_SESSION['quizMode'] );
 
-    } elseif ( $_GET['mode'] == 'practice' ) {
+    } elseif ( in_array($mode, ['practice', 'review', 'challenge']) ) {
 
-        if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
-        if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
-
-        $_SESSION['quizMode'] = 'practice';
-        getUserPracticeList();
+        $_SESSION['quizMode'] = $mode;
+        switch ( $mode ) {
+            case 'practice':
+                getUserPracticeList(); // TODO - get rid of User in various places
+                break;
+            case 'review':
+                getUserReviewList();
+                break;
+            case 'challenge':
+                getChallengeList();
+                break;
+            default:
+                print('error'); // TODO - improve this error
+                break;
+        }
         setModeQuizStats();
-
-    } elseif ( $_GET['mode'] == 'review' ) {
-        if ( isset( $_SESSION['practiceList'] ) ) unset( $_SESSION['practiceList'] );
-        if ( isset( $_SESSION['reviewList'] ) ) unset( $_SESSION['reviewList']  );
-
-        $_SESSION['quizMode'] = 'review';
-        getUserReviewList();
-        setModeQuizStats();
-    }
+    } 
 }
 
 header( 'Location: index.php' );

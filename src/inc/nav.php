@@ -27,7 +27,12 @@
                         <label class="text-secondary info-text m-1 pb-2">
                             Discover new content</label>';
                 }
-                echo '<a href="switchMode.php?mode=review">
+                echo '<a href="switchMode.php?mode=challenge">
+                        <i class="fa-solid fa-ranking-star"></i>&nbsp; Gauntlet
+                    </a>
+                    <label class="text-secondary info-text m-1 pb-2">
+                        Random challenge</label>
+                    <a href="switchMode.php?mode=review">
                         <i class="fa-solid fa-dumbbell"></i>&nbsp; Review
                     </a>
                     <label class="text-secondary info-text m-1 pb-2">
@@ -41,7 +46,30 @@
                         <label class="text-secondary info-text m-1 pb-2">
                             Discover new content</label>';
                 }
-                echo '<a href="switchMode.php?mode=practice">
+                echo '<a href="switchMode.php?mode=challenge">
+                        <i class="fa-solid fa-ranking-star"></i>&nbsp; Gauntlet
+                    </a>
+                    <label class="text-secondary info-text m-1 pb-2">
+                        Random challenge</label>
+                    <a href="switchMode.php?mode=practice">
+                        <i class="fa-solid fa-weight-hanging"></i>&nbsp; Practice
+                    </a>
+                    <label class="text-secondary info-text m-1 pb-2">
+                        Strengthen skills</label>';
+            } elseif ( $_SESSION['quizMode'] == 'challenge' ) { 
+                if ( $_SESSION['testedCards'] < $_SESSION['questionCount'] ) {
+                    echo '<a href="switchMode.php?mode=learn">
+                            <i class="fa-solid fa-graduation-cap"></i>&nbsp; Learn
+                        </a>
+                        <label class="text-secondary info-text m-1 pb-2">
+                            Discover new content</label>';
+                }
+                echo '<a href="switchMode.php?mode=review">
+                        <i class="fa-solid fa-dumbbell"></i>&nbsp; Review
+                    </a>
+                    <label class="text-secondary info-text m-1 pb-2">
+                        Refresh your memory</label>
+                    <a href="switchMode.php?mode=practice">
                         <i class="fa-solid fa-weight-hanging"></i>&nbsp; Practice
                     </a>
                     <label class="text-secondary info-text m-1 pb-2">
@@ -53,6 +81,11 @@
                 </a>
                 <label class="text-secondary info-text m-1 pb-2">
                     Strengthen skills</label>
+                <a href="switchMode.php?mode=challenge">
+                    <i class="fa-solid fa-ranking-star"></i>&nbsp; Gauntlet
+                </a>
+                <label class="text-secondary info-text m-1 pb-2">
+                    Random challenge</label>
                 <a href="switchMode.php?mode=review">
                     <i class="fa-solid fa-dumbbell"></i>&nbsp; Review
                 </a>

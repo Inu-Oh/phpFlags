@@ -168,9 +168,13 @@ function getQuestion( $pdo ): void {
     
         getPracticeQuestion();
     
-    } else {
+    } elseif ( $_SESSION['quizMode'] == 'review' ) {
 
         getReviewQuestion();
+
+    } else {
+
+        getChallengeQuestion();
     }
 
     // This setting prevents loading feedback page if user click back arrow
@@ -201,6 +205,32 @@ function getPracticeQuestion(): void {
         unset($_SESSION['quizMode']);
     }
 }
+
+// TODO - refactor to combine the above and bolow functions
+// Get question for practice quiz mode 
+function getChallengeQuestion(): void {
+
+    if ( count( $_SESSION['challengeList'] ) > 0 ) {
+
+        $nextQuestion = array_shift( $_SESSION['challengeList'] );
+        $quizId = $nextQuestion['quizId'];
+        $questionId = $nextQuestion['questionId'];
+        setQuizAndQuestion( $quizId, $questionId ) ;
+
+    } else {
+        // Switch to learn mode if no more practice questions...
+        $_SESSION['modeQuizSummary'] = TRUE;
+
+        // ... or to review mode if no questions to learn
+        if ( $_SESSION['questionCount'] <= 0 ) {
+            header( 'Location: switchMode.php?mode=review' );
+            exit();
+        }
+        $_SESSION['mode'] = $_SESSION['quizMode'];
+        unset($_SESSION['quizMode']);
+    }
+}
+
 
 // Get question for review quiz mode
 function getReviewQuestion(): void {
@@ -302,6 +332,42 @@ function getUserPracticeList(): void {
         $_SESSION['practiceList'] = array_slice( $practiceList, 0, 30 );
     } else {
         $_SESSION['practiceList'] = $practiceList;
+    }
+}
+
+
+// Return random list of questions with accuracy below 90%
+function getChallengeList(): void {
+
+    // Create an array of practice questions with value grading each question
+    $practiceList = array();
+
+    foreach ( $_SESSION['userProgress'] as $key => $questionProgress ) {
+
+        list( $views, $correct ) = $questionProgress;
+
+        if ( $views > 0 ) {
+            
+            $questionAccuracy = $correct / $views;
+            if ( $questionAccuracy < 0.9 ) {
+
+                $quizId = intval( round( $key / 10_000 ) );
+                $questionId = $key % 10_000;
+                $practiceList[] = array(
+                    'quizId' => $quizId,
+                    'questionId' => $questionId,
+                    'accuracy' => $questionAccuracy
+                );
+            }
+        }
+    }
+
+    # Truncate if too long and save to session
+    shuffle( $practiceList );
+    if ( count( $practiceList ) > 30 ) {
+        $_SESSION['challengeList'] = array_slice( $practiceList, 0, 30 );
+    } else {
+        $_SESSION['challengeList'] = $practiceList;
     }
 }
 
@@ -578,11 +644,20 @@ function scoreBoard( $pdo, $quizId=FALSE ): string {
                             htmlspecialchars( ucwords( $_SESSION['quizMode'] ) ) . 
                         '</span>';
         
-        if ( $_SESSION['quizMode'] == 'practice' ) {
-            $cards_left = count( $_SESSION['practiceList'] );
-
-        } elseif ( $_SESSION['quizMode'] == 'review' ) {
-            $cards_left = count( $_SESSION['reviewList'] );
+        switch ($_SESSION['quizMode']) {
+            case 'practice':
+                $cards_left = count( $_SESSION['practiceList'] );
+                break;
+            case 'review':
+                $cards_left = count( $_SESSION['reviewList'] );
+                break;
+            case 'challenge':
+                $cards_left = count( $_SESSION['challengeList'] );
+                break;
+            default:
+                $cards_left = 0;
+                print('error'); // TODO - imporve this error
+                break;
         }
         
         if ( $cards_left == 0 ) {
@@ -667,8 +742,10 @@ function setQuizAndQuestion( $quizId, $questionId ) {
 function setModeQuizStats(): void {
     if ( $_SESSION['quizMode'] == 'practice' ) {
         $_SESSION['modeQuizLength'] = count( $_SESSION['practiceList'] );
-    } else {
+    } elseif ( $_SESSION['quizMode'] == 'review' ) {
         $_SESSION['modeQuizLength'] = count( $_SESSION['reviewList'] );
+    } else {
+        $_SESSION['modeQuizLength'] = count( $_SESSION['challengeList'] );
     }
     $_SESSION['modeQuizAccuracy'] = '';
     $_SESSION['modeQuizTested'] = 0;

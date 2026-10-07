@@ -12,6 +12,9 @@ switch ( $quizMode ) {
     case 'review':
         unset( $_SESSION['reviewList'] );
         break;
+    case 'challenge':
+        unset( $_SESSION['challengeList'] );
+        break;
     default:
         # TODO - Code for learn completion will go here
         break;
