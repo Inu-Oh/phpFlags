@@ -127,8 +127,7 @@ $(document).ready(function() {
 
     $(document).on('keydown', function(e) {
         if (e.key === 'Enter') {
-            // $('#feedback-button').click(); // firgure out why this jQuery not working
-            document.getElementById('check-button').click();
+            $('#check-button').click();
         }
     });
 });
