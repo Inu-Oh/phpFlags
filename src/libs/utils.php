@@ -300,7 +300,7 @@ function getUserLearnQuestion( $pdo ): void {
 }
 
 // Return list of questions from user's learned questions ordered from low to high grade
-function getUserPracticeList(): void {
+function getPracticeList(): void {
 
     // Create an array of practice questions with value grading each question
     $practiceList = array();
@@ -373,7 +373,7 @@ function getChallengeList(): void {
 
 // TODO - make this function more efficient - don't make full list then truncate
 // Return random list of questions from user's learned question set
-function getUserReviewList(): void {
+function getReviewList(): void {
 
     // Make a list of random 30 previously tested questions from user progress
     $reviewList = array();

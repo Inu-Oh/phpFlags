@@ -32,10 +32,10 @@ if ( isGetRequest() && isset( $_GET['mode'] ) ) {
         $_SESSION['quizMode'] = $mode;
         switch ( $mode ) {
             case 'practice':
-                getUserPracticeList(); // TODO - get rid of User in various places
+                getPracticeList(); // TODO - get rid of User in various places
                 break;
             case 'review':
-                getUserReviewList();
+                getReviewList();
                 break;
             case 'challenge':
                 getChallengeList();

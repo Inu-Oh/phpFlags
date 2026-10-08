@@ -27,7 +27,7 @@ switch ( $_SESSION['currentQuiz'] ) {
 
     case 'flagCapital':
         $question['src'] = 'static/images/'.$question['code'].'.png';
-        $question['text'] = 'Name the capital of this flag';
+        $question['text'] = "Name the capital of this flag's country";
         $question['placeholder'] = 'Capital city name ...';
         $_SESSION['answer'] = $question['capital'];
         $_SESSION['distractor'] = array( $question['country'], 'country', 'capital' );
