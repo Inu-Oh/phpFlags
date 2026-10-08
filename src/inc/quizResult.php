@@ -72,7 +72,7 @@ getQuestion( $pdo );
                     </div>
                     <div class="col-9 ps-1">
                         <p class="fs-3">accuracy rate</p>
-                        <p>qustions tested</p>
+                        <p>questions tested</p>
                         <p>answered correctly</p>
                     </div>
                 </div>
