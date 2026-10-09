@@ -114,6 +114,68 @@ function getGlossaryData( $pdo ): array {
     return $countries;
 }
 
+
+// Return random list of questions with accuracy below 90%
+function getChallengeList(): void {
+
+    // Create an array of practice questions with value grading each question
+    $practiceList = array();
+
+    foreach ( $_SESSION['userProgress'] as $key => $questionProgress ) {
+
+        list( $views, $correct ) = $questionProgress;
+
+        if ( $views > 0 ) {
+            
+            $questionAccuracy = $correct / $views;
+            if ( $questionAccuracy < 0.9 ) {
+
+                $quizId = intval( round( $key / 10_000 ) );
+                $questionId = $key % 10_000;
+                $practiceList[] = array(
+                    'quizId' => $quizId,
+                    'questionId' => $questionId,
+                    'accuracy' => $questionAccuracy
+                );
+            }
+        }
+    }
+
+    # Truncate if too long and save to session
+    shuffle( $practiceList );
+    if ( count( $practiceList ) > 30 ) {
+        $_SESSION['challengeList'] = array_slice( $practiceList, 0, 30 );
+    } else {
+        $_SESSION['challengeList'] = $practiceList;
+    }
+}
+
+// TODO - refactor to combine bolow and getPracticeQuestion functions
+// Get question for practice quiz mode 
+function getChallengeQuestion(): void {
+
+    if ( count( $_SESSION['challengeList'] ) > 0 ) {
+
+        $nextQuestion = array_shift( $_SESSION['challengeList'] );
+        $quizId = $nextQuestion['quizId'];
+        $questionId = $nextQuestion['questionId'];
+        setQuizAndQuestion( $quizId, $questionId ) ;
+
+    } else {
+        // Switch to learn mode if no more practice questions...
+        $_SESSION['modeQuizSummary'] = TRUE;
+
+        // ... or to review mode if no questions to learn
+        if ( $_SESSION['questionCount'] <= 0 ) {
+            header( 'Location: switchMode.php?mode=review' );
+            exit();
+        }
+        $_SESSION['mode'] = $_SESSION['quizMode'];
+        unset($_SESSION['quizMode']);
+    }
+}
+
+
 // Get question for learn quiz mode
 function getLearnQuestion(): void {
 
@@ -153,6 +215,32 @@ function getLearnQuestion(): void {
     if ( ! isset( $_SESSION['nextQuestion'] ) ) getLearnQuestion();  
 }
 
+
+// Get question for practice quiz mode 
+function getPracticeQuestion(): void {
+
+    if ( count( $_SESSION['practiceList'] ) > 0 ) {
+
+        $nextQuestion = array_shift( $_SESSION['practiceList'] );
+        $quizId = $nextQuestion['quizId'];
+        $questionId = $nextQuestion['questionId'];
+        setQuizAndQuestion( $quizId, $questionId ) ;
+
+    } else {
+        // Switch to learn mode if no more practice questions...
+        $_SESSION['modeQuizSummary'] = TRUE;
+
+        // ... or to review mode if no questions to learn
+        if ( $_SESSION['questionCount'] <= 0 ) {
+            header( 'Location: switchMode.php?mode=review' );
+            exit();
+        }
+        $_SESSION['mode'] = $_SESSION['quizMode'];
+        unset($_SESSION['quizMode']);
+    }
+}
+
+
 // Get the next quiz question and save it to session
 function getQuestion( $pdo ): void {
 
@@ -180,55 +268,6 @@ function getQuestion( $pdo ): void {
     // This setting prevents loading feedback page if user click back arrow
     $_SESSION['loaded'] = TRUE;
     $_SESSION['feedback'] = FALSE;
-}
-
-// Get question for practice quiz mode 
-function getPracticeQuestion(): void {
-
-    if ( count( $_SESSION['practiceList'] ) > 0 ) {
-
-        $nextQuestion = array_shift( $_SESSION['practiceList'] );
-        $quizId = $nextQuestion['quizId'];
-        $questionId = $nextQuestion['questionId'];
-        setQuizAndQuestion( $quizId, $questionId ) ;
-
-    } else {
-        // Switch to learn mode if no more practice questions...
-        $_SESSION['modeQuizSummary'] = TRUE;
-
-        // ... or to review mode if no questions to learn
-        if ( $_SESSION['questionCount'] <= 0 ) {
-            header( 'Location: switchMode.php?mode=review' );
-            exit();
-        }
-        $_SESSION['mode'] = $_SESSION['quizMode'];
-        unset($_SESSION['quizMode']);
-    }
-}
-
-// TODO - refactor to combine the above and bolow functions
-// Get question for practice quiz mode 
-function getChallengeQuestion(): void {
-
-    if ( count( $_SESSION['challengeList'] ) > 0 ) {
-
-        $nextQuestion = array_shift( $_SESSION['challengeList'] );
-        $quizId = $nextQuestion['quizId'];
-        $questionId = $nextQuestion['questionId'];
-        setQuizAndQuestion( $quizId, $questionId ) ;
-
-    } else {
-        // Switch to learn mode if no more practice questions...
-        $_SESSION['modeQuizSummary'] = TRUE;
-
-        // ... or to review mode if no questions to learn
-        if ( $_SESSION['questionCount'] <= 0 ) {
-            header( 'Location: switchMode.php?mode=review' );
-            exit();
-        }
-        $_SESSION['mode'] = $_SESSION['quizMode'];
-        unset($_SESSION['quizMode']);
-    }
 }
 
 
@@ -332,42 +371,6 @@ function getPracticeList(): void {
         $_SESSION['practiceList'] = array_slice( $practiceList, 0, 30 );
     } else {
         $_SESSION['practiceList'] = $practiceList;
-    }
-}
-
-
-// Return random list of questions with accuracy below 90%
-function getChallengeList(): void {
-
-    // Create an array of practice questions with value grading each question
-    $practiceList = array();
-
-    foreach ( $_SESSION['userProgress'] as $key => $questionProgress ) {
-
-        list( $views, $correct ) = $questionProgress;
-
-        if ( $views > 0 ) {
-            
-            $questionAccuracy = $correct / $views;
-            if ( $questionAccuracy < 0.9 ) {
-
-                $quizId = intval( round( $key / 10_000 ) );
-                $questionId = $key % 10_000;
-                $practiceList[] = array(
-                    'quizId' => $quizId,
-                    'questionId' => $questionId,
-                    'accuracy' => $questionAccuracy
-                );
-            }
-        }
-    }
-
-    # Truncate if too long and save to session
-    shuffle( $practiceList );
-    if ( count( $practiceList ) > 30 ) {
-        $_SESSION['challengeList'] = array_slice( $practiceList, 0, 30 );
-    } else {
-        $_SESSION['challengeList'] = $practiceList;
     }
 }
 
