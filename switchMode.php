@@ -5,14 +5,19 @@ require_once __DIR__ . '/src/libs/utils.php';
 if ( empty( $_SESSION['csrf_token'] ) )
     $_SESSION['csrf_token'] = bin2hex( random_bytes( 32 ) );
 
-if ( isPostRequest() ) {
+verifyCsrfOrDie();
 
-    verifyCsrfOrDie();
+if ( isPostRequest() ) {
     header( 'Location: index.php' );
     return;
 }
 
 if ( isGetRequest() && isset( $_GET['mode'] ) ) {
+
+    if ( !isset( $_SESSION['username'] ) ) {
+        header( 'Location: index.php' );
+        return;
+    }
 
     // Wipe previous quiz mode from session and write quiz list for newsly selected mode
     if ( isset( $_SESSION['currentQuiz'] ) ) unset( $_SESSION['currentQuiz'] );

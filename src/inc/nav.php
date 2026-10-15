@@ -31,7 +31,7 @@
                         <i class="fa-solid fa-ranking-star"></i>&nbsp; Gauntlet
                     </a>
                     <label class="text-secondary info-text m-1 pb-2">
-                        Random challenge</label>
+                        Peak challenge</label>
                     <a href="switchMode.php?mode=review">
                         <i class="fa-solid fa-dumbbell"></i>&nbsp; Review
                     </a>
@@ -50,7 +50,7 @@
                         <i class="fa-solid fa-ranking-star"></i>&nbsp; Gauntlet
                     </a>
                     <label class="text-secondary info-text m-1 pb-2">
-                        Random challenge</label>
+                        Peak challenge</label>
                     <a href="switchMode.php?mode=practice">
                         <i class="fa-solid fa-weight-hanging"></i>&nbsp; Practice
                     </a>
@@ -85,7 +85,7 @@
                     <i class="fa-solid fa-ranking-star"></i>&nbsp; Gauntlet
                 </a>
                 <label class="text-secondary info-text m-1 pb-2">
-                    Random challenge</label>
+                    Peak challenge</label>
                 <a href="switchMode.php?mode=review">
                     <i class="fa-solid fa-dumbbell"></i>&nbsp; Review
                 </a>
