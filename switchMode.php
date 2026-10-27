@@ -5,9 +5,8 @@ require_once __DIR__ . '/src/libs/utils.php';
 if ( empty( $_SESSION['csrf_token'] ) )
     $_SESSION['csrf_token'] = bin2hex( random_bytes( 32 ) );
 
-verifyCsrfOrDie();
-
 if ( isPostRequest() ) {
+    verifyCsrfOrDie();
     header( 'Location: index.php' );
     return;
 }
@@ -15,6 +14,7 @@ if ( isPostRequest() ) {
 if ( isGetRequest() && isset( $_GET['mode'] ) ) {
 
     if ( !isset( $_SESSION['username'] ) ) {
+        verifyCsrfOrDie();
         header( 'Location: index.php' );
         return;
     }

@@ -51,20 +51,15 @@ function checkAnswerAccuracy( $percAccuracy ): void {
 // Check the user answer for a match and return accuracy
 function checkUserAnswer(): ?float {
     $_SESSION['userInput'] = htmlspecialchars( $_POST['answer'], ENT_QUOTES, 'UTF-8' );
-    $matchingChars = similar_text(
-        iconv( 'UTF-8', 'ASCII//TRANSLIT', strtolower( $_SESSION['userInput'] ) ),
-        iconv( 'UTF-8', 'ASCII//TRANSLIT', strtolower(
-            htmlspecialchars( $_SESSION['answer'] ) )
-        ),
-        $percAccuracy
-    );
+    $normalizedInput = normalize( $_POST['answer'] );
+    $normalizedAnswer = normalize( $_SESSION['answer'] );
+    $matchingChars = similar_text( $normalizedInput,  $normalizedAnswer, $percAccuracy );
 
     // Check if user entered distractor instead of question answer
+    $normalizedDistractor = normalize( $_SESSION['distractor'][0] );
     $matchDistractor = similar_text(
-        iconv( 'UTF-8', 'ASCII//TRANSLIT', strtolower( $_SESSION['userInput'] ) ),
-        iconv( 'UTF-8', 'ASCII//TRANSLIT', strtolower(
-            htmlspecialchars($_SESSION['distractor'][0] ) )
-        ),
+        $normalizedInput,
+        $normalizedDistractor,
         $distractorAccuracy
     );
     // Redirect back to question card if user entered distractor
@@ -618,6 +613,17 @@ function makeUserGlossaryTable( $countries, $search ): string {
         </table>';
 
     return $countryList;
+}
+
+// Helper function for checkUserAnswer: replace punctionabefore comparing strings
+function normalize( string $text ): string {
+    $ascii = iconv( 'UTF-8', 'ASCII//TRANSLIT', $text );
+
+    if ( $ascii === false ) {
+        throw new RuntimeException( "Could not normalize answer text." );
+    }
+
+    return preg_replace( "/[^a-z]/", "", strtolower( $ascii ) ) ?? "";
 }
 
 // Creates HTML for scoreboard
