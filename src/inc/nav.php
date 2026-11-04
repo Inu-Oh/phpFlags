@@ -31,12 +31,12 @@
                         <i class="fa-solid fa-ranking-star"></i>&nbsp; Gauntlet
                     </a>
                     <label class="text-secondary info-text m-1 pb-2">
-                        Peak challenge</label>
+                        Top challenge</label>
                     <a href="switchMode.php?mode=review">
                         <i class="fa-solid fa-dumbbell"></i>&nbsp; Review
                     </a>
                     <label class="text-secondary info-text m-1 pb-2">
-                        Refresh your memory</label>';
+                        Random cards</label>';
 
             } elseif ( $_SESSION['quizMode'] == 'review' ) { 
                 if ( $_SESSION['testedCards'] < $_SESSION['questionCount'] ) {
@@ -50,12 +50,12 @@
                         <i class="fa-solid fa-ranking-star"></i>&nbsp; Gauntlet
                     </a>
                     <label class="text-secondary info-text m-1 pb-2">
-                        Peak challenge</label>
+                        Top challenge</label>
                     <a href="switchMode.php?mode=practice">
-                        <i class="fa-solid fa-weight-hanging"></i>&nbsp; Practice
+                        <i class="fa-solid fa-weight-hanging"></i>&nbsp; Cram
                     </a>
                     <label class="text-secondary info-text m-1 pb-2">
-                        Strengthen skills</label>';
+                        Practice tough cards</label>';
             } elseif ( $_SESSION['quizMode'] == 'challenge' ) { 
                 if ( $_SESSION['testedCards'] < $_SESSION['questionCount'] ) {
                     echo '<a href="switchMode.php?mode=learn">
@@ -68,29 +68,29 @@
                         <i class="fa-solid fa-dumbbell"></i>&nbsp; Review
                     </a>
                     <label class="text-secondary info-text m-1 pb-2">
-                        Refresh your memory</label>
+                        Random cards</label>
                     <a href="switchMode.php?mode=practice">
-                        <i class="fa-solid fa-weight-hanging"></i>&nbsp; Practice
+                        <i class="fa-solid fa-weight-hanging"></i>&nbsp; Cram
                     </a>
                     <label class="text-secondary info-text m-1 pb-2">
-                        Strengthen skills</label>';
+                        Practice tough cards</label>';
             }
         } else {
             echo '<a href="switchMode.php?mode=practice">
-                    <i class="fa-solid fa-weight-hanging"></i>&nbsp; Practice
+                    <i class="fa-solid fa-weight-hanging"></i>&nbsp; Cram
                 </a>
                 <label class="text-secondary info-text m-1 pb-2">
-                    Strengthen skills</label>
+                    Practice tough cards</label>
                 <a href="switchMode.php?mode=challenge">
                     <i class="fa-solid fa-ranking-star"></i>&nbsp; Gauntlet
                 </a>
                 <label class="text-secondary info-text m-1 pb-2">
-                    Peak challenge</label>
+                    Top challenge</label>
                 <a href="switchMode.php?mode=review">
                     <i class="fa-solid fa-dumbbell"></i>&nbsp; Review
                 </a>
                 <label class="text-secondary info-text m-1 pb-2">
-                    Refresh your memory</label>';
+                    Random cards</label>';
         }
     } else {
         echo '<div class="card card-body m-3 bg-light border-5 border-white rounded-4">
