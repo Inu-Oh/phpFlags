@@ -17,5 +17,5 @@
             crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
-        <link rel="stylesheet" href="static/css/style.css">
+        <link rel="stylesheet" href="static/css/style.css?v=2">
     </head>

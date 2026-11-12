@@ -56,7 +56,8 @@ view('head'); ?>
 <script id="quiz-feedback" type="text/x-handlebars-template">
 <div class="px-3">
 
-    <div id="feedback" class="text-center">
+    <div id="feedback" 
+        class="text-center <?= !empty($_SESSION['correct']) ? 'feedback-success' : 'feedback-failure' ?>">
         <h2 class="pb-2">
             {{#if feedback.correct }}
                 You got it right
