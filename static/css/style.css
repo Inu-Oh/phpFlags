@@ -59,8 +59,37 @@ body {
 #q-card {
     z-index: 0;
     width: 33rem;
-    height: 37rem;
+    height: 39rem;
     position: relative;
+}
+
+body.feedback-page #q-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.feedback-layout {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    padding-bottom: 2rem;
+}
+
+.feedback-layout #feedback {
+    flex: 0 0 auto;
+}
+
+.feedback-layout #form-div {
+    flex: 0 0 auto;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.feedback-layout #q-form {
+    position: static;
+    width: 94%;
+    margin: 0 auto;
 }
 
 #q-img {
@@ -138,10 +167,6 @@ body {
 
 .sort-btn-bottom {
     top: 0;
-}
-
-#feedback {
-  margin-bottom: 1rem;
 }
 
 #feedback.feedback-success {

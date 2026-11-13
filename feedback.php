@@ -37,7 +37,7 @@ if ( isGetRequest() ) {
 
 view('head'); ?>
 
-<body class="p-5">
+<body class="p-5 feedback-page">
 
 <?php require_once __DIR__ . '/src/inc/falseNav.php'; ?>
 <?php require_once __DIR__ . '/src/inc/infoPane.php'; ?>
@@ -54,7 +54,7 @@ view('head'); ?>
 </main>
 
 <script id="quiz-feedback" type="text/x-handlebars-template">
-<div class="px-3">
+<div class="feedback-layout px-3">
 
     <div id="feedback" 
         class="text-center <?= !empty($_SESSION['correct']) ? 'feedback-success' : 'feedback-failure' ?>">
@@ -79,7 +79,7 @@ view('head'); ?>
 
     <div id="form-div">
 
-    <form method="post" action="" class="form-group pt-5">
+    <form method="post" action="" class="form-group">
         <div id="q-form" class="row">
             <input type="hidden" name="csrf_token"
                 value="<?= $_SESSION['csrf_token'] ?>">

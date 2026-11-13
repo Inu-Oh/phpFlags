@@ -51,34 +51,33 @@ function checkAnswerAccuracy( $percAccuracy ): void {
 // Check the user answer for a match and return accuracy
 function checkUserAnswer(): ?float {
     $_SESSION['userInput'] = htmlspecialchars( $_POST['answer'], ENT_QUOTES, 'UTF-8' );
+    $answer = isset( $_SESSION['answer'] ) ? (string) $_SESSION['answer'] : '';
     $matchingChars = similar_text(
         iconv( 'UTF-8', 'ASCII//TRANSLIT', strtolower( $_SESSION['userInput'] ) ),
-        iconv( 'UTF-8', 'ASCII//TRANSLIT', strtolower(
-            htmlspecialchars( $_SESSION['answer'] ) )
-        ),
+        iconv( 'UTF-8', 'ASCII//TRANSLIT', strtolower( htmlspecialchars( $answer ) ) ),
         $percAccuracy
     );
 
     // Check if user entered distractor instead of question answer
-    $matchDistractor = similar_text(
-        iconv( 'UTF-8', 'ASCII//TRANSLIT', strtolower( $_SESSION['userInput'] ) ),
-        iconv( 'UTF-8', 'ASCII//TRANSLIT', strtolower(
-            htmlspecialchars($_SESSION['distractor'][0] ) )
-        ),
-        $distractorAccuracy
-    );
-    // Redirect back to question card if user entered distractor
-    if ( $percAccuracy <= 85 && $distractorAccuracy > 85 ) {
-        $_SESSION['message'] = 'Enter the ' .
-            htmlspecialchars( $_SESSION['distractor'][2] ) . ' not the ' . 
-            htmlspecialchars( $_SESSION['distractor'][1] );
+    $distractor = $_SESSION['distractor'] ?? null;
+    if ( is_array( $distractor ) && isset( $distractor[0], $distractor[1], $distractor[2] ) ) {
+        $matchDistractor = similar_text(
+            iconv( 'UTF-8', 'ASCII//TRANSLIT', strtolower( $_SESSION['userInput'] ) ),
+            iconv( 'UTF-8', 'ASCII//TRANSLIT', strtolower( htmlspecialchars( $distractor[0] ) ) ),
+            $distractorAccuracy
+        );
+        // Redirect back to question card if user entered distractor
+        if ( $percAccuracy <= 85 && $distractorAccuracy > 85 ) {
+            $_SESSION['message'] = 'Enter the ' .
+                htmlspecialchars( $distractor[2] ) . ' not the ' .
+                htmlspecialchars( $distractor[1] );
 
-            header( 'Location: index.php' );
-            exit();
+                header( 'Location: index.php' );
+                exit();
+        }
+    }
 
-    } else {
-        return $percAccuracy;
-    }  
+    return $percAccuracy;
 }
 
 // Prevent showing HTML code for select few special chars in user feedback
@@ -628,14 +627,14 @@ function scoreBoard( $pdo, $quizId=FALSE ): string {
         if ( ! isset( $_SESSION['accuracy'] ) ) {
             getUserStats( $pdo, $quizId );
         }
-        
+
         $score = round( $_SESSION['accuracy'] ) . '%';
         $conjunction = ' on ';
     } else {
-        $score = $_SESSION['score'];
+        $score = $_SESSION['score'] ?? 0;
         $conjunction = ' out of ';
     }
-    $seen = $_SESSION['testedCards'];
+    $seen = $_SESSION['testedCards'] ?? 0;
     $card_s = ( $seen != 1 ) ? ' cards ' : ' card ';
 
     $scoreBoard = '<div class="text-center p-3">
@@ -666,8 +665,8 @@ function scoreBoard( $pdo, $quizId=FALSE ): string {
         if ( $cards_left == 0 ) {
             $scoreBoard .= ' last card &nbsp; ';
         } else {
-            $scoreBoard .= ' card ' . $_SESSION['modeQuizLength'] - $cards_left . 
-                            ' of ' . $_SESSION['modeQuizLength'] . ' &nbsp; ' ;
+            $scoreBoard .= ' card ' . ( $_SESSION['modeQuizLength'] - $cards_left ) .
+                            ' of ' . $_SESSION['modeQuizLength'] . ' &nbsp; ';
         }
 
         $scoreBoard .= '<span class="text-warning">' .
@@ -767,50 +766,54 @@ function sortGlossary( $direction, $col, $countries ): array {
             usort( $countries, function( $a, $b ) {
                 return strcmp( strtolower( $b['country'] ), strtolower( $a['country'] ) );
             } );
-        }        
+        }
     } elseif ( $col == 'capital' ) {
-        if ( $col == 'capital' ) {
-            if ( $direction == 'asc' ) {
-                usort( $countries, function( $a, $b) {
-                    return strcmp( strtolower( $a['capital'] ), strtolower( $b['capital'] ) );
-                } );
-            } else {
-                usort( $countries, function( $a, $b ) {
-                    return strcmp( strtolower( $b['capital'] ), strtolower( $a['capital'] ) );
-                } );
-            }        
+        if ( $direction == 'asc' ) {
+            usort( $countries, function( $a, $b) {
+                return strcmp( strtolower( $a['capital'] ), strtolower( $b['capital'] ) );
+            } );
+        } else {
+            usort( $countries, function( $a, $b ) {
+                return strcmp( strtolower( $b['capital'] ), strtolower( $a['capital'] ) );
+            } );
         }
     } elseif ( $col == 'hint' ) {
-        if ( $col == 'hint' ) {
-            if ( $direction == 'asc' ) {
-                usort( $countries, function( $a, $b) {
-                    return strcmp( strtolower( $a['hint'] ), strtolower( $b['hint'] ) );
-                } );
-            } else {
-                usort( $countries, function( $a, $b ) {
-                    return strcmp( strtolower( $b['hint'] ), strtolower( $a['hint'] ) );
-                } );
-            }        
+        if ( $direction == 'asc' ) {
+            usort( $countries, function( $a, $b) {
+                return strcmp( strtolower( $a['hint'] ), strtolower( $b['hint'] ) );
+            } );
+        } else {
+            usort( $countries, function( $a, $b ) {
+                return strcmp( strtolower( $b['hint'] ), strtolower( $a['hint'] ) );
+            } );
         }
-    } elseif ( $col == 'grade' ) { # TODO - incomplete - needs to sort TBD grades from tested grades
-        if ( $col == 'grade' ) {
-            if ( $direction == 'asc' ) {
-                usort( $countries, function( $a, $b) {
-                    if ( is_string( $a['grade'] ) && is_string( $b['grade'] ) )
-                        return strcmp( $a['grade'], $b['grade'] );
-                    elseif ( is_string( $a['grade'] ) ) return -1; // Strings come first
-                    elseif ( is_string( $b['grade'] ) ) return 1; // Strings come first
-                    else return $a['grade'] <=> $b['grade'];
-                } );
-            } else {
-                usort( $countries, function( $a, $b ) {
-                    if ( is_string( $a['grade'] ) && is_string( $b['grade'] ) )
-                        return strcmp( $b['grade'], $a['grade'] );
-                    elseif ( is_string( $a['grade'] ) ) return 1; // Numbers come first
-                    elseif ( is_string( $b['grade'] ) ) return -1; // Numbers come first
-                    else return $b['grade'] <=> $a['grade'];
-                } );
-            }        
+    } elseif ( $col == 'grade' ) {
+        if ( $direction == 'asc' ) {
+            usort( $countries, function( $a, $b ) {
+                $aGrade = $a['grade'];
+                $bGrade = $b['grade'];
+
+                $aNumeric = is_numeric( $aGrade );
+                $bNumeric = is_numeric( $bGrade );
+
+                if ( $aNumeric && $bNumeric ) return (float) $aGrade <=> (float) $bGrade;
+                if ( $aNumeric && ! $bNumeric ) return -1;
+                if ( ! $aNumeric && $bNumeric ) return 1;
+                return strcmp( (string) $aGrade, (string) $bGrade );
+            } );
+        } else {
+            usort( $countries, function( $a, $b ) {
+                $aGrade = $a['grade'];
+                $bGrade = $b['grade'];
+
+                $aNumeric = is_numeric( $aGrade );
+                $bNumeric = is_numeric( $bGrade );
+
+                if ( $aNumeric && $bNumeric ) return (float) $bGrade <=> (float) $aGrade;
+                if ( $aNumeric && ! $bNumeric ) return -1;
+                if ( ! $aNumeric && $bNumeric ) return 1;
+                return strcmp( (string) $bGrade, (string) $aGrade );
+            } );
         }
     }
 
@@ -884,22 +887,20 @@ function updateScore( $pdo, $quizId, $percAccuracy ): void {
 
 // Update the logged in user's progress in the PostgreSQL database
 function updateUserProgressInDB( $pdo, $quizId ): void {
-    if ( $_SESSION['correct'] ) {
-        $sql = 'UPDATE progress 
-            SET test_count=test_count+1, correct_count=correct_count+1,
-            updated_at = NOW()
-            WHERE user_id=:ui AND country_id=:ci AND quiz_id = :qi';
-        
-    } else {
-        $sql = 'UPDATE progress 
-            SET test_count=test_count+1, updated_at = NOW()
-            WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
-    }
+    $correct = $_SESSION['correct'] ? 1 : 0;
+    $sql = 'INSERT INTO progress (user_id, country_id, quiz_id, test_count, correct_count, updated_at)
+            VALUES (:ui, :ci, :qi, 1, :correct, NOW())
+            ON CONFLICT (user_id, country_id, quiz_id) DO UPDATE
+            SET test_count = progress.test_count + 1,
+                correct_count = progress.correct_count + EXCLUDED.correct_count,
+                updated_at = NOW()';
+
     $stmt = $pdo->prepare( $sql );
     $stmt->execute( array(
         ':ui' => $_SESSION['userId'],
         ':ci' => $_SESSION['nextQuestion'],
-        ':qi' => $quizId
+        ':qi' => $quizId,
+        ':correct' => $correct
     ) );
 }
 
@@ -930,7 +931,7 @@ function updateUserProgressInSession( $pdo, $quizId ): void {
         $key = $quizId * 10000 + $_SESSION['nextQuestion'];
         list( $testCount, $correctCount ) = $_SESSION['userProgress'][$key];
         $testCount++;
-        if ( $_SESSION['correct'] ) $correctCount++; # TODO eEview Does this duplicate update score?
+        if ( $_SESSION['correct'] ) $correctCount++; # TODO Review Does this duplicate update score?
         $val = array( $testCount, $correctCount );
         $_SESSION['userProgress'][$key] = $val;
     }
@@ -941,22 +942,21 @@ function updateUserProgressFromSessionToDB( $pdo ): void {
     if ( isset( $_SESSION['anonProgress'] ) ) {
         foreach ( $_SESSION['anonProgress'] as $questionProgress )  {
             list( $quizId, $countryId, $correct ) = $questionProgress;
-            $primaryKey = array(
+            $correctCount = $correct ? 1 : 0;
+            $sql = 'INSERT INTO progress (user_id, country_id, quiz_id, test_count, correct_count, updated_at)
+                        VALUES (:ui, :ci, :qi, 1, :cc, NOW())
+                        ON CONFLICT (user_id, country_id, quiz_id) DO UPDATE
+                        SET test_count = progress.test_count + 1,
+                            correct_count = progress.correct_count + EXCLUDED.correct_count,
+                            updated_at = NOW()';
+
+            $stmt = $pdo->prepare( $sql );
+            $stmt->execute( array(
                 ':ui' => $_SESSION['userId'],
                 ':ci' => $countryId,
-                ':qi' => $quizId
-            );
-            if ( $correct ) {
-                $sql = 'UPDATE progress 
-                            SET test_count=1, correct_count=1, updated_at = NOW()
-                            WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
-            } else {
-                $sql = 'UPDATE progress
-                            SET test_count=1, updated_at = NOW()
-                            WHERE user_id=:ui AND country_id=:ci AND quiz_id=:qi';
-            }
-            $stmt = $pdo->prepare( $sql );
-            $stmt->execute( $primaryKey );
+                ':qi' => $quizId,
+                ':cc' => $correctCount
+            ) );
         }
         unset( $_SESSION['anonProgress'] );
     }
