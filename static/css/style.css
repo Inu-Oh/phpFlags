@@ -59,7 +59,7 @@ body {
 #q-card {
     z-index: 0;
     width: 33rem;
-    height: 35rem;
+    height: 37rem;
     position: relative;
 }
 
@@ -138,6 +138,10 @@ body {
 
 .sort-btn-bottom {
     top: 0;
+}
+
+#feedback {
+  margin-bottom: 1rem;
 }
 
 #feedback.feedback-success {
